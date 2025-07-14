@@ -1,0 +1,276 @@
+/* Existing styles from user's code */
+.sale-banner {
+  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 50%, #dc3545 100%); /* Dynamic gradient from old CSS */
+  position: relative;
+  overflow: hidden;
+  display: flex; /* From new CSS for layout */
+  align-items: stretch; /* From new CSS for layout */
+  border-radius: 1rem; /* From new CSS */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* From new CSS */
+  border: 2px solid rgba(255, 255, 255, 0.6); /* Enhanced border from new CSS */
+}
+
+.sale-tag {
+  background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%) !important; /* Gradient from old CSS */
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%); /* Unique shape from old CSS */
+  min-width: 100px; /* From old CSS */
+  display: flex; /* From new CSS */
+  align-items: center; /* From new CSS */
+  justify-content: center; /* From new CSS */
+  padding: 0.75rem 1.5rem; /* From new CSS */
+  color: white; /* From new CSS */
+}
+
+.sale-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* From old CSS */
+  animation: pulse 2s infinite; /* From old CSS */
+}
+
+.discount-info {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important; /* Gradient from old CSS */
+  flex: 1; /* From old CSS */
+  max-width: 400px; /* From old CSS */
+  display: flex; /* From new CSS */
+  align-items: center; /* From new CSS */
+  padding: 0.75rem 1.5rem; /* From new CSS */
+  color: white; /* From new CSS */
+}
+
+.discount-info span {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Add subtle text shadow */
+}
+
+.discount-percentage {
+  font-weight: bold;
+  font-size: 2rem;
+  color: #ffc107; /* Bootstrap warning color */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* From old CSS */
+  animation: bounce 2s infinite; /* From old CSS */
+}
+
+.sale-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks through sparkles */
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1.2rem; /* Base font size from old CSS */
+  animation: sparkle 2s infinite; /* Animation from old CSS */
+  pointer-events: none; /* From old CSS */
+  opacity: 0.8; /* From new CSS */
+}
+
+.sparkle-1 {
+  top: 10%; /* From old CSS */
+  left: 15%; /* From old CSS */
+  font-size: 2.5rem; /* Larger size from new CSS */
+  animation-delay: 0s; /* From old CSS */
+}
+
+.sparkle-2 {
+  top: 5%; /* From old CSS */
+  right: 5%; /* From old CSS */
+  font-size: 2.2rem; /* Larger size from new CSS */
+  animation-delay: 0.7s; /* From old CSS */
+}
+
+.sparkle-3 {
+  bottom: 10%; /* From old CSS */
+  left: 30%; /* From old CSS */
+  font-size: 2.8rem; /* Larger size from new CSS */
+  animation-delay: 1.4s; /* From old CSS */
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+/* New styles for the overall sale section background */
+.sale-section-wrapper {
+  /* A vibrant, warm gradient to highlight the sale section */
+  background: linear-gradient(145deg, #ff6b6b 0%, #ffa500 100%); /* Red-orange to orange */
+  padding: 3rem 0; /* More vertical padding for visual breathing room */
+  border-radius: 1.5rem; /* More rounded corners for a softer look */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Deeper shadow for prominence */
+  position: relative;
+  overflow: hidden; /* Ensures background elements stay within bounds */
+  margin: 2rem auto; /* Center the wrapper and add margin */
+  max-width: 1200px; /* Limit width for better presentation */
+}
+
+/* Optional: Add subtle animated background elements for a dynamic feel */
+.sale-section-wrapper::before,
+.sale-section-wrapper::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15); /* Slightly more visible white circles */
+  animation: float-and-fade 15s infinite ease-in-out alternate;
+  z-index: 0; /* Behind content */
+  filter: blur(10px); /* Soften the circles */
+}
+
+.sale-section-wrapper::before {
+  width: 200px;
+  height: 200px;
+  top: -80px;
+  left: -80px;
+  animation-delay: 0s;
+}
+
+.sale-section-wrapper::after {
+  width: 250px;
+  height: 250px;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: 7s;
+}
+
+@keyframes float-and-fade {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-30px) translateX(30px) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Ensure the main content (Container) is on top of the background elements */
+.sale-section-wrapper > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhance product card hover effect */
+.card.hover-effect:hover {
+  transform: translateY(-8px) scale(1.02); /* Slightly more pronounced lift and scale */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.6); /* Stronger shadow and golden glow */
+}
+
+/* Navigation Buttons - Gradient and enhanced hover/active effects */
+.nav-btn {
+  border: 2px solid #dc3545; /* Red border for navigation buttons */
+  color: white; /* From old CSS */
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); /* Gradient from old CSS */
+  border-color: #dc3545; /* From old CSS */
+}
+
+.nav-btn:hover {
+  transform: scale(1.1); /* From old CSS */
+  box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4); /* From old CSS */
+  background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%); /* From old CSS */
+  border-color: #fd7e14; /* From old CSS */
+  color: white; /* From old CSS */
+}
+
+.nav-btn:active {
+  transform: scale(0.95); /* From old CSS */
+}
+
+/* Letter Spacing Utilities */
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
+
+.letter-spacing-2 {
+  letter-spacing: 2px;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .sale-section-wrapper {
+    padding: 2rem 0;
+    margin: 1rem auto;
+    border-radius: 1rem;
+  }
+  .sale-section-wrapper::before,
+  .sale-section-wrapper::after {
+    width: 100px;
+    height: 100px;
+    filter: blur(5px);
+  }
+  .sparkle {
+    font-size: 1.5rem; /* Smaller sparkles on mobile */
+  }
+  .sale-text {
+    font-size: 1.2rem !important;
+    letter-spacing: 1px;
+  }
+  .discount-percentage {
+    font-size: 1.8rem !important;
+  }
+  .nav-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .nav-btn span {
+    font-size: 1.2rem !important;
+  }
+  .discount-info {
+    max-width: 350px;
+  }
+}
+
+/* Additional responsive adjustments */
+@media (max-width: 576px) {
+  .discount-percentage {
+    font-size: 1.5rem !important;
+  }
+  .discount-info {
+    max-width: 300px;
+  }
+}

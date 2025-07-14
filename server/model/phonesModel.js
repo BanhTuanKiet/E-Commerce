@@ -1,12 +1,15 @@
 import mongoose from "mongoose"
 
-const phonesModel = new mongoose.Schema({
+const phones = new mongoose.Schema({
   _id: String,
   brand: String,
   model: String,
   storage: String,
   ram: String,
   price: Number,
+  category: String,
+  state: String,
+  discount: { type: Number, default: 0 },
   images: [String],
   stock: Number,
   configuration_and_memory: {
@@ -25,7 +28,7 @@ const phonesModel = new mongoose.Schema({
     screen: String
   },
   battery: {
-    capacity: String,
+    capacity: Number,
     connector: String
   },
   features: {
@@ -46,4 +49,4 @@ const phonesModel = new mongoose.Schema({
   }
 })
 
-export default mongoose.model('Phones', phonesModel, 'Phones')
+export default mongoose.model('Phones', phones, 'Phones')

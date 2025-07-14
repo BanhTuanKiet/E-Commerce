@@ -1,94 +1,109 @@
 import { Card } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
+import { formatLabel, formatValue } from '../../util/DataClassify'
 
 export default function PhoneCard({ product, keys }) {
   const { category } = useParams()
   const navigate = useNavigate()
 
   return (
-    <div className="p-2 pt-0 py-3">
+    <div className="p-2 pt-1 py-3">
       <Card
-        className="border-1 h-100 position-relative overflow-hidden"
+        className="border-0 h-100 position-relative overflow-hidden w-100 shadow-sm"
         style={{
-          width: '100%',
           maxWidth: '14rem',
-          borderRadius: '16px',
-          transition: 'all 0.3s ease-in-out'
+          borderRadius: '20px',
+          transition: 'all 0.3s ease-in-out',
+          cursor: 'pointer'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-8px)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)'
-        }}
+        onClick={() => navigate(`/${category}/${product?._id}`)}
       >
-        {/* Badge cho sản phẩm mới */}
-        <div
-          className="position-absolute top-0 start-0 badge bg-primary text-white m-2 px-2 py-1"
-          style={{
-            zIndex: 10,
-            borderRadius: '8px',
-            fontSize: '0.7rem',
-            fontWeight: '600'
-          }}
-        >
+        <div className="position-absolute top-0 start-0 badge rounded text-white m-2 px-2 py-1 z-3 rounded-pill bg-primary">
           New
         </div>
 
-        {/* Container hình ảnh với overlay gradient */}
-        <div className="position-relative overflow-hidden p-3" style={{ borderRadius: '16px 16px 0 0' }}>
-          {/* <div className='p-2'> */}
+        {product.discount > 0 && (
+          <div
+            className="position-absolute top-0 end-0 badge text-white m-2 px-2 py-1 z-3 rounded-pill bg-danger"
+          >
+            Discount {product.discount}%
+          </div>
+        )}
+
+        <div
+          className="position-relative overflow-hidden"
+          style={{
+            borderRadius: '20px 20px 0 0',
+            background: 'transparent',
+            paddingTop: '30px'
+          }}
+        >
           <Card.Img
             variant="top"
-            src={product?.images?.[0] || "https://cdn.tgdd.vn/Products/Images/42/240259/iPhone-14-plus-thumb-xanh-600x600.jpg"}
+            src={product.images[0] || ""}
             alt={product?.model}
+            className='object-fit-fill p-1'
             style={{
-              height: '220px',
-              objectFit: 'cover',
-              transition: 'transform 0.3s ease-in-out'
+              height: '200px',
+              transition: 'transform 0.3s ease-in-out',
             }}
-            onClick={() => navigate(`/${category}/${product?._id}`)}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.transform = 'translateY(-8px)'
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.transform = 'translateY(0)'
             }}
           />
-          {/* </div> */}
-
-          {/* Gradient overlay */}
         </div>
 
-        <Card.Body className="p-3">
-          {/* Tên sản phẩm với typography cải tiến */}
+        {product?.price && (
+          <div className="px-3 py-2 ">
+            <div className="d-flex justify-content-between align-items-center gap-2">
+              <div
+                className="fw-bold text-primary text-danger"
+                style={{ fontSize: '1.1rem' }}
+              >
+                {
+                  product.discount > 0
+                  ? `${(product.price * (1 - product.discount / 100)).toLocaleString('vi-VN')}đ`
+                  : `${(product.price).toLocaleString('vi-VN')}đ`
+                }
+              </div>
+
+              {product.discount > 0 && (
+                <div
+                  className='text-muted text-decoration-line-through'
+                  style={{ fontSize: '0.9rem' }}
+                >
+                  {product.price.toLocaleString('vi-VN')}đ
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <Card.Body className="p-3 pt-2">
           <Card.Title
-            className="fs-6 text-start fw-bold mb-2 text-truncate"
+            className="fs-6 text-start fw-bold mb-3 text-truncate"
+            title={product?.model}
             style={{
               color: '#2c3e50',
-              lineHeight: '1.3',
-              letterSpacing: '-0.01em'
+              lineHeight: '1.3'
             }}
-            title={product?.model}
           >
             {product?.model}
           </Card.Title>
 
-          {/* Thông tin chi tiết với design cải tiến */}
-          <div className="mb-3">
+          <div className="mb-0">
             {keys && keys.map((key) => {
-              if (key === 'model' || key === '_id') return null
+              if (['model', '_id', 'price', 'discount', 'stock', 'category'].includes(key)) return null;
 
-              const value = product[key]
+              const value = product[key];
               return (
                 <div
                   key={key}
-                  className="d-flex justify-content-between align-items-center py-1 border-bottom"
-                  style={{
-                    borderBottomColor: '#f8f9fa !important',
-                    borderBottomWidth: '1px',
-                    fontSize: '0.85rem'
-                  }}
+                  className="d-flex justify-content-between align-items-center py-1 mb-1 border-bottom"
+                  style={{ fontSize: '0.8rem' }}
                 >
                   <span
                     className="text-muted fw-medium"
@@ -97,62 +112,48 @@ export default function PhoneCard({ product, keys }) {
                     {formatLabel(key)}
                   </span>
                   <span
-                    className="fw-semibold text-end"
+                    className="fw-semibold text-end text-truncate"
                     style={{
                       color: '#495057',
                       maxWidth: '60%',
-                      wordBreak: 'break-word'
+                      fontSize: '0.8rem'
                     }}
                   >
-                    {formatValue(value)}
+                    {key === "size" ? `${formatValue(value)} inch` : formatValue(value)}
+                    {value === true ? "Yes" : ""}
+                    {value === false ? "No" : ""}
                   </span>
                 </div>
-              )
+              );
             })}
-
           </div>
 
-          {/* Giá tiền với design nổi bật */}
-          {product?.price && (
-            <div
-              className="mt-3 p-3 text-center fw-bold position-relative"
-              style={{
-                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-                color: 'white',
-                borderRadius: '12px',
-                fontSize: '1.1rem',
-                letterSpacing: '0.5px',
-              }}
-            >
-              <div className="position-absolute top-0 start-0 w-100 h-100"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
-                  borderRadius: '12px'
-                }}
-              />
-              <span className="position-relative">
-                {product[keys.price].toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </span>
+          {product?.stock !== undefined && (
+            <div className="mt-2 pt-2">
+              <div className="d-flex align-items-center justify-content-between">
+                <span className="small text-muted">Tình trạng:</span>
+                <span
+                  className={`small fw-semibold 
+                    ${product.stock > 10
+                      ? 'text-success'
+                      : product.stock > 1
+                        ? 'text-warning'
+                        : 'text-danger'
+                    }`}
+                >
+                  {
+                    product.stock > 10
+                      ? 'In stock'
+                      : product.stock > 1
+                        ? `${product.stock} products left`
+                        : 'Out of stock'
+                  }
+                </span>
+              </div>
             </div>
           )}
         </Card.Body>
       </Card>
     </div>
   )
-}
-
-function formatLabel(key) {
-  return key.charAt(0).toUpperCase() + key.slice(1)
-}
-
-function formatValue(value) {
-  if (value == null || value === '') return 'N/A'
-  if (typeof value === 'number') return value.toLocaleString()
-  if (typeof value === 'string' && value.length > 20) {
-    return value.substring(0, 17) + '...'
-  }
-  return value
 }

@@ -1,16 +1,13 @@
-const debounce = (func) => {
-    let timerId = null
-    
-    return (...args) => {
-        if (timerId) {
-            clearTimeout(timerId)
-            timerId = null
-        }
+const debounce = (func, delay = 300) => {
+  let timerId
 
-        timerId = setTimeout(() => {
-            func(...args)
-        }, 300);
-    }
+  return (...args) => {
+    if (timerId) clearTimeout(timerId)
+
+    timerId = setTimeout(() => {
+      func(...args)
+    }, delay)
+  }
 }
 
 export default debounce

@@ -1,7 +1,7 @@
 import expres from "express"
 import { getFilterOptions } from "../controller/filterOptionsController.js"
-const filterOptionRoute = expres.Router()
+const filterOptionsRoute = expres.Router()
 
-filterOptionRoute.get("/:category", getFilterOptions)
+filterOptionsRoute.get("/:category", getFilterOptions)
 
-export default filterOptionRoute
+export default filterOptionsRoute

@@ -9,15 +9,17 @@ const filterItemSchema = new mongoose.Schema({
   min: Number,                                    // dùng với range
   max: Number,
   step: Number,
-  unit: String
+  unit: String,
+  path: String,
+  match: String
 }, { _id: false })
 
 // Schema cho danh mục và các filters của nó
-const filterOptionsModel = new mongoose.Schema({
+const filterOptions = new mongoose.Schema({
   category: { type: String, required: true, unique: true }, // ví dụ: "phone"
-  filters: [filterItemSchema]
+  filters: [filterItemSchema],
 }, {
   timestamps: true
 })
 
-export default mongoose.model('FilterOptions', filterOptionsModel, 'FilterOptions')
+export default mongoose.model('FilterOptions', filterOptions, 'FilterOptions')

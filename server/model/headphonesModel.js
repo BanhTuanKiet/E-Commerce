@@ -1,16 +1,16 @@
 import mongoose from "mongoose"
 
-const headphonesModel = new mongoose.Schema({
-  _id: String, // e.g. "sony-wh1000xm5-8gb-128gb" (nếu có phiên bản)
+const headphones = new mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId, // e.g. "sony-wh1000xm5-8gb-128gb" (nếu có phiên bản)
 
   brand: String,     // e.g. "Sony", "Bose", "Apple"
   model: String,     // e.g. "WH-1000XM5", "QC45", "AirPods Max"
   type: String,      // "Over-ear", "On-ear", "In-ear", "True Wireless"
-
+  category: String,
   connectivity: String, // "Wireless", "Wired", "True Wireless"
   microphone: Boolean,
   noise_cancelling: Boolean,
-
+  state: String,
   battery: {
     battery_life: String,   // e.g. "30 hours"
     charging_connector: String // e.g. "USB-C", "Lightning", "MagSafe"
@@ -45,4 +45,4 @@ const headphonesModel = new mongoose.Schema({
   }
 })
 
-export default mongoose.model('Headphones', headphonesModel, 'Headphones')
+export default mongoose.model('Headphones', headphones, 'Headphones')

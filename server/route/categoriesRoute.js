@@ -1,7 +1,7 @@
 import expres from "express"
 import { getCategories } from "../controller/categoriesController.js"
-const categoryRoute = expres.Router()
+const categoriesRoute = expres.Router()
 
-categoryRoute.get("/", getCategories)
+categoriesRoute.get("/", getCategories)
 
-export default categoryRoute
+export default categoriesRoute

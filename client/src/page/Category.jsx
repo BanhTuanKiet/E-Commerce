@@ -7,92 +7,104 @@ import { Col, Row } from 'react-bootstrap'
 import ProductFilterSidebar from '../component/ProductFilterSidebar'
 
 export default function Category() {
-    const { category } = useParams()
-    const [products, setProducts] = useState()
-    const [keys, setKeys] = useState()
-    const [keysFilter, setKeysFilter] = useState()
-    const [filterSelections, setFilterSelections] = useState({});
+  const { category } = useParams()
+  const [products, setProducts] = useState([])
+  const [keys, setKeys] = useState()
+  const [keysFilter, setKeysFilter] = useState()
+  const [filterSelections, setFilterSelections] = useState({})
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get(`/products/${category}`)
-                setProducts(response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        fetchProducts()
-    }, [category])
-
-    useEffect(() => {
-        const fetchFilterOptions = async () => {
-            try {
-                const response = await axios.get(`/filter_options/${category}`)
-                setKeysFilter(response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        fetchFilterOptions()
-    }, [category])
-
-    useEffect(() => {
-        if (products && products.length > 0) {
-            setKeys(getPrimitive(products[0]))
-        }
-    }, [products])
-
-    useEffect(() => {
-        const filterProducts = async () => {
-            try {
-                const options = encodeURIComponent(JSON.stringify(filterSelections))
-
-                const response = await axios.get(`/products/${category}/filter/${options}`)
-                console.log(response.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        if (Object.keys(filterSelections).length === 0) return
-
-        filterProducts()
-    }, [category, filterSelections])
-
-    const handleCheckboxChange = (key, value) => {
-        setFilterSelections((prev) => {
-            const prevValues = prev[key] || []
-            const alreadySelected = prevValues.includes(value)
-
-            return {
-                ...prev,
-                [key]: alreadySelected
-                    ? prevValues.filter((v) => v !== value)
-                    : [...prevValues, value],
-            }
-        })
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await axios.get(`/filter_options/${category}`)
+        setKeysFilter(response.data)
+      } catch (error) {
+        console.error(error)
+      }
     }
 
-    return (
-        <div>
-            <Row>
-                <Col md={2} className='p-0 ps-2' >
-                    <ProductFilterSidebar keysFilter={keysFilter?.filters} handleCheckboxChange={handleCheckboxChange} />
-                </Col>
-                <Col md={10} >
-                    <Row className='g-1'>
-                        {products?.map((product, index) => (
-                            <Col lg={3} md={6} xs={12} >
-                                <PhoneCard product={product} keys={keys} />
-                            </Col>
-                        ))}
-                    </Row>
-                </Col>
-            </Row>
+    fetchFilterOptions()
+  }, [category])
 
-        </div>
-    )
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        if (Object.keys(filterSelections).length === 0) {
+          const res = await axios.get(`/products/${category}`)
+          setProducts(res.data)
+        } else {
+          const options = encodeURIComponent(JSON.stringify(filterSelections))
+          const res = await axios.get(`/products/${category}/filter/${options}`)
+          setProducts(res.data)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchProducts()
+  }, [category, filterSelections])
+
+  useEffect(() => {
+    if (products.length > 0) {
+      setKeys(getPrimitive(products[0]))
+    }
+  }, [products])
+
+  const handleCheckboxChange = (key, value) => {
+    if (key === "price") {
+      setFilterSelections(prev => ({ ...prev, price: { min: value.min, max: value.max } }))
+      return
+    }
+
+    if (typeof value === "string") {
+      if (value.includes("inch")) {
+        value = value.split(" ")[0]
+      } else if (value.startsWith("<")) {
+        const end = parseFloat(value.replace(/[^\d.]/g, ""))
+        value = { start: 0, end }
+      } else if (value.startsWith(">")) {
+        const start = parseFloat(value.replace(/[^\d.]/g, ""))
+        value = { start, end: start * start }
+      } else if (value.includes("-")) {
+        const [start, , end] = value.split(" ")
+        value = { start: parseFloat(start), end: parseFloat(end) }
+      }
+    }
+
+    setFilterSelections(prev => {
+      const prevValues = prev[key] || []
+      const alreadySelected = prevValues.some(v => JSON.stringify(v) === JSON.stringify(value))
+
+      const newValues = alreadySelected
+        ? prevValues.filter(v => JSON.stringify(v) !== JSON.stringify(value))
+        : [...prevValues, value]
+
+      if (newValues.length === 0) {
+        const { [key]: _, ...rest } = prev
+        return rest
+      }
+
+      return { ...prev, [key]: newValues }
+    })
+  }
+
+  return (
+    <div className='w-75 mx-auto'>
+      <Row>
+        <Col md={2} className='p-0 pt-1 ps-2'>
+          <ProductFilterSidebar keysFilter={keysFilter?.filters} handleCheckboxChange={handleCheckboxChange} />
+        </Col>
+        <Col md={10}>
+          <Row className='g-1'>
+            {products.map((product, index) => (
+              <Col lg={3} md={6} xs={12} key={index}>
+                <PhoneCard product={product} keys={keys} />
+              </Col>
+            ))}
+          </Row>
+        </Col>
+      </Row>
+    </div>
+  )
 }

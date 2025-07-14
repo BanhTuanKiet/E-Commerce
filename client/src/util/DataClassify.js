@@ -37,3 +37,35 @@ export const getObject = (data) => {
 
     return keys
 }
+
+export const toReadAble = (key) => {
+    if (key.includes('_')) {
+        return key.split('_').map(word => word[0].toUpperCase() + word.slice(1)).join(' ')
+    }
+
+    return key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
+}
+
+export const formatLabel = (key) => {
+    return key.charAt(0).toUpperCase() + key.slice(1)
+}
+
+export const formatValue = (value) => {
+    if (value == null || value === '') return 'N/A'
+    if (typeof value === 'number') return value.toLocaleString()
+    if (typeof value === 'string' && value.length > 20) {
+        return value.substring(0, 17) + '...'
+    }
+    return value
+}
+
+export const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    })
+}

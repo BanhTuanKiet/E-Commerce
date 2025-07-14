@@ -5,9 +5,11 @@ import Footer from '../component/Footer'
 
 export default function index({ children }) {
     return (
-        <div className='w-75 mx-auto'>
+        <div className='mx-auto'>
             <Header />
-            <main>{children}</main>
+            <div className='mx-auto'>
+                <main>{children}</main>
+            </div>
             <Footer />
         </div>
     )

@@ -28,23 +28,21 @@ instance.interceptors.response.use(function (response) {
 // Any status codes that falls outside the range of 2xx cause this function to trigger
 // Do something with response error
   if (error && error.response && error.response.data) {
-    const errorMessage = error.response.data.ErrorMessage || error.response.data.errorMessage
+    console.log(error)
+    const errorMessage = error.response.data.message
     const statusCode = error.response.status
-    // console.log(error)
-    // console.log(statusCode, error.response.data?.RetryRequest)
-    if (statusCode === 401 && error.response.data?.RetryRequest && !error.config.retry) {
-      console.log(error.config)
-      console.log(error.config.retry)
 
-      error.config.retry = true
-      return instance(error.config)
-    }
-    console.log(errorMessage)
+    // if (statusCode === 401 && error.response.data?.RetryRequest && !error.config.retry) {
+    //   console.log(error.config)
+    //   console.log(error.config.retry)
+
+    //   error.config.retry = true
+    //   return instance(error.config)
+    // }
+    // console.log(errorMessage)
     switch (statusCode) {
       case 400:
       case 404:
-        // WarningNotify(errorMessage)
-        break
       case 403:
         // WarningNotify(errorMessage)
         break
@@ -56,9 +54,9 @@ instance.interceptors.response.use(function (response) {
         localStorage.setItem("prevPage", currentPath)
         // WarningNotify(errorMessage)
   
-        // setTimeout(() => {
-        //   window.location.href = "/đăng nhập"
-        // }, 1700)
+        setTimeout(() => {
+          window.location.href = "/signin"
+        }, 1700)
         break
       default:
         // ErrorNotify(errorMessage)

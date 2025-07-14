@@ -1,9 +1,15 @@
-import phoneModel from "../model/phonesModel.js";
-import tabletModel from "../model/tabletsModel.js";
-import headphoneModel from "../model/headphonesModel.js";
+import phones from "../model/phonesModel.js";
+import tablets from "../model/tabletsModel.js";
+import headphones from "../model/headphonesModel.js";
+import laptops from "../model/laptopsModel.js";
 
 export const categoryMap = {
-    phones: phoneModel,
-    tablets: tabletModel,
-    headphones: headphoneModel
+    phones: phones,
+    tablets: tablets,
+    headphones: headphones,
+    laptops: laptops,
+    phone: phones,
+    tablet: tablets,
+    headphone: headphones,
+    laptop: laptops
 }

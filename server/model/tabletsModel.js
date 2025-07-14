@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const tabletsModel = new mongoose.Schema({
+const tablets = new mongoose.Schema({
   _id: String,
   brand: { type: String, required: true },            // Apple, Samsung, Xiaomi, etc.
   model: { type: String, required: true },            // iPad mini (7th Gen), Galaxy Tab S9, etc.
@@ -9,7 +9,8 @@ const tabletsModel = new mongoose.Schema({
   price: Number,
   images: [String],
   stock: Number,
-
+  category: String,
+  state: String,
   configuration_and_memory: {
     operating_system: String,                         // iPadOS 18, Android 14, etc.
     processor_chip: String,                           // A17 Pro, Snapdragon 8 Gen 2, etc.
@@ -54,4 +55,4 @@ const tabletsModel = new mongoose.Schema({
   }
 });
 
-export default mongoose.model("Tablets", tabletsModel, 'Tablets')
+export default mongoose.model("Tablets", tablets, 'Tablets')

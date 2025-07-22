@@ -1,0 +1,195 @@
+.modern-orders-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.table-header {
+    background: #f8f9fa;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    min-width: 250px;
+}
+
+.search-input:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    outline: none;
+}
+
+.filter-select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    min-width: 180px;
+}
+
+.filter-select:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    outline: none;
+}
+
+.clean-table {
+    margin: 0;
+    border: none;
+}
+
+.clean-table thead th {
+    background: white;
+    border: none;
+    border-bottom: 2px solid #f0f0f0;
+    padding: 20px 25px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.clean-table thead th:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.clean-table tbody tr {
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.clean-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.clean-table tbody tr:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.clean-table tbody td {
+    padding: 20px 25px;
+    border: none;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.order-id {
+    color: #4285f4;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.order-id:hover {
+    color: #1a73e8;
+    text-decoration: underline;
+}
+
+.customer-name {
+    color: #202124;
+    font-weight: 500;
+}
+
+.status-badge {
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.amount {
+    color: #137333;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.order-date {
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.sort-indicator {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    background: white;
+    color: #1a73e8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+}
+
+.btn-view {
+    color: #1a73e8;
+}
+
+.btn-edit {
+    color: #ea4335;
+}
+
+.table-stats {
+    color: #5f6368;
+    font-size: 13px;
+    margin-left: auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9aa0a6;
+}
+
+.empty-state h5 {
+    color: #5f6368;
+    margin-bottom: 8px;
+}
+
+.status-badge-custom {
+    background-color: var(--my-bg-color) !important;
+    color: var(--my-text-color) !important;
+}
+
+.no-border-vertical td {
+  border-left: none !important;
+  border-right: none !important;
+}

@@ -1,23 +1,52 @@
-import { getCartByCustomer } from "../service/cartsService.js"
+import { addProductToCart, getCartByCustomer, updateCartByCustomerId } from "../service/cartsService.js"
 import { getProductImage } from "../util/getProductImage.js"
 
-export const getCart = async (req, res) => {
+export const getCart = async (req, res, next) => {
     try {
-        const { customerId } = req.params
-        const cart = await getCartByCustomer(customerId)
-
+        const { user } = req
+        const cart = await getCartByCustomer(user._id)
+        
         const cartObj = cart.toObject().items.map((product, index) => {
             const imageUrls = getProductImage(product._id.images)
 
             return {
-                ...product._id,
-                images: imageUrls, quantity: cart.items[index].quantity
+                ...product,
+                _id: {
+                    ...product._id,
+                    images: imageUrls
+                },
+                quantity: cart.items[index].quantity
             }
         })
-
+        
         return res.json({ data: cartObj })
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Internal Server Error" })
+        next(error)
+    }
+}
+
+export const updateCart = async (req, res, next) => {
+    try {
+        const { user } = req
+        const { cart } = req.body
+
+        await updateCartByCustomerId(user._id, cart)
+
+        return res.json({})
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const postProductToCart = async (req, res, next) => {
+    try {
+        const { productId } = req.body
+        const { user } = req
+        
+        await addProductToCart(productId, user._id)
+
+        return res.json({ message: "Added product successfully!" })
+    } catch (error) {
+        next(error)
     }
 }

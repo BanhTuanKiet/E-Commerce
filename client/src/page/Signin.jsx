@@ -2,27 +2,27 @@ import { Lock, User } from "lucide-react"
 import React, { useContext, useState } from "react"
 import { Container, Row, Col, Form, Button, InputGroup } from "react-bootstrap"
 import { ValideFormContext } from "../context/ValideForm"
+import { UserContext } from "../context/UserContext"
+import axios from "../util/AxiosConfig"
 
 export default function Signin() {
     const { formErrors, validateForm, validateField } = useContext(ValideFormContext)
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    })
+    const { user, setUser, signin } = useContext(UserContext)
 
     const handleChange = (e) => {
-        setFormData((prev) => ({
+        setUser((prev) => ({
             ...prev, [e.target.name]: e.target.value
         }))
         validateField(e.target.nam, e.target.value)
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        const errsCount = validateForm(formData)
+        const errsCount = validateForm(user, "signin")
         if (errsCount > 0) return
         try {
-            
+            const reseponse = await axios.post(`/users/signin`, { user: user })
+            signin(reseponse.data.email, reseponse.data.name)
         } catch (error) {
             console.log(error)
         }
@@ -46,7 +46,7 @@ export default function Signin() {
                                             name="email"
                                             type="email"
                                             placeholder="Enter email"
-                                            value={formData.email}
+                                            value={user.email}
                                             onChange={handleChange}
                                             isInvalid={!!formErrors.email}
                                             className="border-start-0 ps-0"
@@ -68,7 +68,7 @@ export default function Signin() {
                                             onChange={handleChange}
                                             isInvalid={!!formErrors.email}
                                             className="border-start-0 ps-0"
-                                            value={formData.password}
+                                            value={user.password}
                                         />
                                         <Form.Control.Feedback type="invalid">{formErrors.password}</Form.Control.Feedback>
                                     </InputGroup>

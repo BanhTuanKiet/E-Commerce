@@ -21,23 +21,35 @@ const ValideFormProvider = ({ children }) => {
         return false
     }
 
-    const validateForm = (formData) => {
+    const validateForm = (formData, type) => {
         const errors = {}
 
-        Object.keys(formData).forEach((key) => {
-            const value = formData[key]?.toString().trim()
+        const fieldNames = {
+            name: "name",
+            phoneNumber: "phone number",
+            email: "email",
+            gender: "gender",
+            password: "password",
+            passwordConfirmed: "password confirmed",
+            address: "address",
+            ward: "ward",
+            city: "city"
+        }
 
-            const fieldNames = {
-                name: "name",
-                phoneNumber: "phone number",
-                email: "email",
-                gender: "gender",
-                password: "password",
-                passwordConfirmed: "password confirmed",
-                address: "address",
-                ward: "ward",
-                city: "city"
-            }
+        // Xác định danh sách các field cần kiểm tra dựa trên type
+        let requiredFields = []
+
+        if (type === "signin") {
+            requiredFields = ["email", "password"]
+        } else {
+            // Mặc định kiểm tra tất cả
+            requiredFields = Object.keys(formData)
+        }
+
+        Object.keys(formData).forEach((key) => {
+            if (!requiredFields.includes(key)) return
+
+            const value = formData[key]?.toString().trim()
 
             if (key === "location") {
                 Object.keys(formData.location).forEach((childKey) => {
@@ -47,57 +59,48 @@ const ValideFormProvider = ({ children }) => {
                     }
                 })
             } else if (!value) {
-                errors[key] = `Please enter ${fieldNames[key]}`
-            }
-
-            if (key === "gender" && !value) {
-                errors[key] = `Please select ${fieldNames[key]}`
-
+                if (key === "gender") {
+                    errors[key] = `Please select ${fieldNames[key]}`
+                } else {
+                    errors[key] = `Please enter ${fieldNames[key]}`
+                }
             }
         })
-        console.log(errors)
 
-        if (formData.email && !errors.email) {
-            const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail.com/
+        // Email format
+        if (requiredFields.includes("email") && formData.email && !errors.email) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/
             if (!emailRegex.test(formData.email)) {
                 errors.email = "Email is not in the correct format"
             }
         }
 
-        if (formData.phone && !errors.phone) {
+        // Phone format
+        if (requiredFields.includes("phoneNumber") && formData.phoneNumber && !errors.phoneNumber) {
             const phoneRegex = /^[0-9]{10,11}$/
-            if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
-                errors.phone = "Phone number must be 10 digits"
+            if (!phoneRegex.test(formData.phoneNumber.replace(/\s/g, ""))) {
+                errors.phoneNumber = "Phone number must be 10-11 digits"
             }
         }
 
-        if (formData.password && !errors.password) {
+        // Password complexity
+        if (requiredFields.includes("password") && formData.password && !errors.password) {
             const password = formData.password
-
             const passwordErrors = []
 
-            if (password.length < 6) {
-                passwordErrors.push("at least 6 characters")
-            }
-            if (!/[0-9]/.test(password)) {
-                passwordErrors.push("at least 1 digital character")
-            }
-            if (!/[a-z]/.test(password)) {
-                passwordErrors.push("at least 1 lowercase letter")
-            }
-            if (!/[A-Z]/.test(password)) {
-                passwordErrors.push("at least 1 uppercase letter")
-            }
-            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-                passwordErrors.push("at least 1 special character")
-            }
+            if (password.length < 6) passwordErrors.push("at least 6 characters")
+            if (!/[0-9]/.test(password)) passwordErrors.push("at least 1 digit")
+            if (!/[a-z]/.test(password)) passwordErrors.push("at least 1 lowercase letter")
+            if (!/[A-Z]/.test(password)) passwordErrors.push("at least 1 uppercase letter")
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) passwordErrors.push("at least 1 special character")
 
             if (passwordErrors.length > 0) {
                 errors.password = `Password must be ${passwordErrors.join(", ")}`
             }
         }
 
-        if (formData.passwordConfirmed && !errors.passwordConfirmed) {
+        // Confirm password
+        if (requiredFields.includes("passwordConfirmed") && formData.passwordConfirmed && !errors.passwordConfirmed) {
             if (formData.password !== formData.passwordConfirmed) {
                 errors.passwordConfirmed = "Mật khẩu xác nhận không khớp với mật khẩu đã nhập"
             }
@@ -106,6 +109,7 @@ const ValideFormProvider = ({ children }) => {
         setFormErrors(errors)
         return Object.keys(errors).length
     }
+
 
     return (
         <ValideFormContext.Provider value={{ validateForm, formErrors, setFormErrors, clearFieldError, validateField }}>

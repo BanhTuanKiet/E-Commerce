@@ -35,15 +35,17 @@ export default function Home() {
   }, [])
 
   return (
-    <div className='mx-auto w-75'>
-      <NewProducts newProducts={newProducts} />
-      <Carousels />
-      <h4>Today Only – Hot Deal</h4>
-      {saleProducts?.map((item, index) => (
-        <>
-          <SaleProductCarousel saleProducts={item} />
-        </>
-      ))}
+    <div className="bg-info-subtle min-vh-100">
+      <div className="mx-auto w-75">
+        {/* <NewProducts newProducts={newProducts} /> */}
+        <Carousels />
+        <h4>Today Only – Hot Deal</h4>
+        {saleProducts?.map((item, index) => (
+          <div key={index}>
+            <SaleProductCarousel saleProducts={item} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

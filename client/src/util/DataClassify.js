@@ -4,8 +4,8 @@ export const getPrimitive = (data) => {
     Object.entries(data).forEach(([key, value]) => {
         const isPrimitive = typeof value !== 'object' || value === null || value instanceof Date
 
-        if (isPrimitive) {
-            keys.push(key)
+        if (key !== 'state' && isPrimitive) {
+            keys.push(key);
         }
     })
 
@@ -39,6 +39,9 @@ export const getObject = (data) => {
 }
 
 export const toReadAble = (key) => {
+    if (key === '_id') {
+        return "Id"
+    }
     if (key.includes('_')) {
         return key.split('_').map(word => word[0].toUpperCase() + word.slice(1)).join(' ')
     }

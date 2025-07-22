@@ -1,25 +1,31 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react';
+
+import { useState, useEffect, useRef } from 'react'
 import { Button, Col, Container, Row } from 'react-bootstrap'
 import axios from "../util/AxiosConfig"
-import { formatLabel, getPrimitive } from '../util/DataClassify';
-import VoucherModal from '../component/VoucherModal';
+import { formatLabel, getPrimitive } from '../util/DataClassify'
+import VoucherModal from '../component/Modal/VoucherModal'
 
 export default function Cart() {
     const [cart, setCart] = useState()
     const [keys, setKeys] = useState()
+    const [selectedProducts, setSelectedProducts] = useState([])
     const [vouchers, setVouchers] = useState()
     const [selectedVoucher, setSelectedVoucher] = useState(null)
     const [showVoucherModal, setShowVoucherModal] = useState(false)
     const [voucherCode, setVoucherCode] = useState('')
+    const [subtotal, setSubtoal] = useState(0)
+    const [total, setTotal] = useState(0)
+    const timeoutCartRef = useRef(null)
+    const prevCartRef = useRef()
+    const timeoutOrderRef = useRef(null)
+    const [paymentMethod, setPaymentMethod] = useState('COD')
 
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const response = await axios.get(`/carts/${"64e37d4f9e8c6b2a8f1b0000"}`)
+                const response = await axios.get(`/carts`)
                 setCart(response.data)
-                const objectKeys = getPrimitive(response.data[0])
+                const objectKeys = getPrimitive(response.data[0]._id)
                 setKeys(objectKeys.filter(key => !['_id', 'stock', 'price', 'model'].includes(key)))
             } catch (error) {
                 console.log(error)
@@ -42,9 +48,83 @@ export default function Cart() {
         fetchVouchers()
     }, [])
 
-    const calculateSubtotal = () => {
-        return cart?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0
-    }
+    useEffect(() => {
+        if (selectedProducts.length === 0) {
+            setSubtoal(0)
+            return
+        }
+
+        const calculateSubtotlal = () => {
+            const tempSubtotal = selectedProducts?.reduce((total, item) => total + (item._id.price * item.quantity), 0) || 0
+            setSubtoal(tempSubtotal)
+        }
+
+        if (selectedProducts.length > 0) {
+            calculateSubtotlal()
+        }
+    }, [selectedProducts])
+
+    useEffect(() => {
+        if (!selectedVoucher || !selectedProducts.length) {
+            setTotal(subtotal)
+            return
+        }
+
+        const calculateTotal = () => {
+            let amountDiscounted
+
+            if (selectedVoucher.discountType === "percentage") {
+                const discount = selectedVoucher.discountValue / 100
+                const percentageAmount = subtotal * discount
+
+                const cappedDiscount = selectedVoucher.maxDiscount
+                    ? Math.min(percentageAmount, selectedVoucher.maxDiscount)
+                    : percentageAmount
+
+                amountDiscounted = subtotal - cappedDiscount
+            } else {
+                const capoedDiscount = selectedVoucher.maxDiscount
+                    ? Math.min(selectedVoucher.discountValue, selectedVoucher.maxDiscount)
+                    : selectedVoucher.discountValue
+
+                amountDiscounted = subtotal - capoedDiscount
+            }
+
+            setTotal(amountDiscounted)
+        }
+
+        calculateTotal()
+    }, [selectedVoucher, subtotal, selectedProducts])
+
+    useEffect(() => {
+        if (cart === prevCartRef.current) return
+
+        if (timeoutCartRef.current) clearTimeout(timeoutCartRef.current)
+
+        timeoutCartRef.current = setTimeout(() => {
+            const updateCart = async () => {
+                try {
+                    await axios.put(`/carts`, { cart: cart })
+                } catch (err) {
+                    console.error("Failed to update cart:", err)
+                }
+            }
+
+            updateCart()
+            prevCartRef.current = cart
+        }, 500)
+    }, [cart])
+
+    useEffect(() => {
+        if (!cart || selectedProducts.length === 0) return
+
+        const updatedSelected = selectedProducts.map((selectedItem) => {
+            const matched = cart.find((c) => c._id === selectedItem._id)
+            return matched ? { ...selectedItem, quantity: matched.quantity } : selectedItem
+        })
+
+        setSelectedProducts(updatedSelected)
+    }, [cart])
 
     const handleSelectVoucher = (voucher) => {
         setSelectedVoucher(voucher)
@@ -60,9 +140,7 @@ export default function Cart() {
 
         try {
             const response = await axios.get(`/vouchers/${voucherCode}`)
-            const voucher = response.data
-
-            setSelectedVoucher(voucher)
+            setSelectedVoucher(response.data)
         } catch (error) {
             console.error(error)
         }
@@ -74,23 +152,85 @@ export default function Cart() {
     }
 
     const handlePlus = (item) => {
-        setCart(prev => 
-            prev.map(cartItem => 
-                cartItem._id === item._id 
-                ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                : cartItem
+        setCart(prev =>
+            prev.map(cartItem =>
+                cartItem._id === item._id
+                    ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                    : cartItem
             )
         )
     }
 
     const handleMinus = (item) => {
-        setCart(prev => 
-            prev.map(cartItem => 
+        setCart(prev =>
+            prev.map(cartItem =>
                 cartItem._id === item._id
-                ? { ...cartItem, quantity: cartItem.quantity - 1 }
-                : cartItem
+                    ? { ...cartItem, quantity: cartItem.quantity - 1 }
+                    : cartItem
             )
         )
+    }
+
+    const handleSelectProduct = (item) => {
+        if (selectedProducts.length === 0) {
+            setSelectedProducts(prev => [...prev, item])
+            return
+        }
+
+        setSelectedProducts(prev => {
+            const isSelected = prev.some(prevItem => prevItem._id === item._id)
+
+            if (isSelected) {
+                return prev.filter(prevItem => prevItem._id !== item._id)
+            } else {
+                return [...prev, item]
+            }
+        })
+    }
+
+    const handlePlaceOrderDebounced = () => {
+        if (timeoutOrderRef.current) {
+            clearTimeout(timeoutOrderRef.current)
+        }
+
+        timeoutOrderRef.current = setTimeout(async () => {
+            const order = {
+                customerId: "",
+                items: selectedProducts.map(item => ({
+                    productId: item._id._id,
+                    quantity: item.quantity,
+                    price: item._id.price
+                })),
+                subtotal,
+                shippingFee: 0,
+                totalAmount: total,
+                paymentMethod,
+                voucher: selectedVoucher
+                    ? {
+                        _id: selectedVoucher._id,
+                        discountAmount:
+                            selectedVoucher.discountType === 'percentage'
+                                ? Math.min(
+                                    subtotal * (selectedVoucher.discountValue / 100),
+                                    selectedVoucher.maxDiscount || Infinity
+                                )
+                                : Math.min(
+                                    selectedVoucher.discountValue,
+                                    selectedVoucher.maxDiscount || Infinity
+                                )
+                    }
+                    : {
+                        _id: null,
+                        discountAmount: null
+                    }
+            }
+
+            try {
+                await axios.post("/orders", { order: order })
+            } catch (error) {
+                console.error("Lỗi đặt hàng:", error)
+            }
+        }, 500)
     }
 
     return (
@@ -99,45 +239,56 @@ export default function Cart() {
                 <Col md={8} className='p-3 ps-0' >
                     <Container fluid className="pb-2 mb-3">
                         <Row className="border-bottom align-items-center fw-semibold px-2 pb-2">
-                            <Col md={6} className='px-0'>
-                                <span>Sản phẩm</span>
+                            <Col md={1}></Col>
+                            <Col md={5} className='px-2'>
+                                <span>Products</span>
                             </Col>
                             <Col md={2} className="text-center">
-                                <span>Đơn giá</span>
+                                <span>Price</span>
                             </Col>
                             <Col md={2} className="text-center">
-                                <span>Số lượng</span>
+                                <span>Quantity</span>
                             </Col>
                             <Col md={2} className="text-end">
-                                <span>Thành tiền</span>
+                                <span>Total</span>
                             </Col>
                         </Row>
 
                         {cart?.map((item) => (
-                            <Row key={item._id} className="border-bottom align-items-center py-3 px-0">
-                                <Col md={6} className='ps-0 d-flex'>
+                            <Row key={item._id._id} className="border-bottom align-items-center py-3 px-0">
+                                <Col md={1}>
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input start-0 m-2 my-auto"
+                                        style={{ width: "20px", height: "20px", cursor: "pointer" }}
+                                        onChange={() => {
+                                            handleSelectProduct(item)
+                                        }}
+                                    />
+                                </Col>
+                                <Col md={5} className='ps-0 d-flex'>
                                     <img
-                                        src={item.images[0]}
-                                        alt={item.model}
+                                        src={item._id.images[0]}
+                                        alt={item._id.model}
                                         style={{ width: '100px', height: '100px' }}
                                         className="me-3"
                                     />
                                     <div>
-                                        <div className='text-dark'><strong>{item.model}</strong></div>
+                                        <div className='text-dark'><strong>{item._id.model}</strong></div>
                                         {keys?.map((key, index) => {
                                             if (['category', 'discount', 'quantity'].includes(key)) return null
                                             return (
-                                                <div key={index} className="text-muted small">{formatLabel(key)}: {item[key]}</div>
+                                                <div key={index} className="text-muted small">{formatLabel(key)}: {item._id[key]}</div>
                                             )
                                         })}
-                                        {item.stock < 20 && (
+                                        {item._id.stock < 20 && (
                                             <div className="text-danger small fw-semibold">Sắp hết hàng</div>
                                         )}
                                     </div>
                                 </Col>
 
                                 <Col md={2} className="text-end fw-semibold">
-                                    {item.price.toLocaleString('vi-VN')}₫
+                                    {item._id.price.toLocaleString('vi-VN')}₫
                                 </Col>
 
                                 <Col md={2} className="text-center">
@@ -149,7 +300,7 @@ export default function Cart() {
                                 </Col>
 
                                 <Col md={2} className="text-end fw-semibold">
-                                    {(item.price * item.quantity).toLocaleString('vi-VN')}₫
+                                    {(item._id.price * item.quantity).toLocaleString('vi-VN')}₫
                                 </Col>
                             </Row>
                         ))}
@@ -213,34 +364,69 @@ export default function Cart() {
                     </div>
 
                     <div className='shadow-sm rounded p-3 bg-white mb-3'>
-                        <h6 className='mb-3 fw-semibold'>💳 Thanh toán</h6>
-
-                        <div className='d-flex justify-content-between mb-2'>
-                            <span className='text-muted'>Tổng tiền tạm tính</span>
-                            {/* <span className='fw-semibold'>{subtotal.toLocaleString('vi-VN')}₫</span> */}
-                        </div>
-
-                        <div className='d-flex justify-content-between mb-2'>
-                            <span className='text-muted'>Phí vận chuyển</span>
-                            <span className='text-success fw-semibold'>Miễn phí</span>
-                        </div>
-
-                        {/* {discount > 0 && (
-                            <div className='d-flex justify-content-between mb-2'>
-                                <span className='text-muted'>Giảm giá</span>
-                                <span className='text-danger fw-semibold'>-{discount.toLocaleString('vi-VN')}₫</span>
+                        <div className="my-2">
+                            <h6 className='mb-3 fw-semibold'>💳 Payment</h6>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="cod"
+                                    value="cod"
+                                    checked={paymentMethod === 'COD'}
+                                    onChange={() => setPaymentMethod('COD')}
+                                />
+                                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="cod">
+                                    <i className="fas fa-money-bill-wave text-success"></i>
+                                    <span>COD</span>
+                                </label>
                             </div>
-                        )} */}
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="vnpay"
+                                    value="vnpay"
+                                    checked={paymentMethod === 'vnpay'}
+                                    onChange={() => setPaymentMethod('vnpay')}
+                                />
+                                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="vnpay">
+                                    <i className="fas fa-credit-card text-primary"></i>
+                                    <span>VNPAY</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className='d-flex justify-content-between mb-2'>
+                            <span className='text-muted'>Total estimated amount</span>
+                            <span className='fw-semibold'>{subtotal.toLocaleString('vi-VN')}₫</span>
+                        </div>
+
+                        <div className='d-flex justify-content-between mb-2'>
+                            <span className='text-muted'>Shipping fee</span>
+                            <span className='text-success fw-semibold'>Free</span>
+                        </div>
+
+                        <div className='d-flex justify-content-between mb-2'>
+                            <span className='text-muted'>Discount</span>
+                            {selectedVoucher && selectedProducts.discountType === 'percentage'
+                                ? <span className='text-danger fw-semibold'>-{selectedVoucher?.discountValue}%</span>
+                                : selectedVoucher
+                                    ? <span className='text-danger fw-semibold'>-{selectedVoucher?.discountValue.toLocaleString('vi-VN')}đ</span>
+                                    : "No voucher selected"
+                            }
+                        </div>
 
                         <hr className='my-2' />
 
                         <div className='d-flex justify-content-between mb-3'>
-                            <span className='fw-bold fs-6'>Tổng cộng</span>
-                            {/* <span className='fw-bold fs-5 text-danger'>{total.toLocaleString('vi-VN')}₫</span> */}
+                            <span className='fw-bold fs-6'>Amount payable</span>
+                            <span className='fw-bold fs-5 text-danger'>{total.toLocaleString('vi-VN')}₫</span>
                         </div>
 
-                        <Button variant="danger" className='w-100 py-2 fw-semibold'>
-                            Mua hàng ({cart?.length || 0})
+                        <Button variant="danger" className='w-100 py-2 fw-semibold' onClick={handlePlaceOrderDebounced}>
+                            Mua hàng ({selectedProducts?.length || 0})
                         </Button>
                     </div>
                 </Col>

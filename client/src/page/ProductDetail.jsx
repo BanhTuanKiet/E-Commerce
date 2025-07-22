@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getObject, toReadAble } from '../util/DataClassify'
 import ProductPolicy from '../component/ProductPolicy'
 
-// Main ProductDetail Component
 const ProductDetail = () => {
     const { category, id } = useParams()
     const [product, setProduct] = useState(null)
@@ -41,11 +40,9 @@ const ProductDetail = () => {
         fetchOtherOptions()
     }, [category, id, product])
 
-
     const handleAddtoCart = async () => {
         try {
-            const response = await axios.put(`/cart/${product?._id}`)
-            console.log(response.data)
+            await axios.post(`/carts`, { productId: product?._id })
         } catch (error) {
             console.log(error)
         }

@@ -7,6 +7,9 @@ import Cart from '../page/Cart.jsx'
 import ImageUploader from '../page/ImageUploader.jsx'
 import Signup from '../page/Singup.jsx'
 import Signin from '../page/Signin.jsx'
+import Order from '../page/Order.jsx'
+import Compare from '../page/Compare.jsx'
+import OrderDetail from '../page/OrderDetail.jsx'
 
 function AppRoute() {
     return (
@@ -16,6 +19,9 @@ function AppRoute() {
             <Route path='/:category' element={<Index><Category /></Index>} />
             <Route path='/:category/:id' element={<Index><ProductDetail /></Index>} />
             <Route path='/cart' element={<Index><Cart /></Index>} />
+            <Route path='/order' element={<Index><Order /></Index>} />
+            <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} />
+            <Route path='/compare/:compareIds' element={<Index><Compare /></Index>} />
             <Route path='/signin' element={<Signin />} />
             <Route path='/signup' element={<Signup />} />
         </Routes>

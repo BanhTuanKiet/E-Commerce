@@ -6,7 +6,7 @@ export const getProductsByCategory = async (category) => {
 
 export const getPhonesByOptions = async (category, filters, options) => {
     const query = {}
-
+    
     filters.forEach(filter => {
         const value = options[filter.key]
         
@@ -22,6 +22,7 @@ export const getPhonesByOptions = async (category, filters, options) => {
                     query[filter.path] = { $gte: v.start, $lte: v.end }
                 })
             } else {
+                console.log( options)
                 query[filter.path] = { $in: value }
             }
         }

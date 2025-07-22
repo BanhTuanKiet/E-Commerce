@@ -1,9 +1,12 @@
+import { UserProvider } from './UserContext'
 import { ValideFormProvider } from './ValideForm'
 
 function Index({ children }) {
     return (
         <ValideFormProvider>
-            {children}
+            <UserProvider>
+                {children}
+            </UserProvider>
         </ValideFormProvider>
     )
 }

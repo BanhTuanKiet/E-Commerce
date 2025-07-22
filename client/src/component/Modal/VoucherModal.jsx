@@ -1,5 +1,4 @@
 import { Modal, Button, Badge, Row, Col, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { formatDate } from '../util/DataClassify'
 
 const VoucherModal = ({ vouchers, show, onHide, onSelectVoucher, selectedVoucher }) => {
     const isExpired = (endDate) => {
@@ -8,7 +7,7 @@ const VoucherModal = ({ vouchers, show, onHide, onSelectVoucher, selectedVoucher
 
     const getDiscountText = (voucher) => {
         if (voucher.discountType === 'percentage') {
-            return `${voucher.discountValue}%`;
+            return `${voucher.discountValue}%`
         }
         return `${voucher.discountValue?.toLocaleString('vi-VN')}₫`
     }
@@ -91,6 +90,7 @@ const VoucherModal = ({ vouchers, show, onHide, onSelectVoucher, selectedVoucher
                                                 <input
                                                     name='voucher'
                                                     type='radio'
+                                                    onClick={() => handleSelectVoucher(voucher)}
                                                 />
                                             </div>
                                         </Col>

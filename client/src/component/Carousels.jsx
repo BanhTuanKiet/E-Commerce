@@ -53,7 +53,7 @@ export default function CustomCarousel() {
   const visibleItems = getVisibleItems()
 
   return (
-    <Container className="my-5">
+    <Container className="py-3">
       <h4 className="fw-bold mb-4">ƯU ĐÃI SINH VIÊN</h4>
       <div className="d-flex align-items-center">
         <Button variant="light" onClick={prev}>&lt;</Button>

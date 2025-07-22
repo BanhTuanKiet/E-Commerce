@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { Search, ShoppingCart, User, List, X } from "lucide-react"
+import { UserContext } from "../context/UserContext"
+import { useNavigate } from "react-router-dom"
+import axios from "../util/AxiosConfig"
 import "../style/Header.css"
-import axios from "../util/AxiosConfig" // Giữ nguyên import axios
-import { useNavigate } from "react-router-dom" // Giữ nguyên import useNavigate
 
 export default function Header() {
+  const { user } = useContext(UserContext)
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [categories, setCategories] = useState([])
-  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [cartCount] = useState(0)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -22,62 +27,109 @@ export default function Header() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`)
+    }
+  }
+
+  const navigateToCategory = (categoryName) => {
+    navigate(`/${categoryName.toLowerCase()}s`)
+    setIsMenuOpen(false)
+  }
+
+  const handleLinkClick = (path) => {
+    navigate(path)
+  }
+  
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3 text-dark custom-header">
-      <div className="container custom-container w-75 mx-auto">
-        <a className="navbar-brand fw-bold fs-4 text-dark logo-text" href="/">
-          TechStore
-        </a>
+    <>
+      <nav className="navbar navbar-expand-lg navbar-custom sticky-header">
+        <div className="container-fluid px-3 px-lg-4" style={{ width: "80%"}}>
+          <button
+            onClick={() => handleLinkClick('/')}
+            className="navbar-brand d-flex align-items-center gap-2 border-0 bg-transparent p-0"
+          >
+            <div className="logo-gradient">T</div>
+            <span className="logo-text d-none d-sm-block">TechStore</span>
+          </button>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          onClick={toggleMenu}
-          aria-expanded={isMenuOpen}
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`} id="navbarNav">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0 category-nav">
+          <div className="d-none d-lg-flex navbar-nav mx-4">
             {categories.map((item) => (
-              <li className="nav-item" key={item._id}>
-                <span
-                  className="nav-link px-3 text-dark category-link"
-                  onClick={() => navigate(`/${item.name.toLowerCase() + "s"}`)}
-                  role="button"
-                >
-                  {item.name}
-                </span>
-              </li>
+              <button
+                key={item._id}
+                onClick={() => navigateToCategory(item.name)}
+                className="nav-link-custom mx-1"
+              >
+                {item.name}
+              </button>
             ))}
-          </ul>
+          </div>
 
-          <div className="d-flex align-items-center gap-3 header-actions">
-            <div className="search-input-container">
+          <div className="d-none d-md-flex flex-grow-1 justify-content-center mx-4">
+            <div className="search-container w-100">
               <input
-                type="search"
-                className="form-control search-input"
-                placeholder="Tìm kiếm..."
-                aria-label="Search"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                placeholder="Tìm kiếm sản phẩm..."
+                className="form-control search-input w-100"
               />
-              <button className="search-icon-btn" aria-label="Search">
-                Search
+              <button
+                onClick={handleSearch}
+                className="search-btn"
+              >
+                <Search size={16} />
               </button>
             </div>
-            <a href="/cart" className="btn btn-outline-primary position-relative cart-btn">
-              Cart
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
-                3
-              </span>
-            </a>
-            <a href="#login" className="btn btn-primary login-btn">
-              Đăng nhập
-            </a>
+          </div>
+
+          <div className="d-flex align-items-center gap-2 gap-md-3">
+            <button className="cart-btn d-md-none">
+              <Search size={20} />
+            </button>
+
+            <button
+              onClick={() => handleLinkClick('/cart')}
+              className="cart-btn"
+            >
+              <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="cart-badge">{cartCount}</span>
+              )}
+            </button>
+
+            {user.name ? (
+              <button
+                onClick={() => handleLinkClick('/profile')}
+                className="user-btn d-none d-md-flex align-items-center gap-2"
+              >
+                <User size={16} />
+                <span>{user?.name.split(" ")[user.name.split(" ").length - 1]}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => handleLinkClick('/signin')}
+                className="user-btn d-none d-md-flex align-items-center gap-2"
+              >
+                <User size={16} />
+                <span>Signin</span>
+              </button>
+            )}
+
+            <button
+              onClick={toggleMenu}
+              className="menu-toggle d-lg-none"
+              aria-label="Toggle navigation"
+            >
+              {isMenuOpen ? <X size={24} /> : <List size={24} />}
+            </button>
           </div>
         </div>
-      </div>
-    </nav>
+
+      </nav>
+    </>
   )
 }

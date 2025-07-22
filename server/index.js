@@ -11,6 +11,8 @@ import cartsRoute from "./route/cartsRoute.js"
 import { errorException } from "./middleware/errorException.js"
 import usersRoute from "./route/usersRoute.js"
 import vouchersRoute from "./route/vouchersRoute.js"
+import ordersRoute from "./route/ordersRoute.js"
+import reviewsRoute from "./route/reviewsRoute.js"
 
 dotenv.config()
 
@@ -28,6 +30,9 @@ connectDB().then(() => {
   app.use('/carts', cartsRoute)
   app.use('/users', usersRoute)
   app.use('/vouchers', vouchersRoute)
+  app.use('/orders', ordersRoute)
+  app.use('/reviews', reviewsRoute)
+
   app.use(errorException)
 
   app.listen(port, () => {

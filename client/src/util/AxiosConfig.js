@@ -1,4 +1,5 @@
 import axios from "axios"
+import { success, warning, danger } from "./NotifyUtil"
 
 const instance = axios.create({
     baseURL: "http://127.0.0.1:2908",
@@ -20,7 +21,7 @@ instance.interceptors.response.use(function (response) {
 // Do something with response data
   if (response.status === 200 && response.data.message) {
     const message = response.data.message
-    // SuccessNotify(message)
+    success(message)
   }
 
   return response.data
@@ -44,22 +45,22 @@ instance.interceptors.response.use(function (response) {
       case 400:
       case 404:
       case 403:
-        // WarningNotify(errorMessage)
+        warning(errorMessage)
         break
       case 500:
-        // ErrorNotify(errorMessage)
+        danger(errorMessage)
         break
       case 401:
         const currentPath = window.location.pathname + window.location.search
         localStorage.setItem("prevPage", currentPath)
-        // WarningNotify(errorMessage)
+        warning(errorMessage)
   
         setTimeout(() => {
           window.location.href = "/signin"
         }, 1700)
         break
       default:
-        // ErrorNotify(errorMessage)
+        danger(errorMessage)
     } 
   }
 

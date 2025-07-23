@@ -1,9 +1,6 @@
-"use client" // This component uses client-side hooks and Bootstrap, so it needs to be a Client Component.
-
 import { useEffect, useState } from "react"
 import { ChevronLeftIcon, ChevronRightIcon, SparklesIcon } from "lucide-react"
 import { Container, Row, Col, Button, Badge, Card, Carousel } from "react-bootstrap"
-// 'bootstrap/dist/css/bootstrap.min.css' is now imported in app/globals.css
 
 const NewProducts = ({ newProducts }) => {
   const [product, setProduct] = useState(null)
@@ -13,29 +10,12 @@ const NewProducts = ({ newProducts }) => {
     if (newProducts && newProducts.length > 0) {
       setProduct(newProducts[currentIndex])
     } else {
-      setProduct(null) // Ensure product is null if no products are available
+      setProduct(null)
     }
   }, [currentIndex, newProducts])
 
   const handleSelect = (selectedIndex) => {
     setCurrentIndex(selectedIndex)
-  }
-
-  if (!product) {
-    return (
-      <Container className="py-5">
-        <Row
-          className="justify-content-center align-items-center"
-          style={{
-            minHeight: "60vh",
-          }}
-        >
-          <Col>
-            <p className="text-muted text-center fs-4">No new products available at the moment.</p>
-          </Col>
-        </Row>
-      </Container>
-    )
   }
 
   return (

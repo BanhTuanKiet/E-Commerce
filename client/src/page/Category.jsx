@@ -8,6 +8,7 @@ import { Col, Row, Spinner } from 'react-bootstrap'
 import ProductFilterSidebar from '../component/ProductFilterSidebar'
 import CompareBar from '../component/CompareBar'
 import { warning } from '../util/NotifyUtil'
+import CategoryBanner from '../component/CategoryBanner'
 
 export default function Category() {
   const { category } = useParams()
@@ -124,6 +125,8 @@ export default function Category() {
 
   return (
     <div className="container my-5" style={{ width: "80%" }}>
+      <CategoryBanner category={category} />
+      
       <Row className="g-4">
         <Col md={2} className="p-0">
           <div className="border rounded  bg-light position-sticky" style={{ top: '20px' }}>

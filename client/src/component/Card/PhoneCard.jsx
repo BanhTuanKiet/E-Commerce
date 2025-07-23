@@ -1,173 +1,200 @@
 import { Card } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import { formatLabel, formatValue } from '../../util/DataClassify'
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, ShoppingCart, Star, Info } from 'lucide-react'
+import { useState } from 'react'
+import '../../style/ProductCard.css'
 
 export default function PhoneCard({ product, keys, handleCompareProducts }) {
   const { category } = useParams()
   const navigate = useNavigate()
+  const [isHovered, setIsHovered] = useState(false)
+
+  const rating = Math.floor(Math.random() * 2) + 4
+  const reviewCount = Math.floor(Math.random() * 500) + 50
 
   return (
-    <div className="p-1 py-0">
+    <div className="phone-card-wrapper p-1 py-0">
       <Card
-        className="border h-100 position-relative overflow-hidden w-100"
+        className={`phone-card border h-100 position-relative overflow-hidden w-100 ${isHovered ? 'hovered' : ''}`}
         style={{
-          maxWidth: '14rem',
-          border: '1px solid #dee2e6',
-          transition: 'all 0.3s ease-in-out',
-          cursor: 'pointer'
+          maxWidth: '16rem',
+          border: '1px solid #e9ecef',
+          borderRadius: '16px',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          cursor: 'pointer',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.border = '1px solid #0d6efd')}
-        onMouseLeave={(e) => (e.currentTarget.style.border = '1px solid #dee2e6')}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
+        <div className="badges-container position-absolute w-100 d-flex justify-content-between p-2" style={{ zIndex: 4 }}>
+          {product.state && (
+            <div className="badge-new bg-success text-white px-2 py-1 rounded-pill">
+              <small className="fw-bold">NEW</small>
+            </div>
+          )}
 
-        {product.state &&
-          <div className="position-absolute top-0 start-0 badge rounded text-white m-2 px-2 py-1 z-3 rounded-pill bg-primary">
-            New
-          </div>
-        }
+          {product.discount > 0 && (
+            <div className="badge-discount bg-danger text-white px-2 py-1 rounded-pill">
+              <small className="fw-bold">-{product.discount}%</small>
+            </div>
+          )}
+        </div>
 
-        {product.discount > 0 && (
-          <div
-            className="position-absolute top-0 end-0 badge text-white m-2 px-2 py-1 z-3 rounded-pill bg-danger"
-          >
-            Discount {product.discount}%
-          </div>
-        )}
-
-        <div
-          className="position-relative overflow-hidden"
+        <div className={`action-buttons position-absolute d-flex flex-column gap-2 ${isHovered ? 'visible' : ''}`}
           style={{
-            borderRadius: '20px 20px 0 0',
-            background: 'transparent',
-            paddingTop: '30px'
-          }}
-        >
+            top: '10%',
+            right: '5%',
+            zIndex: 3,
+            opacity: isHovered ? 1 : 0,
+            transform: isHovered ? 'translateX(0)' : 'translateX(20px)',
+            transition: 'all 0.3s ease'
+          }}>
+          <button
+            className="btn btn-primary rounded-circle p-2 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleCompareProducts(product)
+            }}
+            style={{ width: '32px', height: '32px' }}
+            title="So sánh sản phẩm"
+          >
+            <PlusCircle size={14} />
+          </button>
+          <button
+            className="btn btn-primary rounded-circle p-2 shadow-sm"
+            onClick={() => navigate(`/${category}/${product?._id}`)}
+            style={{ width: '36px', height: '36px' }}
+          >
+            <Info size={16} />
+          </button>
+        </div>
+
+        <div className="image-container position-relative overflow-hidden"
+          style={{
+            borderRadius: '16px 16px 0 0',
+            background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+            paddingTop: '30px',
+            height: '240px'
+          }}>
           <Card.Img
             variant="top"
             src={product.images[0] || ""}
             alt={product?.model}
-            className='object-fit-contain p-1'
+            className='product-image object-fit-contain p-2'
             style={{
               height: '200px',
-              transition: 'transform 0.3s ease-in-out',
-            }}
-            onClick={() => navigate(`/${category}/${product?._id}`)}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: isHovered ? 'scale(1.05) translateY(-8px)' : 'scale(1)',
             }}
           />
+
+          <div className="image-overlay position-absolute bottom-0 w-100"
+            style={{
+              height: '60px',
+              background: 'linear-gradient(transparent, rgba(255,255,255,0.8))',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease'
+            }} />
         </div>
-
-        {product?.price && (
-          <div className="px-3 py-1">
-            <div className="">
-              <div
-                className="fw-bold text-primary text-danger mb-1"
-                style={{ fontSize: '1.1rem' }}
-              >
-                {
-                  product.discount > 0
-                    ? `${(product.price * (1 - product.discount / 100)).toLocaleString('vi-VN')}đ`
-                    : `${(product.price).toLocaleString('vi-VN')}đ`
-                }
-                <PlusCircle
-                  size={16}
-                  className="ms-2 text-primary"
-                  onClick={() => handleCompareProducts(product)}
-                />
-              </div>
-
-              {product.discount > 0
-                ?
-                <div
-                  className='text-muted text-decoration-line-through'
-                  style={{ fontSize: '0.8rem' }}
-                >
-                  {product.price.toLocaleString('vi-VN')}đ
-                </div>
-                :
-                <div
-                  className='text-white'
-                  style={{ fontSize: '0.8rem' }}
-                >
-                  0
-                </div>
-              }
-            </div>
-          </div>
-        )}
 
         <Card.Body className="p-3 pt-2">
           <Card.Title
-            className="fs-6 text-start fw-bold mb-2 text-truncate d-flex align-items-center"
+            className="product-title fs-6 text-start fw-bold mb-2 text-truncate"
             title={product?.model}
             style={{
-              color: '#2c3e50',
-              lineHeight: '1.3'
+              color: '#1a1a1a',
+              lineHeight: '1.4',
+              fontSize: '0.95rem'
             }}
           >
             {product?.model}
           </Card.Title>
 
-          <div className="mb-0">
-            {keys && keys.map((key) => {
-              if (['model', '_id', 'price', 'discount', 'stock', 'category'].includes(key)) return null;
+          <div className="rating-container d-flex align-items-center mb-2">
+            <div className="stars d-flex me-2">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  fill={i < rating ? '#ffc107' : 'none'}
+                  color={i < rating ? '#ffc107' : '#dee2e6'}
+                />
+              ))}
+            </div>
+            <small className="text-muted">({reviewCount})</small>
+          </div>
 
-              const value = product[key];
+          {product?.price && (
+            <div className="price-container mb-3">
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="price-info">
+                  <div className="current-price fw-bold text-primary mb-1"
+                    style={{ fontSize: '1.1rem', color: '#e74c3c !important' }}>
+                    {product.discount > 0
+                      ? `${(product.price * (1 - product.discount / 100)).toLocaleString('vi-VN')}đ`
+                      : `${(product.price).toLocaleString('vi-VN')}đ`
+                    }
+                  </div>
+
+                  {product.discount > 0 && (
+                    <div className="original-price text-muted text-decoration-line-through"
+                      style={{ fontSize: '0.85rem' }}>
+                      {product.price.toLocaleString('vi-VN')}đ
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="specifications mb-3">
+            {keys && keys.map((key) => {
+              if (['model', '_id', 'price', 'discount', 'stock', 'category', 'images', 'state'].includes(key)) return null
+
+              const value = product[key]
+              if (!value) return null
+
               return (
-                <div
-                  key={key}
-                  className="d-flex justify-content-between align-items-center py-1 mb-1 border-bottom"
-                  style={{ fontSize: '0.8rem' }}
-                >
-                  <span
-                    className="text-muted fw-medium"
-                    style={{ color: '#6c757d' }}
-                  >
-                    {formatLabel(key)}
+                <div key={key} className="spec-item d-flex justify-content-between align-items-center py-1">
+                  <span className="spec-label text-muted" style={{ fontSize: '0.75rem' }}>
+                    {formatLabel(key)}:
                   </span>
-                  <span
-                    className="fw-semibold text-end text-truncate"
-                    style={{
-                      color: '#495057',
-                      maxWidth: '60%',
-                      fontSize: '0.8rem'
-                    }}
-                  >
-                    {key === "size" ? `${formatValue(value)} inch` : formatValue(value)}
+                  <span className="spec-value fw-medium text-end"
+                    style={{ fontSize: '0.75rem', color: '#495057', maxWidth: '60%' }}>
+                    {key === "size" ? `${formatValue(value)}"` : formatValue(value)}
                     {value === true ? "Yes" : ""}
                     {value === false ? "No" : ""}
                   </span>
                 </div>
-              );
+              )
             })}
           </div>
 
           {product?.stock !== undefined && (
-            <div className="mt-2">
-              <div className="d-flex align-items-center justify-content-between">
-                <span className="small text-muted">State:</span>
-                <span
-                  className={`small fw-semibold  
-                    ${product.stock > 10
-                      ? 'text-success'
+            <div className="stock-status">
+              <div
+                className="d-flex align-items-center justify-content-between p-2 rounded"
+                style={{ backgroundColor: '#f8f9fa' }}
+              >
+                <span className="small text-muted fw-medium">Status:</span>
+                <div className="d-flex align-items-center">
+                  <div
+                    className={`status-dot me-2 rounded-circle ${product.stock > 10 ? 'bg-success' : product.stock > 1 ? 'bg-warning' : 'bg-danger'}`}
+                    style={{ width: '6px', height: '6px' }}
+                  />
+                  <span
+                    className={`small fw-semibold ${product.stock > 10 ? 'text-success' : product.stock > 1 ? 'text-warning' : 'text-danger'}`}
+                  >
+                    {product.stock > 10
+                      ? 'In Stock'
                       : product.stock > 1
-                        ? 'text-warning'
-                        : 'text-danger'
-                    }`}
-                >
-                  {
-                    product.stock > 10
-                      ? 'In stock'
-                      : product.stock > 1
-                        ? `${product.stock} products left`
-                        : 'Out of stock'
-                  }
-                </span>
+                        ? `Only ${product.stock} left`
+                        : 'Out of Stock'}
+                  </span>
+                </div>
               </div>
             </div>
           )}

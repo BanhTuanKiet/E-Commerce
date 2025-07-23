@@ -1,0 +1,185 @@
+/* CategoryBanner.css */
+
+.category-banner-container {
+  margin-bottom: 2rem;
+}
+
+.category-carousel {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-item-custom {
+  padding: 10px;
+}
+
+.banner-card {
+  height: 100%;
+}
+
+.banner-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+}
+
+.banner-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+}
+
+.banner-title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.banner-subtitle {
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* Custom carousel controls */
+.category-carousel .carousel-control-prev,
+.category-carousel .carousel-control-next {
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.category-carousel .carousel-control-prev {
+  left: 15px;
+}
+
+.category-carousel .carousel-control-next {
+  right: 15px;
+}
+
+.category-carousel .carousel-control-prev-icon,
+.category-carousel .carousel-control-next-icon {
+  background-size: 20px;
+  filter: invert(1);
+}
+
+.category-carousel .carousel-control-prev:hover,
+.category-carousel .carousel-control-next:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Custom indicators */
+.category-carousel .carousel-indicators {
+  bottom: -40px;
+  margin-bottom: 0;
+}
+
+.category-carousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: #dee2e6;
+  border: 2px solid transparent;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.category-carousel .carousel-indicators button.active {
+  background-color: #007bff;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .banner-image {
+    height: 150px !important;
+  }
+  
+  .banner-title {
+    font-size: 1.2rem !important;
+  }
+  
+  .banner-subtitle {
+    font-size: 0.9rem !important;
+  }
+  
+  .category-carousel .carousel-control-prev,
+  .category-carousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .category-carousel .carousel-control-prev {
+    left: 10px;
+  }
+  
+  .category-carousel .carousel-control-next {
+    right: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-item-custom {
+    padding: 5px;
+  }
+  
+  .banner-image {
+    height: 120px !important;
+  }
+  
+  .banner-title {
+    font-size: 1rem !important;
+  }
+  
+  .banner-subtitle {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Animation cho banner content */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carousel-item.active .banner-content {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Hover effect cho banner */
+.banner-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(0, 123, 255, 0.1), rgba(255, 193, 7, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  border-radius: 10px;
+}
+
+.banner-image:hover::before {
+  opacity: 1;
+}

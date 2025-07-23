@@ -1,0 +1,274 @@
+/* PhoneCard.css */
+
+.phone-card-wrapper {
+  height: 100%;
+}
+
+.phone-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.phone-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+  border-color: #007bff !important;
+}
+
+.phone-card.hovered {
+  border-color: #007bff;
+}
+
+/* Badges */
+.badges-container {
+  pointer-events: none;
+}
+
+.badge-new, .badge-discount {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.badge-new {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
+}
+
+.badge-discount {
+  background: linear-gradient(135deg, #dc3545, #fd7e14) !important;
+}
+
+/* Action Buttons */
+.action-buttons button {
+  backdrop-filter: blur(10px);
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-buttons button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-buttons button.btn-light:hover {
+  background-color: #ffffff !important;
+}
+
+.action-buttons button.btn-primary:hover {
+  background-color: #0056b3 !important;
+}
+
+/* Image Container */
+.image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-image {
+  object-fit: contain;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.phone-card:hover .product-image {
+  filter: brightness(1.05);
+}
+
+/* Content Styling */
+.product-title {
+  font-weight: 700;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+}
+
+.phone-card:hover .product-title {
+  color: #007bff;
+}
+
+/* Rating */
+.rating-container .stars {
+  gap: 1px;
+}
+
+/* Price */
+.price-container .current-price {
+  color: #e74c3c !important;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.price-container .original-price {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.price-container button {
+  transition: all 0.3s ease;
+}
+
+.price-container button:hover {
+  transform: scale(1.05);
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+/* Specifications */
+.specifications {
+  border-top: 1px solid #f1f3f4;
+  padding-top: 0.5rem;
+}
+
+.spec-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.25rem 0;
+}
+
+.spec-item:last-child {
+  border-bottom: none;
+}
+
+.spec-label {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.spec-value {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Stock Status */
+.stock-status {
+  border-top: 1px solid #f1f3f4;
+  padding-top: 0.5rem;
+}
+
+.status-dot {
+  flex-shrink: 0;
+}
+
+/* Floating Action Button */
+.floating-cart button {
+  backdrop-filter: blur(10px);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-cart button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  background-color: #0056b3 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .phone-card {
+    max-width: 100% !important;
+  }
+  
+  .image-container {
+    height: 200px;
+  }
+  
+  .product-image {
+    height: 160px !important;
+  }
+  
+  .action-buttons {
+    display: none !important;
+  }
+  
+  .floating-cart {
+    display: none !important;
+  }
+  
+  .price-container .current-price {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .badges-container {
+    padding: 0.5rem;
+  }
+  
+  .badge-new, .badge-discount {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .specifications {
+    margin-bottom: 0.5rem;
+  }
+  
+  .spec-item {
+    font-size: 0.7rem;
+  }
+}
+
+/* Animation Classes */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.phone-card {
+  animation: fadeInScale 0.5s ease-out;
+}
+
+/* Hover Effects Enhancement */
+.phone-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.02), rgba(0, 123, 255, 0.08));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.phone-card:hover::before {
+  opacity: 1;
+}
+
+.phone-card .card-body {
+  position: relative;
+  z-index: 2;
+}
+
+/* Smooth transitions for all interactive elements */
+.phone-card * {
+  transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for specifications if needed */
+.specifications::-webkit-scrollbar {
+  width: 2px;
+}
+
+.specifications::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.specifications::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 1px;
+}
+
+.specifications::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}

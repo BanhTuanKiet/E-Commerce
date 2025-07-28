@@ -1,56 +1,66 @@
-import { Card, Badge } from "react-bootstrap"
+import { Badge } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
+import "../../style/MostPurchased.css"
 
 export default function MostPurchasedProductCard({ product }) {
   const navigate = useNavigate()
 
   if (!product) {
     return (
-      <Card className="w-100 h-100 bg-white rounded-4 shadow-lg d-flex flex-column justify-content-center align-items-center p-3">
-        <Card.Body className="text-center">
-          <p className="text-muted">Không có sản phẩm mua nhiều nhất để hiển thị.</p>
-        </Card.Body>
-      </Card>
+      <div className="not-found-card">
+        <p className="not-found-text">Không có sản phẩm mua nhiều nhất để hiển thị.</p>
+      </div>
     )
   }
 
   const salePrice = product.price * (1 - product.discount / 100)
+  const saveAmount = product.price - salePrice
 
   return (
-    <Card
-      className="w-100 h-100 bg-white rounded-4 shadow-lg d-flex flex-column justify-content-between p-4 cursor-pointer most-purchased-card"
-      onClick={() => navigate(`/${product.category.toLowerCase()}s/${product._id}`)}
+    <div
+      className="flip-card"
+      onClick={() =>
+        navigate(`/${product.category.toLowerCase()}s/${product._id}`)
+      }
     >
-      <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center flex-grow">
-        <Badge bg="warning" className="mb-3 px-4 py-2 text-dark fw-bold" style={{ fontSize: "0.8rem" }}>
-          <i className="bi bi-star-fill me-2"></i>SẢN PHẨM BÁN CHẠY NHẤT
-        </Badge>
-        <div
-          className="position-relative w-100 d-flex align-items-center justify-content-center mb-3"
-          style={{ height: "160px" }}
-        >
-          <img
-            src={product.images[0] || "/placeholder.svg"}
-            alt={product.model}
-            className="img-fluid"
-            style={{ maxHeight: "150px", objectFit: "contain" }}
-          />
+      <div className="flip-card-inner">
+        {/* Mặt trước của card */}
+        <div className="flip-card-front">
+          <div className="card-image-container">
+            <img
+              src={product.images[0] || "/placeholder.svg"}
+              alt={product.model}
+              className="card-image"
+            />
+            <Badge bg="warning" className="best-seller-badge">
+              <i className="bi bi-star-fill"></i> Best Seller
+            </Badge>
+          </div>
+          <div className="card-info">
+            <h5 className="product-title">{product.model}</h5>
+            <div className="product-price">
+              <span className="original-price">
+                {product.price.toLocaleString()}₫
+              </span>
+              <span className="sale-price">
+                {salePrice.toLocaleString()}₫
+              </span>
+            </div>
+          </div>
         </div>
-        <Card.Title className="mb-2 fw-bold text-primary" style={{ fontSize: "1.1rem" }}>
-          {product.model}
-        </Card.Title>
-        <Card.Text className="text-muted small mb-2">
-          Giá gốc: <span className="text-decoration-line-through">{product.price.toLocaleString()}₫</span>
-        </Card.Text>
-        <div className="d-flex flex-column align-items-center">
-          <Card.Text className="text-danger fw-bolder mb-1" style={{ fontSize: "1.5rem" }}>
-            {salePrice.toLocaleString()}₫
-          </Card.Text>
-          <Badge bg="danger" className="px-3 py-2" style={{ fontSize: "0.7rem" }}>
-            TIẾT KIỆM {(product.price - salePrice).toLocaleString()}₫
-          </Badge>
+        {/* Mặt sau của card */}
+        <div className="flip-card-back">
+          <div className="card-back-content">
+            <h5 className="product-title">{product.model}</h5>
+            <p className="product-price-detail">
+              Tiết kiệm: {saveAmount.toLocaleString()}₫
+            </p>
+            <Badge bg="danger" className="discount-badge">
+              {product.discount}% OFF
+            </Badge>
+          </div>
         </div>
-      </Card.Body>
-    </Card>
+      </div>
+    </div>
   )
 }

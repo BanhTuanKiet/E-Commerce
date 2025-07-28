@@ -1,4 +1,5 @@
-import { findReviewById, addReview, updateReview } from "../service/reviewsService.js"
+import { getProductById } from "../service/productsService.js"
+import { findReviewById, addReview, updateReview, findReviewsByProductId } from "../service/reviewsService.js"
 
 export const getReview = async (req, res, next) => {
     try {
@@ -22,10 +23,13 @@ export const postReview = async (req, res, next) => {
         const { user } = req
         const { review, orderId, productId } = req.body
 
+        const product = await getProductById(productId)
         const existingReview = await findReviewById(user, orderId, productId)
 
         if (existingReview === null) {
             await addReview(user._id, review, orderId, productId)
+            product.reviews++
+            await product.save()
 
             return res.json({ message: "Review successful! " })
         }
@@ -33,6 +37,25 @@ export const postReview = async (req, res, next) => {
         await updateReview(existingReview._id, review)
 
         return res.json({ message: "Review updated!" })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getRating = async (req, res, next) => {
+    try {
+        const { productId } = req.params
+        const reviews = await findReviewsByProductId(productId)
+
+        if (reviews.length === 0) {
+            return res.json({ totalReviews: 0 })
+        }
+
+        const scores = reviews.map(r => r.rating)
+        const totalScore = scores.reduce((sum, score) => sum + score, 0)
+        const averageScore = totalScore / scores.length
+
+        return res.json({ averageRating: Number(averageScore.toFixed(1)),  totalReviews: reviews.length })
     } catch (error) {
         next(error)
     }

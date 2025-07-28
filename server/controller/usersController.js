@@ -1,10 +1,11 @@
-import { createUser, saveRefreshToken, userIsExist } from "../service/usersService.js"
+import { createUser, findUserById, saveRefreshToken, userIsExist, updateUser } from "../service/usersService.js"
 import ErrorException from "../util/error.js"
 import sendMail from "../util/mailUtl.js"
 import { generateOTP, verifyOTP } from "../util/otpUtil.js"
 import client from "../config/redis.js"
 import { comparePassword, hashPassword } from "../util/passwordUtil.js"
 import { generateToken } from "../util/tokenUtil.js"
+import mongoose from "mongoose"
 
 export const signup = async (req, res, next) => {
     try {
@@ -84,8 +85,40 @@ export const signin = async (req, res, next) => {
 
         await saveRefreshToken(isExist.email, refreshToken)
 
-        return res.json({ data: { email: isExist.email, name: isExist.name }, message: "Signin successful!"})
+        return res.json({ data: { role: isExist.role, name: isExist.name }, message: "Signin successful!"})
     } catch (error) {
         next(error)
+    }
+}
+
+export const getUser = async (req, res, next) => {
+    try {
+        const { user } = req
+
+        const u = await findUserById(user._id)
+
+        if (!u) throw new ErrorException(500, "User not found!")
+
+        return res.json({ data: u })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const putUser = async (req, res, next) => {
+    try {
+        const { user } = req
+        const { newUser } = req.body
+        const objectId = new mongoose.Types.ObjectId(user._id)
+        
+        const userUpdated = await updateUser(objectId, newUser)
+
+        if (userUpdated === null) {
+            throw new ErrorException(400, "Error updating information!")
+        } 
+
+        return res.json({ message: "Update successful!" })
+    } catch (error) {
+        console.log(error)
     }
 }

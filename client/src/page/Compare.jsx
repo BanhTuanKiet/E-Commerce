@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom'
 import { getObject, getPrimitive, toReadAble } from '../util/DataClassify'
 import { useEffect, useState } from 'react'
 import axios from '../util/AxiosConfig'
-import PhoneCard from '../component/Card/PhoneCard'
+import ProductCard from '../component/Card/ProductCard'
 
 export default function Compare() {
-  const { compareIds } = useParams()
+  const { category, compareIds } = useParams()
   const [products, setProducts] = useState()
   const [objectKeys, setObjectKeys] = useState()
 
@@ -14,8 +14,9 @@ export default function Compare() {
     const fetchProducts = async () => {
       try {
         const ids = compareIds.split('vs')
+
         const responses = await Promise.all(
-          ids.map(id => axios.get(`/products/${"phones"}/${id}/detail`))
+          ids.map(id => axios.get(`/products/${category}/${id}/detail`))
         )
 
         const productsData = responses.map(res => res.data)
@@ -38,7 +39,7 @@ export default function Compare() {
         </Col>
         {products?.map((product, index) => (
           <Col lg={3} md={4} sm={6} xs={12} key={index} className='px-0 mt-3'>
-            <PhoneCard product={product} keys={getPrimitive(product )} />
+            <ProductCard product={product} keys={getPrimitive(product )} />
           </Col>
         ))}
       </Row>

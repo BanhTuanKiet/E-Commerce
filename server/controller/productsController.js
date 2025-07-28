@@ -1,13 +1,26 @@
 import { getFilterOptionsByCategory } from "../service/filterOptionsService.js"
-import { getProductsByCategory, getPhonesByOptions, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getItemsByState } from "../service/productsService.js"
+import { countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions } from "../service/productsService.js"
 import { getProductImage } from "../util/getProductImage.js"
 import ErrorException from "../util/error.js"
 import { getList } from "../service/categoriesService.js"
 
 export const getProducts = async (req, res, next) => {
   try {
+    const { page } = req.query
+    const { products, totalPages } = await findProducts(page)
+
+    return res.json({ data: products, totalPages: totalPages })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getProductsByCategory = async (req, res, next) => {
+  try {
     const { category } = req.params
-    const products = await getProductsByCategory(category)
+    const { page } = req.query
+
+    const { products, totalPages } = await findProductsByCategory(category, page)
 
     const productsWithImages = products.map((product) => {
       if (!product.images || product.images.length === 0) {
@@ -22,24 +35,47 @@ export const getProducts = async (req, res, next) => {
       }
     })
 
-    return res.json({ data: productsWithImages })
+    return res.json({ data: productsWithImages, totalPages: totalPages })
   } catch (error) {
     next(error)
   }
 }
 
-
 export const filterProducts = async (req, res, next) => {
   try {
-    const { category, options } = req.params
-    const decodedOptions = JSON.parse(decodeURIComponent(options))
-    let products
-    let filters
+    const { options } = req.params
+    const { page } = req.query
 
-    // if (category === "phones") {
-    filters = await getFilterOptionsByCategory(category)
-    products = await getPhonesByOptions(category, filters.filters, decodedOptions)
-    // }
+    const decodedOptions = JSON.parse(decodeURIComponent(options))
+
+    const { products, totalPages } = await getFilterProducts(decodedOptions, page)
+
+    const productsWithImages = products.map((product) => {
+      if (!product.images || product.images.length === 0) {
+        return product
+      }
+
+      const imageUrls = getProductImage(product.images)
+
+      return {
+        ...product.toObject?.(),
+        images: imageUrls
+      }
+    })
+    return res.json({ data: productsWithImages, totalPages: totalPages })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const filterProductsByCategory = async (req, res, next) => {
+  try {
+    const { category, options } = req.params
+    const { page } = req.query
+    const decodedOptions = JSON.parse(decodeURIComponent(options))
+
+    const filters = await getFilterOptionsByCategory(category)
+    const { products, totalPages } = await getProductsByOptions(category, filters.filters, decodedOptions, page)
 
     const productsWithImageUrls = products.map((product) => {
       if (!product.images || product.images.length === 0) {
@@ -54,18 +90,17 @@ export const filterProducts = async (req, res, next) => {
       }
     })
 
-    return res.json({ data: productsWithImageUrls })
+    return res.json({ data: productsWithImageUrls, totalPages: totalPages })
   } catch (error) {
-    console.error("Filter error:", error)
-    return res.status(500).json({ message: "Internal Server Error" })
+    next(error)
   }
 }
 
 export const getProductDetail = async (req, res, next) => {
   try {
-    const { category, id } = req.params
+    const { id } = req.params
 
-    const product = await getProductById(category, id)
+    const product = await getProductById(id)
 
     const imageUrls = getProductImage(product.images)
 
@@ -73,16 +108,15 @@ export const getProductDetail = async (req, res, next) => {
 
     return res.json({ data: productWithImages })
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: "Internal Server Error" })
+    next(error)
   }
 }
 
 export const getOtherOptions = async (req, res, next) => {
   try {
-    const { category, model } = req.params
+    const { model } = req.params
 
-    const product = await getOtherOptionsItem(category, model)
+    const product = await getOtherOptionsItem(model)
 
     return res.json({ data: product })
   } catch (error) {
@@ -94,10 +128,10 @@ export const getSaleProducts = async (req, res, next) => {
   try {
     const saleProducts = [] // Mỗi phần tử là mảng sản phẩm đã có ảnh
     const categories = await getList()
-    console.log(categories)
+
     for (const category of categories) {
-      const items = await getSaleProductsByCategory(category.name.toLowerCase())
-      console.log(items.length)
+      const items = await getSaleProductsByCategory(category.name)
+
       if (items && items.length > 0) {
         const categoryProducts = []
 
@@ -128,8 +162,7 @@ export const getSaleProducts = async (req, res, next) => {
 export const getProductsByState = async (req, res, next) => {
   try {
     const { state } = req.params
-    console.log(req.params)
-    const products = await getItemsByState(state)
+    const products = await getProductByState(state)
 
     const productsWithImages = products.map(product => {
       if (!product.images || product.images.length === 0) {
@@ -145,6 +178,18 @@ export const getProductsByState = async (req, res, next) => {
     })
 
     return res.json({ data: productsWithImages })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const countProduct = async (req, res, next) => {
+  try {
+    const { state } = req.params
+
+    const count = await countProductByState(state)
+    console.log(state, count)
+    return res.json({ key: state, data: count })
   } catch (error) {
     next(error)
   }

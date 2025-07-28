@@ -1,3 +1,13 @@
+export const getKey = (data) => {
+    const keys = []
+
+    Object.entries(data).map(key => (
+        keys.push(key)
+    ))
+
+    return keys
+}
+
 export const getPrimitive = (data) => {
     const keys = []
 
@@ -58,8 +68,8 @@ export const formatLabel = (key) => {
 export const formatValue = (value) => {
     if (value == null || value === '') return 'N/A'
     if (typeof value === 'number') return value.toLocaleString()
-    if (typeof value === 'string' && value.length > 20) {
-        return value.substring(0, 17) + '...'
+    if (typeof value === 'string' && value.length > 15) {
+        return value.substring(0, 15) + '...'
     }
     return value
 }
@@ -71,4 +81,12 @@ export const formatDate = (dateString) => {
         month: '2-digit',
         year: 'numeric'
     })
+}
+
+export const formatStateLabel = (state) => {
+    if (!state) return 'N/A'
+
+    return state
+        .replace(/([a-z])([A-Z])/g, '$1 $2')  // thêm dấu cách giữa chữ thường và hoa
+        .replace(/^./, str => str.toUpperCase())  // viết hoa chữ cái đầu
 }

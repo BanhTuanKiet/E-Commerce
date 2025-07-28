@@ -1,17 +1,10 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import Product from "./productsModel.js";
 
-const phones = new mongoose.Schema({
-  _id: String,
-  brand: String,
-  model: String,
+const phoneSchema = new mongoose.Schema({
   storage: String,
   ram: String,
-  price: Number,
-  category: String,
-  state: String,
-  discount: { type: Number, default: 0 },
-  images: [String],
-  stock: Number,
+  discount: Number,
   configuration_and_memory: {
     operating_system: String,
     processor_chip: String,
@@ -47,6 +40,7 @@ const phones = new mongoose.Schema({
       thickness: String
     }
   }
-})
+});
 
-export default mongoose.model('Phones', phones, 'Phones')
+const Phone = Product.discriminator("Phone", phoneSchema);
+export default Phone

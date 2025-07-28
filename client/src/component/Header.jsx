@@ -9,6 +9,7 @@ export default function Header() {
   const { user } = useContext(UserContext)
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [categories, setCategories] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [cartCount] = useState(0)
@@ -35,18 +36,26 @@ export default function Header() {
   }
 
   const navigateToCategory = (categoryName) => {
-    navigate(`/${categoryName.toLowerCase()}s`)
+    navigate(`/${categoryName}`)
     setIsMenuOpen(false)
   }
 
   const handleLinkClick = (path) => {
     navigate(path)
   }
-  
+
+  const handleMouseEnter = () => setIsDropdownOpen(true)
+  const handleMouseLeave = () => setIsDropdownOpen(false)
+
+  const handleDropdownClick = (path) => {
+    setIsDropdownOpen(false)
+    navigate(path)
+  }
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-custom sticky-header">
-        <div className="container-fluid px-3 px-lg-4" style={{ width: "80%"}}>
+        <div className="container-fluid px-3 px-lg-4" style={{ width: "80%" }}>
           <button
             onClick={() => handleLinkClick('/')}
             className="navbar-brand d-flex align-items-center gap-2 border-0 bg-transparent p-0"
@@ -102,13 +111,40 @@ export default function Header() {
             </button>
 
             {user.name ? (
-              <button
-                onClick={() => handleLinkClick('/profile')}
-                className="user-btn d-none d-md-flex align-items-center gap-2"
+              <div
+                className="user-dropdown-container d-none d-md-flex align-items-center position-relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                style={{ cursor: "pointer" }}
               >
-                <User size={16} />
-                <span>{user?.name.split(" ")[user.name.split(" ").length - 1]}</span>
-              </button>
+                <div
+                  className="user-btn d-flex align-items-center gap-2"
+                  onClick={() => {
+                    if (user?.role !== 'customer') {
+                      handleDropdownClick('/manage')
+                    }
+                  }}
+                >
+                  <User size={16} />
+                  {/* <span>{user?.name.split(" ").slice(-1)}</span> */}
+                  <span>{user?.role}</span>
+                </div>
+
+                {isDropdownOpen && user?.role === "customer"
+                  ?
+                  (
+                    <div className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2" style={{ zIndex: 999 }}>
+                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/profile')}>Hồ sơ</div>
+                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/order')}>Đơn hàng</div>
+                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/review')}>Đánh giá</div>
+                    </div>
+                  )
+                  :
+                  (
+                    <></>
+                  )
+                }
+              </div>
             ) : (
               <button
                 onClick={() => handleLinkClick('/signin')}
@@ -128,7 +164,6 @@ export default function Header() {
             </button>
           </div>
         </div>
-
       </nav>
     </>
   )

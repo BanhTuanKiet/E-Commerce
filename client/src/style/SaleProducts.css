@@ -1,66 +1,104 @@
-.sale-section-wrapper {
-  padding: 2rem 0;
+.sale-banner {
+  background: linear-gradient(to right, #fceabb, #f8b500);
+  animation: fadeIn 0.7s ease-in-out;
+  border: 2px solid #f1c40f;
+  position: relative;
 }
 
-/* Sale banner với gradient & clip-path */
-.sale-banner {
-  background: linear-gradient(135deg, #ff4e00 0%, #ec9f05 100%);
-  clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+.sale-text-animated {
+  animation: flicker 1.5s infinite alternate;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+.sale-strip {
   position: relative;
   overflow: hidden;
 }
 
-.sale-tag,
-.discount-info {
-  clip-path: none;
+.wave-bg {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.2) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  animation: wave 3s linear infinite;
+  z-index: 1;
 }
 
-.sale-text {
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+.animated-icon {
+  animation: float 2.5s infinite ease-in-out, rotate 4s linear infinite;
+  pointer-events: none;
+  z-index: 10;
 }
 
-/* Hover effect cho card */
-.hover-effect {
-  transition: transform 0.3s, box-shadow 0.3s;
+.countdown-animated {
+  animation: pulse 1.8s infinite ease-in-out;
 }
 
-.hover-effect:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Nút chi tiết fade-in */
-.detail-btn {
-  opacity: 0;
-  transition: opacity 0.2s;
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 10px #fff, 0 0 15px #f00;
+  }
 }
 
-.hover-effect:hover .detail-btn {
-  opacity: 1;
+@keyframes wave {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 0%;
+  }
 }
 
-/* Countdown flash sale */
-.flash-countdown {
-  font-weight: 500;
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-6px);
+  }
 }
 
-/* Skeleton loader card */
-.skeleton-card {
-  margin-right: 1rem;
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) translate(-50%, -50%);
+  }
+  100% {
+    transform: rotate(360deg) translate(-50%, -50%);
+  }
 }
 
-/* Dark mode & theming */
-:root {
-  --bg-card: #fff;
-  --text-primary: #333;
-}
-
-[data-theme="dark"] {
-  --bg-card: #1f1f1f;
-  --text-primary: #eee;
-}
-
-.card {
-  background-color: var(--bg-card);
-  color: var(--text-primary);
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
 }

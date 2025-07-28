@@ -6,19 +6,18 @@ export default function OrdersTable({ orders, keys, handleSort, sortConfig }) {
     const navigate = useNavigate()
     
     const orderStatusMap = {
-        completed: { color: '#28a745', bgColor: '#d4edda' },   // Hoàn tất
-        pending: { color: '#856404', bgColor: '#fff3cd' },     // Chờ xử lý
-        processing: { color: '#004085', bgColor: '#cce5ff' },  // Đang xử lý
-        cancelled: { color: '#721c24', bgColor: '#f8d7da' },   // Đã huỷ
-        shipping: { color: '#0c5460', bgColor: '#d1ecf1' },    // Đang giao
-        shipped: { color: '#1b1e21', bgColor: '#d6d8d9' }       // Đã giao
+        completed: { color: '#28a745', bgColor: '#d4edda' }, 
+        pending: { color: '#856404', bgColor: '#fff3cd' },   
+        processing: { color: '#004085', bgColor: '#cce5ff' },
+        cancelled: { color: '#721c24', bgColor: '#f8d7da' }, 
+        shipping: { color: '#0c5460', bgColor: '#d1ecf1' },   
+        shipped: { color: '#1b1e21', bgColor: '#d6d8d9' }      
     }
 
-
     const paymentStatusMap = {
-        paid: { color: '#155724', bgColor: '#d4edda' },        // Đã thanh toán
-        unpaid: { color: '#856404', bgColor: '#fff3cd' },      // Chưa thanh toán
-        failed: { color: '#721c24', bgColor: '#f8d7da' }       // Thanh toán thất bại
+        paid: { color: '#155724', bgColor: '#d4edda' },
+        unpaid: { color: '#856404', bgColor: '#fff3cd' },   
+        failed: { color: '#721c24', bgColor: '#f8d7da' }     
     }
 
     const getSortIcon = (key) => {

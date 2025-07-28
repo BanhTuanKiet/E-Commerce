@@ -1,0 +1,140 @@
+/* Tạo hiệu ứng flip cho card */
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  max-width: 300px;
+  height: 400px;
+  perspective: 1000px;
+  cursor: pointer;
+  margin: auto;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 15px;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Cấu hình mặt trước và mặt sau của card */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+/* Mặt trước với nền gradient sáng, thân thiện */
+.flip-card-front {
+  background: linear-gradient(135deg, #f0f0f0, #ffffff);
+  color: #333;
+}
+
+/* Mặt sau với nền gradient, hiệu ứng nổi bật */
+.flip-card-back {
+  background: linear-gradient(135deg, #e63946, #f1faee);
+  color: #fff;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Phần chứa hình ảnh */
+.card-image-container {
+  position: relative;
+  height: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-image {
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Badge hiển thị “Best Seller” */
+.best-seller-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+}
+
+/* Thông tin sản phẩm ở mặt trước */
+.card-info {
+  padding: 15px;
+}
+
+.product-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  font-size: 1rem;
+  color: #888;
+}
+
+.sale-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e63946;
+}
+
+/* Nội dung mặt sau của card */
+.card-back-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+.product-price-detail {
+  font-size: 1rem;
+}
+
+.discount-badge {
+  font-size: 0.9rem;
+  padding: 5px 15px;
+}
+
+/* Hiển thị thông báo khi không có sản phẩm */
+.not-found-card {
+  width: 100%;
+  padding: 40px;
+  background-color: #f8f9fa;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.not-found-text {
+  color: #6c757d;
+  font-size: 1rem;
+}

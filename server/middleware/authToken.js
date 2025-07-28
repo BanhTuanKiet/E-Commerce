@@ -5,7 +5,6 @@ import { generateToken } from "../util/tokenUtil.js"
 
 const authToken = async (req, res, next) => {
     try {
-        console.log("AAAAAAA")
         const token = await req.cookies.accessToken
 
         if (!token) {

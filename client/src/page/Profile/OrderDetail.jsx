@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Col, Row, Table, Badge, Spinner } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
-import { formatDate, formatLabel, toReadAble } from '../util/DataClassify'
-import axios from '../util/AxiosConfig'
-import ReviewModal from '../component/Modal/ReviewModal'
+import { formatDate, formatLabel, toReadAble } from '../../util/DataClassify'
+import axios from '../../util/AxiosConfig'
+import ReviewModal from '../../component/Modal/ReviewModal'
 
 export default function OrderDetail() {
     const { orderId } = useParams()

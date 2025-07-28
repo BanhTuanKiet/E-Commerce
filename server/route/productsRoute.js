@@ -1,12 +1,15 @@
 import expres from "express"
-import { getProducts, filterProducts, getProductDetail, getOtherOptions, getSaleProducts, getProductsByState } from "../controller/productsController.js"
+import { countProduct, getProducts, getProductsByCategory, filterProducts, filterProductsByCategory, getProductDetail, getOtherOptions, getSaleProducts, getProductsByState } from "../controller/productsController.js"
 const productsRoute = expres.Router()
 
+productsRoute.get('/', getProducts)
+productsRoute.get('/filter/:options', filterProducts)
+productsRoute.get('/state/count/:state', countProduct)
 productsRoute.get('/state/:state', getProductsByState)
 productsRoute.get('/sales', getSaleProducts)
-productsRoute.get("/:category", getProducts)
-productsRoute.get('/:category/filter/:options', filterProducts)
-productsRoute.get('/:category/:id/detail', getProductDetail)
-productsRoute.get('/:category/:model/other_options', getOtherOptions)
+productsRoute.get("/:category", getProductsByCategory)
+productsRoute.get('/:category/filter/:options', filterProductsByCategory)
+productsRoute.get('/detail/:id/', getProductDetail)
+productsRoute.get('/other_options/:model', getOtherOptions)
 
 export default productsRoute

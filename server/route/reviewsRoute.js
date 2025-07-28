@@ -1,11 +1,12 @@
 import expres from "express"
-import { getReview, postReview } from "../controller/reviewsController.js"
+import { getReview, postReview, getRating } from "../controller/reviewsController.js"
 import authToken from "../middleware/authToken.js"
 const reviewsRoute = expres.Router()
 
 reviewsRoute.use(authToken)
 
-reviewsRoute.get(`/:orderId/:productId`, getReview)
 reviewsRoute.post(`/`, postReview)
+reviewsRoute.get('/rating/:productId', getRating)
+reviewsRoute.get(`/:orderId/:productId`, getReview)
 
 export default reviewsRoute

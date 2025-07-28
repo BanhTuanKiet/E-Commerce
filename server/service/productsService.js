@@ -1,56 +1,109 @@
-import { categoryMap } from "../util/categoryMap.js"
+import Product from "../model/productsModel.js"
 
-export const getProductsByCategory = async (category) => {
-    return await categoryMap[category].find()
+const itemsPerPage = 8
+
+export const findProducts = async (page) => {
+    const skipIndex = (page - 1) * 10
+
+    const products = await Product.find().skip(skipIndex).limit(10)
+
+    const total = await Product.countDocuments()
+
+    return {
+        products,
+        totalPages: Math.ceil(total / 10)
+    }
 }
 
-export const getPhonesByOptions = async (category, filters, options) => {
+export const findProductsByCategory = async (category, page) => {
+    const skipIndex = (page - 1) * itemsPerPage
+
+    const products = await Product.find({ category })
+        .skip(skipIndex)
+        .limit(itemsPerPage)
+
+    const total = await Product.countDocuments({ category })
+
+    return {
+        products,
+        totalPages: Math.ceil(total / itemsPerPage),
+    }
+}
+
+export const getFilterProducts = async (options, page) => {
+    const skipIndex = (page - 1) * 10
     const query = {}
-    
+
+    if (options.category !== '' && options.category !== 'all') {
+        query.category = options.category
+    }
+
+    if (options.state !== '' && options.state !== 'all') {
+        query.state = options.state
+    }
+
+    const products = await Product.find(query).skip(skipIndex).limit(10)
+    const totalPages = await Product.countDocuments(query)
+
+    return {
+        products,
+        totalPages: Math.ceil(totalPages / 10),
+    }
+}
+
+export const getProductsByOptions = async (category, filters, options, page) => {
+    const query = { category }
+    const skipIndex = (page - 1) * itemsPerPage
+
     filters.forEach(filter => {
         const value = options[filter.key]
-        
         if (value) {
             if (filter.match === "range") {
                 query[filter.path] = { $gt: value.min, $lte: value.max }
             } else if (filter.match === "regex") {
-                value.forEach(v => {
-                    query[filter.path] = { $regex: v, $options: 'i' }
-                })
+                query["$or"] = value.map(v => ({
+                    [filter.path]: { $regex: v, $options: 'i' }
+                }))
             } else if (filter.match === "multi-range") {
-                value.forEach(v => {
-                    query[filter.path] = { $gte: v.start, $lte: v.end }
-                })
+                query["$or"] = value.map(v => ({
+                    [filter.path]: { $gte: v.start, $lte: v.end }
+                }))
             } else {
-                console.log( options)
                 query[filter.path] = { $in: value }
             }
         }
-        
-        return query
     })
-    const products = await categoryMap[category].find(query)
 
-    return products
+    const products = await Product.find(query).skip(skipIndex).limit(itemsPerPage)
+    const totalPages = await Product.countDocuments(query)
+
+    return {
+        products,
+        totalPages: Math.ceil(totalPages / itemsPerPage),
+    }
 }
 
-export const getProductById = async (category, id) => {
-    return await categoryMap[category].findById(id)
+export const getProductById = async (id) => {
+    return await Product.findOne({ _id: id })
 }
 
-export const getOtherOptionsItem = async (category, model) => {
-    return await categoryMap[category].find(
-        { model: model }
+export const getOtherOptionsItem = async (model) => {
+    return await Product.find(
+        { model }
     ).select('_id ram storage')
 }
 
 export const getSaleProductsByCategory = async (category) => {
-    return categoryMap[category].find({ discount: { $gt: 0 } })
-    .sort({ discount: -1 })
-    .limit(10)
-    .lean()
+    return Product.find({ category, discount: { $gt: 0 } })
+        .sort({ discount: -1 })
+        .limit(10)
+        .lean()
 }
 
-export const getItemsByState = async (state) => {
-    return categoryMap["laptop"].find({ state: state })
+export const getProductByState = async (state) => {
+    return Product.find({ state: state })
+}
+
+export const countProductByState = async (state) => {
+    return Product.find({ state: state }).countDocuments()
 }

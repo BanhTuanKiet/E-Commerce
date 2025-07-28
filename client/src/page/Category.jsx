@@ -1,14 +1,16 @@
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from '../util/AxiosConfig'
 import { getPrimitive } from '../util/DataClassify'
-import PhoneCard from '../component/Card/PhoneCard'
+import ProductCard from '../component/Card/ProductCard'
 import { Col, Row, Spinner } from 'react-bootstrap'
 import ProductFilterSidebar from '../component/ProductFilterSidebar'
 import CompareBar from '../component/CompareBar'
 import { warning } from '../util/NotifyUtil'
 import CategoryBanner from '../component/CategoryBanner'
+import "../style/Category.css"
+import PaginationProducts from '../component/Pagination'
 
 export default function Category() {
   const { category } = useParams()
@@ -18,6 +20,8 @@ export default function Category() {
   const [filterSelections, setFilterSelections] = useState({})
   const [sortOrder, setSortOrder] = useState("default")
   const [productsCompare, setProductsCompare] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -38,17 +42,21 @@ export default function Category() {
   }, [])
 
   useEffect(() => {
+    setCurrentPage(1)
+  }, [filterSelections])
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        let res
+        let response
         if (Object.keys(filterSelections).length === 0) {
-          res = await axios.get(`/products/${category}`)
+          response = await axios.get(`/products/${category}?page=${currentPage}`)
         } else {
           const options = encodeURIComponent(JSON.stringify(filterSelections))
-          res = await axios.get(`/products/${category}/filter/${options}`)
+          response = await axios.get(`/products/${category}/filter/${options}?page=${currentPage}`)
         }
 
-        let sortedProducts = res.data
+        let sortedProducts = response.data
 
         if (sortOrder === "sale") {
           sortedProducts = [...sortedProducts].sort((a, b) => b.discount - a.discount)
@@ -59,13 +67,14 @@ export default function Category() {
         }
 
         setProducts(sortedProducts)
+        setTotalPages(response.totalPages)
       } catch (error) {
         console.error(error)
       }
     }
 
     fetchProducts()
-  }, [category, filterSelections, sortOrder])
+  }, [category, filterSelections, sortOrder, currentPage])
 
   useEffect(() => {
     if (products.length > 0) {
@@ -126,7 +135,7 @@ export default function Category() {
   return (
     <div className="container my-5" style={{ width: "80%" }}>
       <CategoryBanner category={category} />
-      
+
       <Row className="g-4">
         <Col md={2} className="p-0">
           <div className="border rounded  bg-light position-sticky" style={{ top: '20px' }}>
@@ -136,20 +145,30 @@ export default function Category() {
             />
           </div>
         </Col>
+
         <Col md={10}>
           <div className="border rounded p-4 bg-white">
-            <div className="d-flex justify-content-between align-items-center">
-              <p className="mb-0 text-muted">{products.length} products found</p>
-              <select
-                className="form-select w-auto"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-              >
-                <option value="default">Sort by default</option>
-                <option value="sale">Sale price</option>
-                <option value="asc">Price: Low to High</option>
-                <option value="desc">Price: High to Low</option>
-              </select>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3 px-2">
+              <p className="text-muted mb-0 fs-6">
+                <strong>{products.length} </strong>
+                {products.length > 1 ? "products" : "product"} found
+              </p>
+              <div className="d-flex align-items-center gap-2">
+                <label htmlFor="sortSelect" className="text-muted small mb-0">
+                  Arrange:
+                </label>
+                <select
+                  id="sortSelect"
+                  className="form-select form-select-sm w-auto shadow-sm border rounded"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                >
+                  <option value="default">Default</option>
+                  <option value="sale">Big discount</option>
+                  <option value="asc">Price Ascending</option>
+                  <option value="desc">Price Descending</option>
+                </select>
+              </div>
             </div>
 
             {products.length === 0 ? (
@@ -166,7 +185,7 @@ export default function Category() {
               <Row className="g-3">
                 {products.map((product, index) => (
                   <Col lg={3} md={4} sm={6} xs={12} key={index} className='px-0 mt-3'>
-                    <PhoneCard product={product} keys={keys} handleCompareProducts={handleCompareProducts} />
+                    <ProductCard product={product} keys={keys} handleCompareProducts={handleCompareProducts} />
                   </Col>
                 ))}
               </Row>
@@ -178,7 +197,7 @@ export default function Category() {
       {productsCompare.length > 0 &&
         <Row>
           <Col>
-            <CompareBar 
+            <CompareBar
               products={productsCompare}
               onClear={() => setProductsCompare([])}
               setProductsCompare={setProductsCompare}
@@ -186,6 +205,8 @@ export default function Category() {
           </Col>
         </Row>
       }
+
+      <PaginationProducts totalPages={totalPages} currentPage={1} setCurrentPage={setCurrentPage} />
     </div>
   )
 }

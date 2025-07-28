@@ -15,3 +15,16 @@ export const findOrdersByStatus = async (customerId, status) => {
 export const findOrderById = async (orderId) => {
     return await orders.findById(orderId).populate('items.productId')
 }
+
+export const findPresentOrder = async (userId) => {
+    return await orders.findOne(
+        {
+            customerId: userId,
+            orderStatus: { $ne: 'cancelled' }
+        },
+        null,
+        {
+            sort: { createdAt: -1 }
+        }
+    )
+}

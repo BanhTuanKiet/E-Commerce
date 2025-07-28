@@ -40,9 +40,9 @@ const UserProvider = ({ children }) => {
         navigate('/signin')
     }
 
-    const signin = (email, name) => {
+    const signin = (role, name) => {
         Cookies.set('user', JSON.stringify({ name: name }), { expires: 1 / 24 })
-        setUser({ ...user, name: name, email: email })
+        setUser({ ...user, name: name, role: role })
         const prevPage = localStorage.getItem('prevPage')
         console.log(prevPage)
         navigate(prevPage.toString())
@@ -50,7 +50,7 @@ const UserProvider = ({ children }) => {
 
     const signout = () => {
         Cookies.remove('user')
-        setUser({ ...user, name: '', email: '' })
+        setUser({ ...user, name: '', role: '' })
         navigate('/signin')
     }
 

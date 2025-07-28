@@ -1,25 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import Carousels from '../component/Carousels'
+import { useEffect, useState } from 'react'
 import SaleProductCarousel from '../component/SaleProducts'
 import axios from '../util/AxiosConfig'
-import NewProducts from '../component/NewProducts'
+import CategoryBanner from '../component/CategoryBanner'
 
 export default function Home() {
   const [saleProducts, setSaleProducts] = useState()
-  const [newProducts, setNewProducts] = useState()
-
-  useEffect(() => {
-    const fetchNewProducts = async () => {
-      try {
-        const response = await axios.get(`/products/state/${"new"}`)
-        setNewProducts(response.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchNewProducts()
-  }, [])
 
   useEffect(() => {
     const fetchSaleProducts = async () => {
@@ -35,13 +20,12 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="bg-info-subtle min-vh-100">
+    <div className=" min-vh-100">
       <div className="mx-auto w-75">
-        {/* <NewProducts newProducts={newProducts} /> */}
-        <Carousels />
-        <h4>Today Only – Hot Deal</h4>
+        <CategoryBanner category={"Home"} />
+        
         {saleProducts?.map((item, index) => (
-          <div key={index}>
+          <div key={index} className='mb-5'>
             <SaleProductCarousel saleProducts={item} />
           </div>
         ))}

@@ -1,0 +1,8 @@
+#sortSelect {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#sortSelect:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}

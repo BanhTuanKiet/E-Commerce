@@ -11,9 +11,8 @@ const orderSchema = new mongoose.Schema(
     items: [
       {
         productId: {
-        //   type: mongoose.Schema.Types.ObjectId,
-        type: String,
-          ref: 'Phones',
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Product',
           required: true
         },
         quantity: {
@@ -63,7 +62,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'failed'],
+      enum: ['unpaid', 'paid', 'failed'],
       default: 'pending'
     },
 

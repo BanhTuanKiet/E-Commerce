@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 export default function CompareBar({ products, setProductsCompare, onClear }) {
+    const { category } = useParams()
     const [comparePath, setComparePath] = useState("")
     const onRemove = (product) => {
         setProductsCompare(products.filter(p => p._id !== product._id))
@@ -126,7 +127,7 @@ export default function CompareBar({ products, setProductsCompare, onClear }) {
                     <div className="col-12 col-lg-4 d-flex align-items-center justify-content-lg-end">
                         <div className="d-flex flex-column flex-lg-row gap-2 w-100 w-lg-auto">
                             <Link
-                                to={`/compare/${comparePath}`}
+                                to={`/compare/${category}/${comparePath}`}
                                 className={`btn btn-primary d-flex align-items-center justify-content-center px-3 py-1 ${filledSlots < 2 ? 'disabled' : ''
                                     }`}
                                 style={{ minWidth: '120px', fontSize: '14px' }}

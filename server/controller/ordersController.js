@@ -1,4 +1,5 @@
-import { postOrder, findOrdersByCustomerId, findOrdersByStatus, findOrderById } from "../service/orderServcie.js"
+import mongoose from "mongoose"
+import { postOrder, findOrdersByCustomerId, findOrdersByStatus, findOrderById,findPresentOrder } from "../service/orderServcie.js"
 import { getProductImage } from "../util/getProductImage.js"
 
 export const placeOrder = async (req, res, next) => {
@@ -7,7 +8,7 @@ export const placeOrder = async (req, res, next) => {
         const { order } = req.body
 
         order.customerId = user._id
-
+        order.paymentStatus = "unpaid"
         await postOrder(order)
 
         return res.json({ message: "Place order successful!" })
@@ -59,6 +60,18 @@ export const getOrder = async (req, res, next) => {
             }
         })
         return res.json({ data: { ...order.toObject(), items: orderObj } })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getPresentOrder = async (req, res, next) => {
+    try {
+        const { user } = req
+        const objectId = new mongoose.Types.ObjectId(user._id)
+        const order = await findPresentOrder(objectId)
+       
+        return res.json({ data: order })
     } catch (error) {
         next(error)
     }

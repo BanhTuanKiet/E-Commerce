@@ -1,48 +1,37 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import Product from "./productsModel.js";
 
-const headphones = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId, // e.g. "sony-wh1000xm5-8gb-128gb" (nếu có phiên bản)
-
-  brand: String,     // e.g. "Sony", "Bose", "Apple"
-  model: String,     // e.g. "WH-1000XM5", "QC45", "AirPods Max"
-  type: String,      // "Over-ear", "On-ear", "In-ear", "True Wireless"
-  category: String,
-  connectivity: String, // "Wireless", "Wired", "True Wireless"
+const headphoneSchema = new mongoose.Schema({
+  type: String,
+  connectivity: String,
   microphone: Boolean,
   noise_cancelling: Boolean,
-  state: String,
   battery: {
-    battery_life: String,   // e.g. "30 hours"
-    charging_connector: String // e.g. "USB-C", "Lightning", "MagSafe"
+    battery_life: String,
+    charging_connector: String
   },
-
   features: {
-    support_voice_assistant: Boolean, // Google Assistant, Siri
+    support_voice_assistant: Boolean,
     touch_controls: Boolean,
-    water_resistance: String, // e.g. "IPX4"
+    water_resistance: String,
     multipoint_connection: Boolean
   },
-
   sound: {
-    driver_size: String, // e.g. "40mm"
-    frequency_response: String, // e.g. "20Hz–20kHz"
-    impedance: String, // e.g. "32Ω"
-    codec_support: [String] // e.g. ["SBC", "AAC", "LDAC"]
+    driver_size: String,
+    frequency_response: String,
+    impedance: String,
+    codec_support: [String]
   },
-
-  price: Number,
-  stock: Number,
-  images: [String],
-
   others: {
-    weight: String, // e.g. "250g"
+    weight: String,
     dimensions: {
       length: String,
       width: String,
       thickness: String
     },
-    material: String // e.g. "Aluminum + Leatherette"
+    material: String
   }
-})
+});
 
-export default mongoose.model('Headphones', headphones, 'Headphones')
+const Headphone = Product.discriminator("Headphones", headphoneSchema, "Headphones");
+export default Headphone

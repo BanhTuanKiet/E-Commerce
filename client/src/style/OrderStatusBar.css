@@ -1,0 +1,51 @@
+.order-status-bar {
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.status-steps .step {
+  position: relative;
+}
+
+.status-steps .circle {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 50%;
+  background: #dee2e6;
+  color: #495057;
+  font-weight: bold;
+  margin: 0 auto 5px;
+}
+
+.status-steps .circle.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.status-steps .label {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.status-steps .label.active {
+  color: #0d6efd;
+}
+
+.status-steps .step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background-color: #dee2e6;
+  z-index: -1;
+  transform: translateX(15px);
+}
+
+.status-steps .circle.active ~ .circle {
+  background-color: #dee2e6 !important;
+}

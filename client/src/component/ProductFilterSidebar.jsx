@@ -38,7 +38,7 @@ export default function ProductFilterSidebar({ keysFilter, handleCheckboxChange 
               <h6 className="mb-3 fw-medium" style={{ fontSize: '14px' }}>{toReadAble(key.key)}</h6>
               <div className="price-range">
                 <div className="price-display d-flex justify-content-between">
-                  <small className="text-muted">{key.min.toLocaleString('vi-VN') + ' ₫'}</small>
+                  <small className="text-muted">{key.min.toLocaleString('vi-VN')}</small>
                   <small className="price-current text-primary fw-medium">{priceRange.toLocaleString('vi-VN') + ' ₫'}</small>
                 </div>
                 <input
@@ -58,7 +58,7 @@ export default function ProductFilterSidebar({ keysFilter, handleCheckboxChange 
           )
         } else {
           return (
-            <div className="filter-section py-2" key={index}>
+            <div className="filter-section" key={index}>
               <div
                 className={`filter-header d-flex justify-content-between ${!expandedSections[key.key] ? 'collapsed' : ''}`}
                 onClick={() => toggleSection(key.key)}

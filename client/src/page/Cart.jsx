@@ -276,7 +276,7 @@ export default function Cart() {
                                     <div>
                                         <div className='text-dark'><strong>{item._id.model}</strong></div>
                                         {keys?.map((key, index) => {
-                                            if (['category', 'discount', 'quantity'].includes(key)) return null
+                                            if (['category', 'discount', 'quantity', 'reviews'].includes(key)) return null
                                             return (
                                                 <div key={index} className="text-muted small">{formatLabel(key)}: {item._id[key]}</div>
                                             )

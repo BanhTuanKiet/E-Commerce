@@ -12,8 +12,9 @@ const productSchema = new mongoose.Schema({
   images: [String],
   stock: Number,
   category: String,
-  state: String
+  state: String,
+  reviews: Number
 }, baseOptions)
 
-const Product = mongoose.model("Products", productSchema, "Products")
+const Product = mongoose.model("Product", productSchema)
 export default Product

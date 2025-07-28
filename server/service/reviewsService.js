@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import reviews from "../model/reviewsModel.js"
 
 export const findReviewById = async (user, orderId, productId) => {
@@ -30,4 +31,8 @@ export const updateReview = async (reviewId, reviewData) => {
         },
         { new: true }
     )
+}
+
+export const findReviewsByProductId = async (productId) => {
+    return await reviews.find({ productId: new mongoose.Types.ObjectId(productId) })
 }

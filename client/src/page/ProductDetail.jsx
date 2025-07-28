@@ -15,7 +15,7 @@ const ProductDetail = () => {
     useEffect(() => {
         const fetchProductDetail = async () => {
             try {
-                const response = await axios.get(`/products/${category}/${id}/detail`)
+                const response = await axios.get(`/products/detail/${id}`)
                 setProduct(response.data)
                 setObjectKeys(getObject(response.data))
             } catch (error) {
@@ -24,12 +24,13 @@ const ProductDetail = () => {
         }
 
         fetchProductDetail()
-    }, [category, id, setObjectKeys])
+    }, [id, setObjectKeys])
 
     useEffect(() => {
         const fetchOtherOptions = async () => {
             try {
-                const response = await axios.get(`/products/${category}/${product?.model}/other_options`)
+                const response = await axios.get(`/products/other_options/${product?.model}`)
+                console.log(response.data)
                 setOtherOptions(response.data)
             } catch (error) {
                 console.log(error)
@@ -80,7 +81,7 @@ const ProductDetail = () => {
                             </Col>
 
                             <Col lg={7} className='text-start'>
-                                {category === 'phones' ? (
+                                {category === 'Phone' ? (
                                     <>
                                         <h1 className="h5 fw-bold mb-3 text-dark">
                                             {product?.model} / {product?.ram} / {product?.storage}

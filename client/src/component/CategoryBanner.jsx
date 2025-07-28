@@ -3,9 +3,38 @@ import { Carousel, Row, Col } from 'react-bootstrap'
 import '../style/CategoryBanner.css'
 
 const CategoryBanner = ({ category }) => {
-  // Mock data cho banner - trong thực tế sẽ fetch từ API
   const bannerData = {
-    phones: [
+    Home: [
+      {
+        id: 1,
+        image: 'https://images.unsplash.com/photo-1603899122644-619f6a877d90?w=1200&h=400&fit=crop',
+        title: 'Back to School Sale',
+        subtitle: 'Giảm đến 30% cho laptop và tablet',
+        link: '/promotion/back-to-school'
+      },
+      {
+        id: 2,
+        image: 'https://images.unsplash.com/photo-1587574293340-ec9c404d4b4e?w=1200&h=400&fit=crop',
+        title: 'Summer Deals 2025',
+        subtitle: 'Sắm điện thoại mới, nhận quà cực chất',
+        link: '/promotion/summer-deals'
+      },
+      {
+        id: 3,
+        image: 'https://images.unsplash.com/photo-1606813909401-5b51e764bf0a?w=1200&h=400&fit=crop',
+        title: 'Headphones & Audio Sale',
+        subtitle: 'Giảm sốc tai nghe Sony, JBL, Bose',
+        link: '/promotion/audio-sale'
+      },
+      {
+        id: 4,
+        image: 'https://images.unsplash.com/photo-1609943243050-8b740b02c1b0?w=1200&h=400&fit=crop',
+        title: 'Flash Sale Mỗi Ngày',
+        subtitle: 'Deal siêu hot chỉ trong hôm nay!',
+        link: '/flash-sale'
+      }
+    ],
+    Phone: [
       {
         id: 1,
         image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=300&fit=crop',
@@ -35,7 +64,7 @@ const CategoryBanner = ({ category }) => {
         link: '/promotion/pixel'
       }
     ],
-    laptops: [
+    Laptop: [
       {
         id: 1,
         image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=300&fit=crop',
@@ -65,7 +94,7 @@ const CategoryBanner = ({ category }) => {
         link: '/promotion/surface'
       }
     ],
-    tablets: [
+    Tablet: [
       {
         id: 1,
         image: 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=600&h=300&fit=crop',
@@ -95,45 +124,43 @@ const CategoryBanner = ({ category }) => {
         link: '/promotion/lenovo-tab'
       }
     ],
-    headphones: [
+    Headphone: [
       {
         id: 1,
-        image: 'https://images.unsplash.com/photo-1580894894513-eec7bd7a9f4e?w=600&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1599669454699-248893623440?w=600&h=300&fit=crop',
         title: 'Sony WH-1000XM5',
         subtitle: 'Chống ồn hàng đầu thế giới',
         link: '/promotion/sony-wh1000xm5'
       },
       {
         id: 2,
-        image: 'https://images.unsplash.com/photo-1616594039964-4c0c29f29f1e?w=600&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=300&fit=crop',
         title: 'Bose QuietComfort',
         subtitle: 'Thoải mái cả ngày dài',
         link: '/promotion/bose-qc'
       },
       {
         id: 3,
-        image: 'https://images.unsplash.com/photo-1617957743325-2de35c83ff56?w=600&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=300&fit=crop',
         title: 'Apple AirPods Max',
         subtitle: 'Âm thanh sống động',
         link: '/promotion/airpods-max'
       },
       {
         id: 4,
-        image: 'https://images.unsplash.com/photo-1626963727691-3d6238d194d9?w=600&h=300&fit=crop',
+        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=300&fit=crop',
         title: 'JBL Live 660NC',
         subtitle: 'Pin trâu, bass mạnh mẽ',
         link: '/promotion/jbl-live'
       }
     ]
-
   }
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const banners = bannerData[category] || bannerData.smartphone
 
-  // Tạo các cặp banner (2 banner mỗi slide)
   const bannerPairs = []
-  for (let i = 0; i < banners.length; i += 2) {
+  for (let i = 0; i < banners?.length; i += 2) {
     bannerPairs.push(banners.slice(i, i + 2))
   }
 
@@ -184,7 +211,6 @@ const CategoryBanner = ({ category }) => {
                         transition: 'transform 0.3s ease',
                         overflow: 'hidden'
                       }}
-                      onClick={() => window.location.href = banner.link}
                       onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                       onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >

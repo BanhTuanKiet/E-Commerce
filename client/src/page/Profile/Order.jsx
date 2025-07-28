@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import axios from '../util/AxiosConfig'
-import OrdersTable from '../component/OrdersTable'
-import { getPrimitive, toReadAble } from '../util/DataClassify'
+import axios from '../../util/AxiosConfig'
+import OrdersTable from '../../component/OrdersTable'
+import { getPrimitive, toReadAble } from '../../util/DataClassify'
 import { Col, Form, InputGroup, Row } from 'react-bootstrap'
-import "../style/Orders.css"
-import { Search } from "lucide-react"
-
+import "../../style/Orders.css"
+import OrderStatusBar from '../../component/OrderStatusBar'
 
 export default function Order() {
+    const [order, setOrder] = useState()
     const [orders, setOrders] = useState()
     const [keys, setKeys] = useState()
     const [searchTerm, setSearchTerm] = useState()
@@ -15,12 +15,24 @@ export default function Order() {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
 
     useEffect(() => {
+        const fetchOrder = async () => {
+            try {
+                const response = await axios.get(`/orders/present`)
+                setOrder(response.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        fetchOrder()
+    })
+    
+    useEffect(() => {
         const fetchOrders = async () => {
             try {
                 const response = await axios.get(`/orders`)
                 setOrders(response.data)
                 setKeys(getPrimitive(response.data[0]))
-                console.log(response.data[0])
             } catch (error) {
                 console.log(error)
             }
@@ -87,9 +99,11 @@ export default function Order() {
         const orderDate = new Date(order.createdAt).toISOString().split('T')[0]
         return orderDate === searchTerm
     })
-
+    
     return (
-        <div style={{ width: "80%" }} className='mx-auto'>
+        <div>
+            <OrderStatusBar order={order} />
+
             <div className="table-header">
                 <div className="table-controls">
                     <InputGroup style={{ maxWidth: '300px' }}>

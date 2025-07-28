@@ -1,17 +1,34 @@
 import { Card } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import { formatLabel, formatValue } from '../../util/DataClassify'
-import { PlusCircle, ShoppingCart, Star, Info } from 'lucide-react'
+import { PlusCircle, Star, Info } from 'lucide-react'
 import { useState } from 'react'
 import '../../style/ProductCard.css'
+import { useEffect } from 'react'
+import axios from '../../util/AxiosConfig'
 
-export default function PhoneCard({ product, keys, handleCompareProducts }) {
+export default function ProductCard({ product, keys, handleCompareProducts }) {
   const { category } = useParams()
   const navigate = useNavigate()
   const [isHovered, setIsHovered] = useState(false)
+  const [scoreRating, setScoreRating] = useState(0)
+  const [total, setTotal] = useState(0)
 
-  const rating = Math.floor(Math.random() * 2) + 4
-  const reviewCount = Math.floor(Math.random() * 500) + 50
+  useEffect(() => {
+    if (!product || !product._id) return
+
+    const fetchScoreRating = async () => {
+      try {
+        const response = await axios.get(`/reviews/rating/${product?._id}`)
+        setScoreRating(response.averageRating)
+        setTotal(response.totalReviews)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    fetchScoreRating()
+  }, [product])
 
   return (
     <div className="phone-card-wrapper p-1 py-0">
@@ -32,7 +49,7 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
         <div className="badges-container position-absolute w-100 d-flex justify-content-between p-2" style={{ zIndex: 4 }}>
           {product.state && (
             <div className="badge-new bg-success text-white px-2 py-1 rounded-pill">
-              <small className="fw-bold">NEW</small>
+              <small className="fw-bold">{product.state}</small>
             </div>
           )}
 
@@ -53,22 +70,24 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
             transition: 'all 0.3s ease'
           }}>
           <button
-            className="btn btn-primary rounded-circle p-2 shadow-sm"
+            className="btn btn-primary rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center"
             onClick={(e) => {
               e.stopPropagation()
               handleCompareProducts(product)
             }}
-            style={{ width: '32px', height: '32px' }}
-            title="So sánh sản phẩm"
+            style={{ width: '36px', height: '36px' }}
+            title="Compare products"
           >
-            <PlusCircle size={14} />
+            <PlusCircle size={18} />
           </button>
+
           <button
-            className="btn btn-primary rounded-circle p-2 shadow-sm"
+            className="btn btn-primary rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center"
             onClick={() => navigate(`/${category}/${product?._id}`)}
             style={{ width: '36px', height: '36px' }}
+            title="More"
           >
-            <Info size={16} />
+            <Info size={18} />
           </button>
         </div>
 
@@ -100,7 +119,7 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
             }} />
         </div>
 
-        <Card.Body className="p-3 pt-2">
+        <Card.Body className="p-3 pt-0">
           <Card.Title
             className="product-title fs-6 text-start fw-bold mb-2 text-truncate"
             title={product?.model}
@@ -113,25 +132,25 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
             {product?.model}
           </Card.Title>
 
-          <div className="rating-container d-flex align-items-center mb-2">
+          <div className="rating-container d-flex align-items-center">
             <div className="stars d-flex me-2">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   size={12}
-                  fill={i < rating ? '#ffc107' : 'none'}
-                  color={i < rating ? '#ffc107' : '#dee2e6'}
+                  fill={i < scoreRating ? '#ffc107' : 'none'}
+                  color={i < scoreRating ? '#ffc107' : '#dee2e6'}
                 />
               ))}
             </div>
-            <small className="text-muted">({reviewCount})</small>
+            <small className="text-muted">({total})</small>
           </div>
 
           {product?.price && (
-            <div className="price-container mb-3">
+            <div className="price-container mb-0">
               <div className="d-flex align-items-center justify-content-between">
                 <div className="price-info">
-                  <div className="current-price fw-bold text-primary mb-1"
+                  <div className="current-price fw-bold text-primary"
                     style={{ fontSize: '1.1rem', color: '#e74c3c !important' }}>
                     {product.discount > 0
                       ? `${(product.price * (1 - product.discount / 100)).toLocaleString('vi-VN')}đ`
@@ -139,7 +158,7 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
                     }
                   </div>
 
-                  {product.discount > 0 && (
+                  {product.discount >= 0 && (
                     <div className="original-price text-muted text-decoration-line-through"
                       style={{ fontSize: '0.85rem' }}>
                       {product.price.toLocaleString('vi-VN')}đ
@@ -150,9 +169,9 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
             </div>
           )}
 
-          <div className="specifications mb-3">
+          <div className="specifications py-0">
             {keys && keys.map((key) => {
-              if (['model', '_id', 'price', 'discount', 'stock', 'category', 'images', 'state'].includes(key)) return null
+              if (['model', '_id', 'price', 'discount', 'stock', 'category', 'images', 'state', 'reviews'].includes(key)) return null
 
               const value = product[key]
               if (!value) return null
@@ -173,7 +192,7 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
             })}
           </div>
 
-          {product?.stock !== undefined && (
+          {/* {product?.stock !== undefined && (
             <div className="stock-status">
               <div
                 className="d-flex align-items-center justify-content-between p-2 rounded"
@@ -197,7 +216,7 @@ export default function PhoneCard({ product, keys, handleCompareProducts }) {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </Card.Body>
       </Card>
     </div>

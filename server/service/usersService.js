@@ -1,3 +1,4 @@
+import { assign } from "nodemailer/lib/shared/index.js"
 import users from "../model/usersModel.js"
 
 export const createUser = async (user) => {
@@ -24,4 +25,16 @@ export const saveRefreshToken = async (email, refreshToken) => {
 
 export const getRefreshToken = async (_id) => {
     return await users.findById(_id).select('refreshToken')
+}
+
+export const findUserById = async (_id) => {
+  return await users.findById(_id).select('-password -refreshToken -__v -role')
+}
+
+export const updateUser = async (_id, user) => {
+    return await users.findOneAndUpdate(
+        { _id },          
+        { $set: { ...user } }, 
+        { new: true }     
+    )
 }

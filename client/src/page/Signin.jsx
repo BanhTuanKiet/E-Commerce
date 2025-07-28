@@ -22,7 +22,7 @@ export default function Signin() {
         if (errsCount > 0) return
         try {
             const reseponse = await axios.post(`/users/signin`, { user: user })
-            signin(reseponse.data.email, reseponse.data.name)
+            signin(reseponse.data.role, reseponse.data.name)
         } catch (error) {
             console.log(error)
         }

@@ -1,9 +1,13 @@
 import expres from "express"
-import { countProduct, getProducts, getProductsByCategory, filterProducts, filterProductsByCategory, getProductDetail, getOtherOptions, getSaleProducts, getProductsByState } from "../controller/productsController.js"
+import authToken from "../middleware/authToken.js"
+import { authRole } from '../middleware/authRole.js'
+import { deleteProduct, searchProduct, postProduct, getFristProduct, putProduct, countProduct, getProducts, 
+  getProductsByCategory, filterProducts, filterProductsByCategory, getProductDetail, getOtherOptions, 
+  getSaleProducts, getProductsByState } from "../controller/productsController.js"
 const productsRoute = expres.Router()
 
 productsRoute.get('/', getProducts)
-productsRoute.get('/filter/:options', filterProducts)
+productsRoute.get('/filter', authToken, authRole('admin'), filterProducts)
 productsRoute.get('/state/count/:state', countProduct)
 productsRoute.get('/state/:state', getProductsByState)
 productsRoute.get('/sales', getSaleProducts)
@@ -11,5 +15,10 @@ productsRoute.get("/:category", getProductsByCategory)
 productsRoute.get('/:category/filter/:options', filterProductsByCategory)
 productsRoute.get('/detail/:id/', getProductDetail)
 productsRoute.get('/other_options/:model', getOtherOptions)
+productsRoute.get('/first/:category', getFristProduct)
 
+productsRoute.put('/', authRole('admin'), putProduct)
+productsRoute.post('/manage', authToken, authRole('admin') , postProduct)
+productsRoute.get('/manage/search', searchProduct)
+productsRoute.delete('/manage/:id', deleteProduct)
 export default productsRoute

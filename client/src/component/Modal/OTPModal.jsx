@@ -1,6 +1,5 @@
 import { Modal, Button, Form } from "react-bootstrap"
 import { useRef } from "react"
-import axios from "../../util/AxiosConfig"
 
 export default function OTPModal({ show, setShowOtpModal, otp, setOtp, handleSubmitOTP }) {
     const inputsRef = useRef([])

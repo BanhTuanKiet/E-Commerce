@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema({
   },
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Phones',
+    ref: 'Product',
     required: true
   },
   userId: {
@@ -35,10 +35,20 @@ const reviewSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  reply: {
+    content: { type: String, trim: true },
+    repliedAt: { type: Date },
+    adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  },
   isVisible: {
     type: Boolean,
     default: true // có thể dùng để ẩn review nếu vi phạm chính sách
-  }
+  },
+  isFlagged: { type: Boolean, default: false },
+}, { 
+  timestamps: true,
+  collection: "Reviews" 
 })
 
-export default mongoose.model('Reviews', reviewSchema, 'Reviews')
+const Review = mongoose.model('Review', reviewSchema)
+export default Review

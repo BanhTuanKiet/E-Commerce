@@ -13,6 +13,7 @@ import usersRoute from "./route/usersRoute.js"
 import vouchersRoute from "./route/vouchersRoute.js"
 import ordersRoute from "./route/ordersRoute.js"
 import reviewsRoute from "./route/reviewsRoute.js"
+import productFieldsRoute from "./route/productFiledsRoute.js"
 
 dotenv.config()
 
@@ -32,6 +33,7 @@ connectDB().then(() => {
   app.use('/vouchers', vouchersRoute)
   app.use('/orders', ordersRoute)
   app.use('/reviews', reviewsRoute)
+  app.use('/productFields', productFieldsRoute)
 
   app.use(errorException)
 

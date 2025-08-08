@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Spinner, Form, Button } from 'react-bootstra
 import moment from 'moment'
 import axios from '../../util/AxiosConfig'
 
-export default function Profile() {
+export default function Profile({ activeTab }) {
   const [user, setUser] = useState(null)
   const [saving, setSaving] = useState(false)
   const [isEdit, setIsEdit] = useState({
@@ -19,10 +19,10 @@ export default function Profile() {
   })
 
   useEffect(() => {
+    if (activeTab !== "profile") return
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/users/profile`)
-        console.log(response)
         setUser(response.data)
       } catch (error) {
         console.log(error)

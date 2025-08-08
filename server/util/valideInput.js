@@ -1,0 +1,173 @@
+import Joi from 'joi'
+
+export const voucherSchema = Joi.object({
+  code: Joi.string().trim().required().messages({
+    'string.base': 'Code must be a string',
+    'string.empty': 'Code cannot be empty',
+  }),
+  description: Joi.string().trim().required().messages({
+    'string.base': 'Description must be a string',
+    'string.empty': 'Description cannot be empty',
+  }),
+  discountType: Joi.string().valid('percentage', 'fixed').required().messages({
+    'any.only': 'Discount type must be "percentage" or "fixed"',
+    'string.empty': 'Discount cannot be empty',
+  }),
+  discountValue: Joi.number().positive().required()
+    .when('discountType', {
+      is: 'percentage',
+      then: Joi.number().positive().less(100).messages({
+        'number.less': 'Discount value must be less than 100 when type is percentage',
+        'number.positive': 'Discount value must be greater than 0',
+        'any.required': 'Discount value required',
+        'number.base': 'Discount value must be a number'
+      }),
+      otherwise: Joi.number().positive().messages({
+        'number.positive': 'Discount value must be greater than 0',
+        'any.required': 'Discount value required',
+        'number.base': 'Discount value must be a number'
+      })
+    }),
+  maxDiscount: Joi.number().min(0).allow(null).messages({
+    'number.base': 'Maximum discount must be a number',
+    'number.min': 'Maximum discount cannot be negative',
+  }),
+  minOrderValue: Joi.number().min(0).allow(null).messages({
+    'number.base': 'Minimum order value must be a number',
+    'number.min': 'Minimum order value cannot be negative',
+  }),
+  quantity: Joi.number().integer().min(1).required().messages({
+    'number.base': 'Quantity must be an integer',
+    'number.min': 'Quantity must be greater than 0',
+  }),
+  usageLimitPerUser: Joi.number().integer().min(1).required().messages({
+    'number.base': 'Limit per user must be an integer',
+    'number.min': 'Limit per user must be >= 1',
+  }),
+  startDate: Joi.date().iso().required().messages({
+    'date.base': 'Invalid start date',
+    'any.required': 'Start date is required',
+  }),
+  endDate: Joi.date().iso().greater(Joi.ref('startDate')).required().messages({
+    'date.base': 'Invalid end date',
+    'date.greater': 'End date must be after start date',
+  }),
+  isActive: Joi.boolean().required(),
+  categories: Joi.array().items(Joi.string().trim()).min(1).unique().required().messages({
+    'array.base': 'Category must be an array',
+    'array.min': 'Must contain at least one category',
+    'array.unique': 'Cannot copy list',
+  }),
+
+  _id: Joi.any().optional(),
+  createdAt: Joi.any().optional(),
+  updatedAt: Joi.any().optional(),
+  usageLimitPerUser: Joi.any().optional(),
+  used: Joi.any().optional(),
+})
+
+const baseProductSchema = Joi.object({
+  model: Joi.string().required().messages({
+    'string.empty': 'Product name is required',
+  }),
+  price: Joi.number().greater(0).required().messages({
+    'number.base': 'Price must be a number',
+    'number.greater': 'Price must be greater than 0',
+  }),
+  stock: Joi.number().integer().min(0).required().messages({
+    'number.base': 'Stock must be a number',
+    'number.min': 'Stock cannot be negative',
+  }),
+  category: Joi.string().valid().required().messages({
+    'any.only': 'Invalid category',
+    'string.empty': 'Category is required',
+  }),
+  brand: Joi.string().required().messages({
+    'string.empty': 'Brand is required',
+  }),
+  images: Joi.array().items(Joi.string()).min(1).required().messages({
+    'array.min': 'At least one image is required',
+  }),
+})
+
+export const phoneSchema = Joi.object({
+  storage: Joi.string().required(),
+  ram: Joi.string().required(),
+  discount: Joi.number().min(0).optional(),
+  configuration_and_memory: Joi.object({
+    operating_system: Joi.string().required(),
+    processor_chip: Joi.string().required(),
+    graphics_chip: Joi.string().required()
+  }).required(),
+  camera_and_display: Joi.object({
+    front_camera: Joi.string().required(),
+    rear_camera: Joi.string().required(),
+    lidar_scanner: Joi.boolean(),
+    display_technology: Joi.string(),
+    flash: Joi.boolean(),
+    size: Joi.number(),
+    brightness: Joi.string(),
+    screen: Joi.string()
+  }).required(),
+  battery: Joi.object({
+    capacity: Joi.number().required(),
+    connector: Joi.string().required()
+  }).required(),
+  features: Joi.object({
+    fingerprint_security: Joi.boolean(),
+    face_recognition: Joi.boolean(),
+    water_resistance: Joi.string(),
+    support_5g: Joi.boolean(),
+    fast_charging: Joi.string()
+  }).required(),
+  others: Joi.object({
+    material: Joi.string(),
+    weight: Joi.string(),
+    dimensions: Joi.object({
+      length: Joi.string(),
+      width: Joi.string(),
+      thickness: Joi.string()
+    })
+  }).required()
+})
+
+export const laptopSchema = Joi.object({
+  chip: Joi.string().required(),
+  size: Joi.number().required(),
+  processor: Joi.object({
+    name: Joi.string().required(),
+    coreThread: Joi.string(),
+    frequency: Joi.string(),
+    cache: Joi.string(),
+    tdp: Joi.string()
+  }).required(),
+  ramAndStorage: Joi.object({
+    ram: Joi.string().required(),
+    ramSlots: Joi.number(),
+    ramUpgrade: Joi.string(),
+    storage: Joi.string().required(),
+    storageUpgrade: Joi.string()
+  }).required(),
+  gpu_display: Joi.object({
+    gpu: Joi.string(),
+    gpuUpgrade: Joi.string(),
+    panel: Joi.string(),
+    brightness: Joi.string(),
+    color: Joi.string(),
+    refreshRate: Joi.string(),
+    antiGlare: Joi.boolean(),
+    touch: Joi.boolean()
+  }).required(),
+  others: Joi.object({
+    battery: Joi.string(),
+    ports: Joi.array().items(Joi.string()),
+    os: Joi.string(),
+    weight: Joi.string()
+  }).required()
+})
+
+export const validateProduct = Joi.alternatives().conditional(Joi.object({ category: Joi.string().valid('Phone') }).unknown(), {
+  then: baseProductSchema.concat(phoneSchema),
+}).conditional(Joi.object({ category: Joi.string().valid('Laptop') }).unknown(), {
+  then: baseProductSchema.concat(laptopSchema),
+})

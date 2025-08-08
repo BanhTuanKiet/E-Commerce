@@ -121,7 +121,7 @@ export default function Header() {
                   className="user-btn d-flex align-items-center gap-2"
                   onClick={() => {
                     if (user?.role !== 'customer') {
-                      handleDropdownClick('/manage')
+                      handleDropdownClick('/manage#info')
                     }
                   }}
                 >

@@ -1,30 +1,141 @@
-import orders from "../model/ordersModel.js"
+import Order from "../model/ordersModel.js"
 
-export const postOrder = async (order) => {
-    return await orders.create(JSON.parse(JSON.stringify(order)))
+const itemsPerPage = 10
+
+export const getAllOrders = async (page) => {
+  const skipIndex = (page - 1) * itemsPerPage
+
+  const orders = await Order.find().skip(skipIndex).limit(itemsPerPage).populate('customerId')
+  const totalPages = await Order.countDocuments()
+
+  return {
+    orders,
+    totalPages: Math.ceil(totalPages / itemsPerPage)
+  }
+}
+
+export const postOrder = async (order, session) => {
+  const [ordered] = await Order.create(JSON.parse(JSON.stringify(order)), { session })
+  return ordered
 }
 
 export const findOrdersByCustomerId = async (customerId) => {
-    return await orders.find({ customerId: customerId })
+  return await Order.find({ customerId: customerId })
 }
 
 export const findOrdersByStatus = async (customerId, status) => {
-    return await orders.find({ customerId: customerId, orderStatus: status })
+  return await Order.find({ customerId: customerId, orderStatus: status })
 }
 
 export const findOrderById = async (orderId) => {
-    return await orders.findById(orderId).populate('items.productId')
+  return await Order.findById(orderId).populate('items.productId').populate('customerId')
 }
 
 export const findPresentOrder = async (userId) => {
-    return await orders.findOne(
-        {
-            customerId: userId,
-            orderStatus: { $ne: 'cancelled' }
-        },
-        null,
-        {
-            sort: { createdAt: -1 }
-        }
-    )
+  return await Order.findOne(
+    {
+      customerId: userId,
+      orderStatus: { $ne: 'cancelled' }
+    },
+    null,
+    {
+      sort: { createdAt: -1 }
+    }
+  )
+}
+
+export const countOrderByState = async (state) => {
+  return Order.find({ orderStatus: state }).countDocuments()
+}
+
+export const getFilterProducts = async (options, page) => {
+  const query = {}
+  const skipIndex = (page - 1) * itemsPerPage
+  let searchTerm, start, end = null
+
+  Object.entries(options).map(([key, value]) => {
+    if (key === 'createdAtFrom') {
+      start = new Date(Date.UTC(
+        new Date(value).getFullYear(),
+        new Date(value).getMonth(),
+        new Date(value).getDate(),
+        0, 0, 0, 0
+      ))
+      query['createdAt'] = { $gte: start, $lte: end }
+    }
+    else if (key === 'createdAtTo') {
+      end = new Date(Date.UTC(
+        new Date(value).getFullYear(),
+        new Date(value).getMonth(),
+        new Date(value).getDate(),
+        23, 59, 59, 999
+      ))
+
+      query['createdAt'] = { $gte: start, $lte: end }
+    }
+    else if (key === 'searchTerm') {
+      searchTerm = value.toLowerCase()
+    }
+    else if (key !== '' && key !== 'total' && value !== '' && value !== 'total') {
+      query[key] = value
+    }
+  })
+
+  let orders = await Order.find(query).skip(skipIndex).limit(itemsPerPage).populate('customerId')
+  const totalPages = await Order.countDocuments(query)
+
+  if (searchTerm) {
+    orders = orders.filter(order => {
+      const customerName = order.customerId?.name?.toLowerCase() || ''
+      const email = order.customerId?.email?.toLowerCase() || ''
+      const orderId = order._id?.toString()
+
+      return (
+        customerName.includes(searchTerm) ||
+        email.includes(searchTerm) ||
+        orderId.includes(searchTerm)
+      )
+    })
+  }
+
+  return {
+    orders,
+    totalPages: Math.ceil(totalPages / itemsPerPage)
+  }
+}
+
+export const updateOrderStatus = async (orderId, orderStatus, paymentStatus, session = null) => {
+  const update = {}
+  const now = Date.now()
+
+  if (orderStatus !== "") {
+    update[`statusHistory.${orderStatus}.updatedAt`] = now
+    update[`orderStatus`] = orderStatus
+    update[`statusHistory.${orderStatus}.createdAt`] = now
+  }
+
+  if (paymentStatus !== "") {
+    update[`paymentStatus`] = paymentStatus
+  }
+
+  const order = await Order.findById(orderId).session(session)
+  const createdAt = order?.statusHistory?.[orderStatus]?.createdAt
+  const updatedAt = order?.statusHistory?.[orderStatus]?.updatedAt
+
+  if (createdAt && createdAt !== updatedAt) {
+    delete update[`statusHistory.${orderStatus}.createdAt`]
+  }
+
+  return await Order.updateOne(
+    { _id: orderId },
+    { $set: update },
+    { session }
+  )
+}
+
+export const hasUsedVoucher = async (customerId, voucherId) => {
+  return await Order.findOne({
+    customerId: customerId,
+    'voucher._id': voucherId
+  })
 }

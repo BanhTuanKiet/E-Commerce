@@ -225,8 +225,8 @@ export default function OrderDetail() {
                                             order?.paymentStatus
                                                 ? <span
                                                     style={{
-                                                        backgroundColor: paymentStatusMap[order?.paymentStatus].bgColor,
-                                                        color: paymentStatusMap[order?.paymentStatus].color
+                                                        backgroundColor: paymentStatusMap[order?.paymentStatus]?.bgColor,
+                                                        color: paymentStatusMap[order?.paymentStatus]?.color
                                                     }}
                                                     className='p-2 py-1 rounded-pill'
                                                 >{order?.paymentStatus}</span>
@@ -244,8 +244,8 @@ export default function OrderDetail() {
                                             order?.orderStatus
                                                 ? <span
                                                     style={{
-                                                        backgroundColor: orderStatusMap[order?.orderStatus].bgColor,
-                                                        color: orderStatusMap[order?.orderStatus].color
+                                                        backgroundColor: orderStatusMap[order?.orderStatus]?.bgColor,
+                                                        color: orderStatusMap[order?.orderStatus]?.color
                                                     }}
                                                     className='p-2 py-1 rounded-pill'
                                                 >{order?.orderStatus}</span>

@@ -1,13 +1,21 @@
 import { getFilterOptionsByCategory } from "../service/filterOptionsService.js"
-import { countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions } from "../service/productsService.js"
+import { addProuct, findFirstProduct, countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions, updateProduct, removeProduct } from "../service/productsService.js"
 import { getProductImage } from "../util/getProductImage.js"
 import ErrorException from "../util/error.js"
 import { getList } from "../service/categoriesService.js"
+import { validateProduct } from "../util/valideInput.js"
+import { handleImageUpload } from "../util/uploadImageUtil.js"
+import mongoose from "mongoose"
 
 export const getProducts = async (req, res, next) => {
   try {
     const { page } = req.query
+
+    if (typeof page !== 'number') throw new ErrorException(400, "Invalid page")
+
     const { products, totalPages } = await findProducts(page)
+
+    if (!Array.isArray(products) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
 
     return res.json({ data: products, totalPages: totalPages })
   } catch (error) {
@@ -21,6 +29,8 @@ export const getProductsByCategory = async (req, res, next) => {
     const { page } = req.query
 
     const { products, totalPages } = await findProductsByCategory(category, page)
+
+    if (!Array.isArray(products) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
 
     const productsWithImages = products.map((product) => {
       if (!product.images || product.images.length === 0) {
@@ -43,12 +53,15 @@ export const getProductsByCategory = async (req, res, next) => {
 
 export const filterProducts = async (req, res, next) => {
   try {
-    const { options } = req.params
-    const { page } = req.query
+    let { options, page } = req.query
+    
+    if (!page) page = 1
 
     const decodedOptions = JSON.parse(decodeURIComponent(options))
 
     const { products, totalPages } = await getFilterProducts(decodedOptions, page)
+
+    if (!Array.isArray(products) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
 
     const productsWithImages = products.map((product) => {
       if (!product.images || product.images.length === 0) {
@@ -77,6 +90,8 @@ export const filterProductsByCategory = async (req, res, next) => {
     const filters = await getFilterOptionsByCategory(category)
     const { products, totalPages } = await getProductsByOptions(category, filters.filters, decodedOptions, page)
 
+    if (!Array.isArray(products) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
+
     const productsWithImageUrls = products.map((product) => {
       if (!product.images || product.images.length === 0) {
         return product
@@ -102,6 +117,8 @@ export const getProductDetail = async (req, res, next) => {
 
     const product = await getProductById(id)
 
+    if (!product) throw new ErrorException(500, "Product not found")
+
     const imageUrls = getProductImage(product.images)
 
     const productWithImages = { ...product.toObject?.(), images: imageUrls }
@@ -126,8 +143,10 @@ export const getOtherOptions = async (req, res, next) => {
 
 export const getSaleProducts = async (req, res, next) => {
   try {
-    const saleProducts = [] // Mỗi phần tử là mảng sản phẩm đã có ảnh
+    const saleProducts = []
     const categories = await getList()
+
+    if (!Array.isArray(categories)) throw new ErrorException(400, "Invalid category list")
 
     for (const category of categories) {
       const items = await getSaleProductsByCategory(category.name)
@@ -154,7 +173,6 @@ export const getSaleProducts = async (req, res, next) => {
 
     return res.json({ data: saleProducts })
   } catch (error) {
-    console.error(error)
     return res.status(500).json({ message: "Internal Server Error" })
   }
 }
@@ -163,6 +181,8 @@ export const getProductsByState = async (req, res, next) => {
   try {
     const { state } = req.params
     const products = await getProductByState(state)
+
+    if (!Array.isArray(products)) throw new ErrorException(400, "Invalid product list")
 
     const productsWithImages = products.map(product => {
       if (!product.images || product.images.length === 0) {
@@ -188,8 +208,120 @@ export const countProduct = async (req, res, next) => {
     const { state } = req.params
 
     const count = await countProductByState(state)
-    console.log(state, count)
+
+    if (typeof count !== 'number' || isNaN(count)) {
+      throw new ErrorException(400, "Invalid count result")
+    }
+
     return res.json({ key: state, data: count })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const putProduct = async (req, res, next) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+
+  try {
+    const { product } = req.body
+
+    const updatedProduct = await updateProduct(product, session)
+
+    if (!updatedProduct.acknowledged) {
+      throw new ErrorException(500, "Database did not acknowledge the update")
+    }
+    if (updatedProduct.matchedCount === 0) {
+      throw new ErrorException(404, "Product not found")
+    }
+
+    if (updatedProduct.modifiedCount === 0) {
+      return res.json({ message: "No changes made" })
+    }
+
+    await session.commitTransaction()
+
+    return res.json({ message: "Update successful!" })
+  } catch (error) {
+    await session.abortTransaction()
+    next(error)
+  } finally {
+    await session.endSession()
+  }
+}
+
+export const getFristProduct = async (req, res) => {
+  try {
+    const { category } = req.params
+
+    const product = await findFirstProduct(category)
+
+    if (!product) throw new ErrorException(404, "Product not found!")
+
+    return res.json({ data: product })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const postProduct = async (req, res, next) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+
+  try {
+    const { product } = req.body
+    const { error } = validateProduct.validate(req.body.product, { abortEarly: false })
+
+    if (error) {
+      const message = error.details.length > 1 ? "Please enter complete information" : error.details[0].message
+      throw new ErrorException(400, message)
+    }
+
+    const imageUrls = await handleImageUpload(product.images)
+
+    if (!imageUrls) {
+      throw new ErrorException(400, 'Image upload failed');
+    }
+
+    product.images = imageUrls
+
+    const postedProduct = await addProuct(product, session)
+
+    if (!postedProduct) {
+      throw new ErrorException(400, "Post product failed")
+    }
+
+    await session.commitTransaction()
+
+    return res.json({ message: "Post product successful!" })
+  } catch (error) {
+    await session.abortTransaction()
+    next(error)
+  } finally {
+    await session.endSession()
+  }
+}
+
+export const searchProduct = async (req, res, next) => {
+  try {
+    const { searchTerm } = req.query
+    
+    // const product = await searchProducts(searchTerm)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const objectId = new mongoose.Types.ObjectId(id)
+
+    const product = await removeProduct(objectId)
+    
+    if (!product.deletedCount || !product.acknowledged) throw new ErrorException(400, "Delete product failed")
+
+    return res.json({ message: "Delete product succesful" })
   } catch (error) {
     next(error)
   }

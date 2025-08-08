@@ -7,7 +7,6 @@ const orderSchema = new mongoose.Schema(
       ref: 'User',
       required: true
     },
-
     items: [
       {
         productId: {
@@ -27,12 +26,10 @@ const orderSchema = new mongoose.Schema(
         }
       }
     ],
-
     subtotal: {
       type: Number,
       required: true
     },
-
     voucher: {
       _id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -43,43 +40,61 @@ const orderSchema = new mongoose.Schema(
         default: 0
       }
     },
-
     shippingFee: {
       type: Number,
       default: 0
     },
-
     totalAmount: {
       type: Number,
       required: true
     },
-
     paymentMethod: {
       type: String,
       enum: ['COD', 'VNPay', 'Momo'],
       default: 'COD'
     },
-
     paymentStatus: {
       type: String,
       enum: ['unpaid', 'paid', 'failed'],
-      default: 'pending'
+      default: 'unpaid'
     },
-
     orderStatus: {
       type: String,
-      enum: ['processing', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+      enum: ['processing', 'confirmed', 'shipping', 'delivered', 'cancelled'],
       default: 'processing'
     },
-
     note: {
       type: String,
       default: ''
+    },
+    statusHistory: {
+      processing: {
+        createdAt: { type: mongoose.Schema.Types.Date, default: Date.now },
+        updatedAt: { type: mongoose.Schema.Types.Date, default: Date.now }
+      },
+      confirmed: {
+        createdAt: { type: mongoose.Schema.Types.Date, default: null },
+        updatedAt: { type: mongoose.Schema.Types.Date, default: null }
+      },
+      shipping: {
+        createdAt: { type: mongoose.Schema.Types.Date, default: null },
+        updatedAt: { type: mongoose.Schema.Types.Date, default: null }
+      },
+      delivered: {
+        createdAt: { type: mongoose.Schema.Types.Date, default: null },
+        updatedAt: { type: mongoose.Schema.Types.Date, default: null }
+      },
+      cancelled: {
+        createdAt: { type: mongoose.Schema.Types.Date, default: null },
+        updatedAt: { type: mongoose.Schema.Types.Date, default: null }
+      }
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    collection: 'Orders'
   }
 )
 
-export default mongoose.model('Orders', orderSchema, 'Orders')
+const Order = mongoose.model('Order', orderSchema)
+export default Order

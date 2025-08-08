@@ -1,64 +1,51 @@
-import React, { useState, useEffect } from 'react'
-import { Tab, Tabs } from 'react-bootstrap'
-import Order from './Order'
-import Profile from './Profile'
-import "../../style/ProfileTabs.css"
+import { Tab, Nav, Row, Col } from 'react-bootstrap'
+import Profile from '../Profile/Profile'
+import OrderManagement from './Order'
+import { useState } from 'react'
 
-export default function ProfileTabs() {
-    const [activeTab, setActiveTab] = useState('profile')
+export default function CustomerDashboard() {
+  const [activeTab, setActiveTab] = useState('info')
 
-    useEffect(() => {
-        const hash = window.location.hash.replace('#', '')
-        if (['profile', 'order', 'review'].includes(hash)) {
-            setActiveTab(hash)
-        }
-    }, [])
+  return (
+    <div className="p-3">
+      <Tab.Container activeKey={activeTab}>
+        <Row>
+          <Col xs={12} md={2} className="mb-3 mb-md-0">
+            <Nav variant="pills" className="flex-column">
+              <Nav.Item>
+                <Nav.Link eventKey="info" onClick={() => setActiveTab('info')}>
+                  Info
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="order" onClick={() => setActiveTab('order')}>
+                  Order
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="review" onClick={() => setActiveTab('review')}>
+                  Review
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Col>
 
-    const handleTabSelect = (k) => {
-        setActiveTab(k)
-        window.history.pushState(null, '', `#${k}`)
-    }
-
-    return (
-        <div className="profile-tabs-container">
-            <Tabs 
-                activeKey={activeTab} 
-                onSelect={handleTabSelect} 
-                className="custom-tabs"
-                variant="pills"
-            >
-                <Tab eventKey="profile" title={
-                    <span className="tab-title">
-                        <i className="fas fa-user me-2"></i>
-                        Profile
-                    </span>
-                }>
-                    <div className="tab-content-wrapper">
-                        <Profile />
-                    </div>
-                </Tab>
-                <Tab eventKey="order" title={
-                    <span className="tab-title">
-                        <i className="fas fa-shopping-cart me-2"></i>
-                        Order
-                    </span>
-                }>
-                    <div className="tab-content-wrapper">
-                        <Order />
-                    </div>
-                </Tab>
-                <Tab eventKey="review" title={
-                    <span className="tab-title">
-                        <i className="fas fa-star me-2"></i>
-                        Review
-                    </span>
-                }>
-                    <div className="tab-content-wrapper">
-                        <h4>Tab content for Review</h4>
-                        <p>Nội dung đánh giá sẽ được hiển thị ở đây.</p>
-                    </div>
-                </Tab>
-            </Tabs>
-        </div>
-    )
+          <Col xs={12} md={10}>
+            <Tab.Content>
+              <Tab.Pane eventKey="info">
+                <Profile activeTab={activeTab} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="order">
+                <OrderManagement activeTab={activeTab} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="review">
+                <h4>Review Management</h4>
+                <p>Quản lý đánh giá...</p>
+              </Tab.Pane>
+            </Tab.Content>
+          </Col>
+        </Row>
+      </Tab.Container>
+    </div>
+  )
 }

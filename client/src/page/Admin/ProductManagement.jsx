@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Card, Col, Container, Row } from 'react-bootstrap'
+import React, { useEffect, useRef, useState } from 'react'
+import { Alert, Button, Card, Col, Container, Row } from 'react-bootstrap'
 import axios from '../../util/AxiosConfig'
-import { formatStateLabel } from "../../util/DataClassify"
 import PaginationProducts from '../../component/Pagination'
 import StateProductCard from '../../component/Card/StateProductCard'
 import ProductDetail from './ProductDetail'
+import { getProductState, getStatusBadge } from '../../util/BadgeUtil'
+import AddModal from '../../component/Modal/AddModal'
 
-const getStatusBadge = (stock) => {
-  if (stock === 0) {
-    return <span className="badge bg-danger">Out of stock: {stock}</span>
-  }
-  if (stock <= 5) {
-    return <span className="badge bg-warning">Almost out of stock: {stock}</span>
-  }
-  return <span className="badge bg-success">In stock: {stock}</span>
-}
-
-export default function ProductManagement() {
+export default function ProductManagement({ activeTab }) {
   const [categories, setCategories] = useState()
   const [products, setProducts] = useState()
   const [productStates, setProductStates] = useState({
@@ -27,12 +18,8 @@ export default function ProductManagement() {
     sale: 0,
     new: 0
   })
-
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterSelections, setFilterSelections] = useState({
-    category: '',
-    state: ''
-  })
+  const timeoutSearchProductRef = useRef(null)
+  const [filterSelections, setFilterSelections] = useState({})
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const stateIcons = {
@@ -44,9 +31,58 @@ export default function ProductManagement() {
     new: { icon: "bi bi-star", color: "text-secondary", label: "Mới về" }
   }
   const [productId, setProductId] = useState()
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    if (activeTab !== "product") return
+
+    setFilterSelections({
+      category: '',
+      state: ''
+    })
+    setCurrentPage(1)
+  }, [activeTab])
+
+  useEffect(() => {
+    if (activeTab !== "product") return
+    if (timeoutSearchProductRef.current) {
+      clearTimeout(timeoutSearchProductRef.current)
+    }
+
+    timeoutSearchProductRef.current = setTimeout(async () => {
+      try {
+        const options = encodeURIComponent(JSON.stringify(filterSelections))
+        const response = await axios.get(`/products/filter?options=${options}`)
+        setProducts(response.data)
+        setCurrentPage(1)
+        setTotalPages(response.totalPages)
+      } catch (error) {
+        console.log(error)
+      }
+    }, 500)
+  }, [activeTab, filterSelections])
+
+  useEffect(() => {
+    if (activeTab !== "product") return
+
+    const fetchProducts = async () => {
+      try {
+        const options = encodeURIComponent(JSON.stringify(filterSelections))
+        const response = await axios.get(`/products/filter?options=${options}&page=${currentPage}`)
+        setProducts(response.data)
+        setTotalPages(response.totalPages)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    fetchProducts()
+  }, [activeTab, currentPage])
 
   useEffect(() => {
     const fetchCategories = async () => {
+      if (activeTab !== "product") return
+
       try {
         const response = await axios.get('/categories')
         setCategories(response.data)
@@ -56,30 +92,11 @@ export default function ProductManagement() {
     }
 
     fetchCategories()
-  }, [])
+  }, [activeTab])
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        let response
-        if (Object.keys(filterSelections).length === 0) {
-          response = await axios.get(`/products?page=${currentPage}`)
-        } else {
-          const options = encodeURIComponent(JSON.stringify(filterSelections))
-          response = await axios.get(`/products/filter/${options}?page=${currentPage}`)
-        }
+    if (activeTab !== "product") return
 
-        setProducts(response.data)
-        setTotalPages(response.totalPages)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchProducts()
-  }, [currentPage, filterSelections])
-
-  useEffect(() => {
     const fetchProductStates = async () => {
       try {
         const responses = await Promise.all(
@@ -118,7 +135,6 @@ export default function ProductManagement() {
     <div className="min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
       <Container className="py-4 pt-0">
         <Row className="mb-4">
-
         </Row>
 
         <Row>
@@ -129,10 +145,11 @@ export default function ProductManagement() {
           {Object?.entries(productStates)?.map(([key, value]) => {
             const icon = stateIcons[key]?.icon || "bi bi-box"
             const color = stateIcons[key]?.color || "text-muted"
-            
+            const isActive = filterSelections.state === key
+
             return (
               <Col md={3} key={key} className="mb-3">
-                <StateProductCard handleFilter={handleFilter} label={key} value={value} icon={icon} color={color} />
+                <StateProductCard handleFilter={handleFilter} type="product" label={key} value={value} icon={icon} color={color} isActive={isActive} />
               </Col>
             )
           })}
@@ -146,10 +163,11 @@ export default function ProductManagement() {
                   <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                   <input
                     type="text"
+                    name='model'
                     className="form-control ps-5"
-                    placeholder="Tìm kiếm theo tên sản phẩm hoặc SKU..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Seach by model..."
+                    value={filterSelections?.model ?? ""}
+                    onChange={(e) => handleFilter(e.target.name, e.target.value)}
                   />
                 </div>
               </Col>
@@ -160,7 +178,7 @@ export default function ProductManagement() {
                   value={filterSelections?.category}
                   onChange={(e) => handleFilter(e.target.name, e.target.value)}
                 >
-                  <option value="all">All</option>
+                  <option value="">All</option>
                   {categories?.map((category) => (
                     <option key={category._id} value={category.name}>
                       {category.name}
@@ -169,7 +187,7 @@ export default function ProductManagement() {
                 </select>
               </Col>
               <Col md={3} className="text-md-end">
-                <Button>
+                <Button onClick={() => setShow(true)}>
                   <i className="bi bi-plus-circle me-2"></i>
                   Add product
                 </Button>
@@ -180,88 +198,104 @@ export default function ProductManagement() {
 
         <Card>
           <Card.Body className="p-0">
-            <div className="table-responsive">
-              <table className="table table-hover mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Index</th>
-                    <th>Image</th>
-                    <th>Model</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>State</th>
-                    <th>Stock</th>
-                    <th>Created at</th>
-                    <th className="text-end">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products?.map((product, index) => (
-                    <tr key={product._id}>
-                      <td>
-                        <div className="fw-medium" style={{ maxWidth: '200px' }}>
-                          <div className="text-truncate">{index + 1 + (10 * (currentPage - 1))}</div>
-                        </div>
-                      </td>
-                      <td>
-                        <img
-                          src={product.images[0]}
-                          alt={product.model}
-                          width="50"
-                          height="50"
-                          className="rounded object-fit-cover"
-                        />
-                      </td>
-                      <td>
-                        <div className="fw-medium" style={{ maxWidth: '200px' }}>
-                          <div className="text-truncate">{product?.model}</div>
-                        </div>
-                      </td>
-                      <td>
-                        <small className="badge bg-light text-dark border">{product.category}</small>
-                      </td>
-                      <td>
-                        <span className="">{product?.price?.toLocaleString('vi-VN')}</span>
-                      </td>
-                      <td className="fw-medium">{formatStateLabel(product?.state)}</td>
-                      <td>
-                        <span
-                          className={`fw-medium ${product.stock === 0
-                            ? "text-danger"
-                            : product.stock <= 5
-                              ? "text-warning"
-                              : "text-success"
-                            }`}
-                        >
-                          {getStatusBadge(product?.stock)}
-                        </span>
-                      </td>
-                      <td>
-                        <small className="text-muted">
-                          {(product?.createdAt)}
-                        </small>
-                      </td>
-                      <td className="text-end">
-                        <div className="d-flex gap-2 justify-content-end">
-                          <Button
-                            variant='outline-primary'
-                            className="btn-sm"
-                            onClick={() => setProductId(product?._id)}
-                          >
-                            <i className="bi bi-eye me-1"></i>
-                            Detail
-                          </Button>
-                        </div>
-                      </td>
+            {products?.length === 0 ? (
+              <Alert variant="info" className="text-center">
+                <div className="fs-1 mb-3">🏷️</div>
+                <h5>Không tìm thấy product</h5>
+                <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+              </Alert>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-hover mb-0 text-center">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Index</th>
+                      <th>Image</th>
+                      <th>Model</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>State</th>
+                      <th>Stock</th>
+                      <th>Created at</th>
+                      <th className="text-end">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {products?.map((product, index) => (
+                      <tr key={product._id} className='align-middle'>
+                        <td>
+                          <div className="fw-medium" style={{ maxWidth: '200px' }}>
+                            <div className="text-truncate">{index + 1 + (10 * (currentPage - 1))}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <img
+                            src={product.images[0]}
+                            alt={product.model}
+                            width="50"
+                            height="50"
+                            className="rounded object-fit-cover"
+                          />
+                        </td>
+                        <td>
+                          <div className="fw-medium" style={{ maxWidth: '200px' }}>
+                            <div className="text-truncate">{product?.model}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <small className="badge bg-light text-dark border">{product.category}</small>
+                        </td>
+                        <td>
+                          <span>{product?.price?.toLocaleString('vi-VN')}</span>
+                        </td>
+                        <td className="fw-medium">{getProductState(product?.state)}</td>
+                        <td>
+                          <span
+                            className={`fw-medium ${product.stock === 0
+                              ? "text-danger"
+                              : product.stock <= 5
+                                ? "text-warning"
+                                : "text-success"
+                              }`}
+                          >
+                            {getStatusBadge(product?.stock)}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="small">
+                            {new Date(product.createdAt).toLocaleDateString("vi-VN")}
+                          </div>
+                          <div className="small text-muted">
+                            {new Date(product.createdAt).toLocaleTimeString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </td>
+                        <td className="text-end">
+                          <div className="d-flex gap-2 justify-content-end">
+                            <Button
+                              variant='outline-primary'
+                              className="btn-sm"
+                              onClick={() => setProductId(product?._id)}
+                            >
+                              <i className="bi bi-eye me-1"></i>
+                              Detail
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
           </Card.Body>
         </Card>
+
+        <AddModal type={"product"} show={show} setShow={setShow} />
       </Container>
     </div>
   )

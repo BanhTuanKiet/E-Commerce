@@ -63,7 +63,7 @@ cd E-Commerce
 
 2. **Install dependencies for both client & server**
 
-cd client && npm install
+cd client && npm install \n
 cd ../server && npm install
 
 

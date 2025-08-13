@@ -32,6 +32,8 @@ The system is built to provide a seamless experience for both **store owners** a
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="50" height="50" alt="MongoDB" />
   <!-- Redis -->
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="50" height="50" alt="Redis" />
+  <!-- JWT -->
+  <img src="https://jwt.io/img/pic_logo.svg" width="50" height="50" alt="JWT" />
 </p>
 
 ---

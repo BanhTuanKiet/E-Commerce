@@ -24,8 +24,6 @@ The system is built to provide a seamless experience for both **store owners** a
 <p align="center">
   <!-- ReactJS -->
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50" height="50" alt="ReactJS" />
-  <!-- React-Bootstrap -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" width="50" height="50" alt="React-Bootstrap" />
   <!-- Bootstrap -->
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" width="50" height="50" alt="Bootstrap" />
   <!-- ExpressJS -->

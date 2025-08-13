@@ -1,45 +1,77 @@
-<h1 align="center">Hi 👋, I'm BanhTuanKiet</h1>
-<h3 align="center">💻 A passionate developer from Vietnam</h3>
-
----
-
-### 🚀 About Me
-- 🌱 I’m currently learning **.NET Core, React, Next.js**
-- 💬 Ask me about **ASP.NET, Node.js, JavaScript**
-- 📫 How to reach me: **your.email@example.com**
-
----
-
-### 🛠️ Tech Stack
-
+<h1 align="center">🛒 eCommerce Management System</h1>
 <p align="center">
-  <!-- Node.js -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40"/>
-  <!-- .NET -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" width="40" height="40"/>
-  <!-- React -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40"/>
-  <!-- Next.js -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="40" height="40"/>
-  <!-- SQL Server -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-plain.svg" width="40" height="40"/>
-  <!-- HTML -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="40" height="40"/>
-  <!-- CSS -->
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="40" height="40"/>
+  <i>A web application designed to streamline eCommerce operations.</i>
 </p>
 
 ---
 
-### 📊 GitHub Stats
+## 📖 Description
+This project is a **full-stack eCommerce management system** that enables efficient management of:
+- 🛍️ **Products** – Add, update, and categorize products
+- 📦 **Orders** – Track and manage customer orders
+- 📊 **Inventory** – Monitor stock levels in real-time
+- ⭐ **User Reviews** – Customers can submit and view product feedback
+- 💳 **Payments** – Secure payment processing
+- 👥 **Role-based Access** – Separate features for customers and admins
+- 🔒 **Secure Authentication** – Implemented with **JWT (JSON Web Token)**
+
+The system is built to provide a seamless experience for both **store owners** and **customers**.
+
+---
+
+## 🛠️ Technologies Used
+
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=BanhTuanKiet&show_icons=true&theme=tokyonight" alt="GitHub stats" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=BanhTuanKiet&theme=tokyonight" alt="GitHub streak" />
+  <!-- ReactJS -->
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50" height="50" alt="ReactJS" />
+  <!-- Bootstrap -->
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" width="50" height="50" alt="Bootstrap" />
+  <!-- ExpressJS -->
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="50" height="50" alt="ExpressJS" />
+  <!-- MongoDB -->
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="50" height="50" alt="MongoDB" />
+  <!-- Redis -->
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="50" height="50" alt="Redis" />
 </p>
 
 ---
 
-### 🌐 Connect with me
-<p align="center">
-  <a href="https://linkedin.com/in/your-linkedin" target="blank"><img align="center" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="linkedin" height="30" width="30" /></a>
-</p>
+## 🚀 Features
+- **Modern UI** built with **ReactJS** and **Bootstrap**
+- **RESTful API** using **ExpressJS**
+- **MongoDB** for scalable data storage
+- **Redis** caching for performance optimization
+- **JWT Authentication** for secure login
+- **Role-based permissions** for customers and admins
+
+---
+
+## 📂 Project Structure
+┣ 📂 client # ReactJS frontend
+┣ 📂 server # ExpressJS backend
+
+---
+
+## ⚡ Installation
+
+1. **Clone the repository**
+
+git clone https://github.com/BanhTuanKiet/E-Commerce
+cd E-Commerce
+
+2. **Install dependencies for both client & server**
+
+cd client && npm install
+cd ../server && npm install
+
+
+3. **Run the application**
+
+# Start backend
+cd server && npm start
+
+# Start frontend
+cd client && npm start
+
+
+

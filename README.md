@@ -69,10 +69,10 @@ cd ../server && npm install
 
 3. **Run the application**
 
-# Start backend
-cd server && npm start
+Start backend
+cd server && npm run dev
 
-# Start frontend
+Start frontend
 cd client && npm start
 
 

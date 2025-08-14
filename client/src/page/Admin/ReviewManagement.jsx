@@ -14,7 +14,7 @@ export default function ReviewManagement({ activeTab }) {
   const [reviews, setReviews] = useState()
   const [categories, setCategories] = useState()
   const [productAverages, setProductAverages] = useState()
-  const [viewMode, setViewMode] = useState("individual") // 'individual' or 'average'
+  const [viewMode, setViewMode] = useState("individual")
   const [filterSelections, setFilterSelections] = useState({
     isFlagged: "",
     rating: "",
@@ -122,8 +122,8 @@ export default function ReviewManagement({ activeTab }) {
       <Container className="py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
-            <h1 className="h2 mb-1">Quản lý đánh giá</h1>
-            <p className="text-muted">Quản lý và kiểm duyệt đánh giá sản phẩm</p>
+            <h1 className="h2 mb-1">Review management</h1>
+            <p className="text-muted">Manage and moderate product reviews</p>
           </div>
           <div className="d-flex gap-2">
             <ButtonGroup>
@@ -132,20 +132,16 @@ export default function ReviewManagement({ activeTab }) {
                 onClick={() => handleViewModeChange("individual")}
               >
                 <List size={16} className="me-2" />
-                Đánh giá cá nhân
+                Personal review
               </Button>
               <Button
                 variant={viewMode === "average" ? "primary" : "outline-primary"}
                 onClick={() => handleViewModeChange("average")}
               >
                 <BarChart3 size={16} className="me-2" />
-                Trung bình sản phẩm
+                Average product rating
               </Button>
             </ButtonGroup>
-            <Button variant="outline-secondary">
-              <Calendar size={16} className="me-2" />
-              Báo cáo
-            </Button>
           </div>
         </div>
 
@@ -163,8 +159,8 @@ export default function ReviewManagement({ activeTab }) {
                     type="text"
                     placeholder={
                       viewMode === "individual"
-                        ? "Tìm kiếm theo tên khách hàng hoặc sản phẩm..."
-                        : "Tìm kiếm theo tên sản phẩm..."
+                        ? "Search by customer or model product..."
+                        : "Search by model product..."
                     }
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -205,10 +201,10 @@ export default function ReviewManagement({ activeTab }) {
                   </Col>
                   <Col md={3}>
                     <Form.Select value={filterSelections?.sort} onChange={(e) => handleFilter(e)} name="sort">
-                      <option value="">Sắp xếp theo</option>
-                      <option value="desc">Đánh giá cao nhất</option>
-                      <option value="asc">Đánh giá thấp nhất</option>
-                      <option value="max">Nhiều đánh giá nhất</option>
+                      <option value="">Sort by</option>
+                      <option value="desc">Highest rated</option>
+                      <option value="asc">Lowest rated</option>
+                      <option value="max">Highest rated price</option>
                     </Form.Select>
                   </Col>
                 </>
@@ -218,13 +214,6 @@ export default function ReviewManagement({ activeTab }) {
         </Card>
 
         <Card>
-          <Card.Header>
-            <Card.Title className="h5 mb-0">
-              {viewMode === "individual"
-                ? `Danh sách đánh giá (${reviews?.length})`
-                : `Đánh giá trung bình sản phẩm (${productAverages?.length})`}
-            </Card.Title>
-          </Card.Header>
           <Card.Body className="p-0">
             {reviews?.length === 0 ? (
               <Alert variant="info" className="text-center">

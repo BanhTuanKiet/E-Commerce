@@ -1,5 +1,5 @@
 import axios from 'axios'
-import ErrorException from './error.js';
+import ErrorException from './errorException.js';
 
 export const handleImageUpload = async (images) => {
   if (!Array.isArray(images)) return [];

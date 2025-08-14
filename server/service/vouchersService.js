@@ -84,3 +84,11 @@ export const getFilterVouchers = async (options, page) => {
     totalPages: Math.ceil(totalPages / 10),
   }
 }
+
+export const addVoucher = async (voucher, session) => {
+  return await Voucher.create([voucher], {session})
+}
+
+export const deleteVoucher = async (voucher) => {
+  return await Voucher.deleteOne(voucher)
+}

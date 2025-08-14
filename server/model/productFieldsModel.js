@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const productFieldSchema = new mongoose.Schema(
   {
+    type: { type: String },
     common: {
       category: { type: String },
       brand: { type: String },

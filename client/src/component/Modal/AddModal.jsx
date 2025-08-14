@@ -29,7 +29,7 @@ export default function AddModal({ show, setShow }) {
 
     const fetchKeyProduct = async () => {
       try {
-        const response = await axios.get(`/productFields`)
+        const response = await axios.get(`/productFields/${"product"}`)
         setPrimitiveKeys(response.data.common)
         setObjectKeys(response.data[formData.category])
       } catch (error) {
@@ -154,8 +154,6 @@ export default function AddModal({ show, setShow }) {
               </Col>
 
               {primitiveKeys && typeof primitiveKeys === 'object' && Object.entries(primitiveKeys).map(([key, value], index) => {
-                if (['_id', 'category', 'reviews', 'avgScore', 'discount', 'sold', 'createdAt', 'images'].includes(key)) return null
-
                 return (
                   <Col md={6}>
                     <Form.Group className="mb-3">

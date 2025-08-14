@@ -143,7 +143,7 @@ function ReviewModal({ showReviewModal, setShowReviewModal, selectedProduct }) {
                         as="textarea"
                         name='content'
                         rows={4}
-                        value={review.content}
+                        value={review?.content[0]?.content}
                         onChange={handleReview}
                     />
                 </Form.Group>

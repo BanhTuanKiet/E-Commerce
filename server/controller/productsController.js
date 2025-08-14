@@ -1,7 +1,7 @@
 import { getFilterOptionsByCategory } from "../service/filterOptionsService.js"
 import { addProuct, findFirstProduct, countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions, updateProduct, removeProduct } from "../service/productsService.js"
 import { getProductImage } from "../util/getProductImage.js"
-import ErrorException from "../util/error.js"
+import ErrorException from "../util/errorException.js"
 import { getList } from "../service/categoriesService.js"
 import { validateProduct } from "../util/valideInput.js"
 import { handleImageUpload } from "../util/uploadImageUtil.js"
@@ -27,6 +27,10 @@ export const getProductsByCategory = async (req, res, next) => {
   try {
     const { category } = req.params
     const { page } = req.query
+
+    if (!category || category.trim() === '') {
+      throw new ErrorException(400, "Category is required")
+    }
 
     const { products, totalPages } = await findProductsByCategory(category, page)
 
@@ -54,7 +58,7 @@ export const getProductsByCategory = async (req, res, next) => {
 export const filterProducts = async (req, res, next) => {
   try {
     let { options, page } = req.query
-    
+
     if (!page) page = 1
 
     const decodedOptions = JSON.parse(decodeURIComponent(options))
@@ -85,6 +89,13 @@ export const filterProductsByCategory = async (req, res, next) => {
   try {
     const { category, options } = req.params
     const { page } = req.query
+
+    if (!category || category.trim() === '') {
+      throw new ErrorException(400, "Category is required")
+    }
+
+    if (typeof page !== 'number') throw new ErrorException(400, "Invalid page")
+
     const decodedOptions = JSON.parse(decodeURIComponent(options))
 
     const filters = await getFilterOptionsByCategory(category)
@@ -132,6 +143,10 @@ export const getProductDetail = async (req, res, next) => {
 export const getOtherOptions = async (req, res, next) => {
   try {
     const { model } = req.params
+
+    if (!model || typeof model !== 'string') {
+      throw new ErrorException(500, "Invalid model")
+    }
 
     const product = await getOtherOptionsItem(model)
 
@@ -207,6 +222,8 @@ export const countProduct = async (req, res, next) => {
   try {
     const { state } = req.params
 
+    if (!state || state.trim() === "") throw new ErrorException(500, "State is required")
+
     const count = await countProductByState(state)
 
     if (typeof count !== 'number' || isNaN(count)) {
@@ -254,6 +271,8 @@ export const getFristProduct = async (req, res) => {
   try {
     const { category } = req.params
 
+    if (!category || category.trim() === '') throw new ErrorException(500, "Category is required")
+
     const product = await findFirstProduct(category)
 
     if (!product) throw new ErrorException(404, "Product not found!")
@@ -270,6 +289,9 @@ export const postProduct = async (req, res, next) => {
 
   try {
     const { product } = req.body
+
+    if (!product) throw new ErrorException(400, "Product data is required")
+
     const { error } = validateProduct.validate(req.body.product, { abortEarly: false })
 
     if (error) {
@@ -302,23 +324,13 @@ export const postProduct = async (req, res, next) => {
   }
 }
 
-export const searchProduct = async (req, res, next) => {
-  try {
-    const { searchTerm } = req.query
-    
-    // const product = await searchProducts(searchTerm)
-  } catch (error) {
-    next(error)
-  }
-}
-
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params
     const objectId = new mongoose.Types.ObjectId(id)
 
     const product = await removeProduct(objectId)
-    
+
     if (!product.deletedCount || !product.acknowledged) throw new ErrorException(400, "Delete product failed")
 
     return res.json({ message: "Delete product succesful" })

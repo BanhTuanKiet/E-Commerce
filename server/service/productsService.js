@@ -129,3 +129,16 @@ export const minusQuantityProduct = async (id, quantity, session) => {
     { session }
   )
 }
+
+export const updateReviewProduct = async (id, avgScore, totalReviews, session) => {
+  return await Product.updateOne(
+    { _id: id },
+    { 
+      $set: {
+        avgScore: avgScore,
+        reviews: totalReviews
+      }
+    },
+    {session}
+  )
+}

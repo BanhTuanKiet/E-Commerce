@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import ErrorException from "../util/error.js"
+import ErrorException from "./errorException.js"
 
 export const generateToken = (_id, role, expire) => {
     try {

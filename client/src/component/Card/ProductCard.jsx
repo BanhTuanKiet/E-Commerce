@@ -171,10 +171,10 @@ export default function ProductCard({ product, keys, handleCompareProducts }) {
 
           <div className="specifications py-0">
             {keys && keys.map((key) => {
-              if (['model', '_id', 'price', 'discount', 'stock', 'category', 'images', 'state', 'reviews'].includes(key)) return null
-
+              if (['model', '_id', 'price', 'createdAt', 'category', 'images', 'state'].includes(key)) return null
+              
               const value = product[key]
-              if (!value) return null
+              if (!value || typeof value === 'number') return null
 
               return (
                 <div key={key} className="spec-item d-flex justify-content-between align-items-center py-1">

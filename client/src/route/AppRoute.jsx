@@ -12,6 +12,7 @@ import Compare from '../page/Compare.jsx'
 import OrderDetail from '../page/Profile/OrderDetail.jsx'
 import Profile from '../page/Profile/Profile.jsx'
 import Admin from '../page/Admin/index.jsx'
+import Review from '../page/Profile/Review.jsx'
 
 function AppRoute() {
     return (
@@ -23,7 +24,7 @@ function AppRoute() {
             <Route path='/cart' element={<Index><Cart /></Index>} />
             <Route path='/order' element={<Index><Order /></Index>} />
             <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} />
-            <Route path='/review' element={<Index><Category /></Index>} />
+            <Route path='/review' element={<Index><Review /></Index>} />
             <Route path='/compare/:category/:compareIds' element={<Index><Compare /></Index>} />
             <Route path='/signin' element={<Signin />} />
             <Route path='/signup' element={<Signup />} />

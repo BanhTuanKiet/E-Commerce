@@ -130,7 +130,7 @@ export default function Header() {
                   <span>{user?.role}</span>
                 </div>
 
-                {isDropdownOpen && user?.role === "customer"
+                {isDropdownOpen && user?.role !== "customer"
                   ?
                   (
                     <div className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2" style={{ zIndex: 999 }}>

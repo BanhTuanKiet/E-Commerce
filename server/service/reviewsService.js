@@ -3,6 +3,10 @@ import Review from "../model/reviewsModel.js"
 
 const itemsPerPage = 10
 
+export const findReview = async (reviewId) => {
+  return await Review.findById(reviewId)
+}
+
 export const findReviewByReviewId = async (reviewId) => {
   return await Review.findById(reviewId).populate('productId').populate('userId').populate('orderId')
 }
@@ -25,7 +29,11 @@ export const addReview = async (userId, review, orderId, productId) => {
     productId,
     userId,
     rating: review.rating,
-    content: review.content
+    content: {
+      content: review.content,
+      role: "customer",
+      _id: userId
+    }
   })
 }
 
@@ -47,17 +55,31 @@ export const findReviewsByProductId = async (productId) => {
   return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
 }
 
-export const saveReply = async (reviewId, adminId, content) => {
+export const findReviewsCustomerByProductId = async (productId) => {
+  return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
+    .populate({
+      path: 'userId',
+      select: 'name'
+    })
+    .populate({
+      path: 'productId',
+      select: 'images'
+    })
+}
+
+export const saveReply = async (reviewId, user, content, session) => {
   return await Review.findByIdAndUpdate(
     reviewId,
     {
-      $set: {
-        'reply.content': content,
-        'reply.repliedAt': new Date(),
-        'reply.adminId': adminId
+      $push: {
+        content: {
+          role: user.role,
+          content: content,
+          _id: user._id
+        }
       }
     },
-    { new: true }
+    { new: true, session }
   )
 }
 
@@ -78,4 +100,28 @@ export const getFilterReviews = async (options, page) => {
     reviews,
     totalPages: Math.ceil(totalPages / itemsPerPage)
   }
+}
+
+export const firstVote = async (reviewId, userId, status, session) => {
+  return await Review.findOneAndUpdate(
+    { _id: reviewId }, // ✅ đúng filter
+    { $push: { isHelpfulCount: { userId, status } } },
+    { new: true, session }
+  )
+}
+
+export const removeVote = async (reviewId, userId, session) => {
+  return await Review.findOneAndUpdate(
+    { _id: reviewId },
+    { $pull: { isHelpfulCount: { userId } } },
+    { new: true, session }
+  )
+}
+
+export const changeVote = async (review, target, userId, session) => {
+  return await Review.findOneAndUpdate(
+    { _id: review._id, "isHelpfulCount.userId": userId },
+    { $set: { "isHelpfulCount.$.status": !target.status } },
+    { new: true, session }
+  )
 }

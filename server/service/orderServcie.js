@@ -23,6 +23,52 @@ export const findOrdersByCustomerId = async (customerId) => {
   return await Order.find({ customerId: customerId })
 }
 
+export const filterOrdersByCustomerAndOpions = async (customerId, options, page) => {
+  const query = { customerId }
+  const skipIndex = (page - 1) * itemsPerPage
+  let start, end = null
+
+  Object.entries(options).forEach(([key, value]) => {
+    if (!value || value === 'total') return
+
+    if (key === 'start') {
+      start = new Date(Date.UTC(
+        new Date(value).getFullYear(),
+        new Date(value).getMonth(),
+        new Date(value).getDate(),
+        0, 0, 0, 0
+      ))
+    }
+    else if (key === 'end') {
+      end = new Date(Date.UTC(
+        new Date(value).getFullYear(),
+        new Date(value).getMonth(),
+        new Date(value).getDate(),
+        23, 59, 59, 999
+      ))
+    }
+    else {
+      query[key] = value
+    }
+  })
+
+  if (start || end) {
+    query['createdAt'] = {}
+    if (start) query['createdAt'].$gte = start
+    if (end) query['createdAt'].$lte = end
+  }
+
+  let orders = await Order.find(query).skip(skipIndex).limit(itemsPerPage).populate('customerId')
+
+  const totalPages = await Order.countDocuments(query)
+  console.log(query)
+
+  return {
+    orders,
+    totalPages: Math.ceil(totalPages / itemsPerPage)
+  }
+}
+
 export const findOrdersByStatus = async (customerId, status) => {
   return await Order.find({ customerId: customerId, orderStatus: status })
 }

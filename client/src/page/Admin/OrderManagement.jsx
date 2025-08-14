@@ -1,10 +1,9 @@
 import axios from '../../util/AxiosConfig'
 import { useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, Card, Table, Form, Button, InputGroup } from 'react-bootstrap'
-import StateProductCard from '../../component/Card/StateProductCard'
+import StatusItemCard from '../../component/Card/StatusItemCard'
 import PaginationProducts from '../../component/Pagination'
 import { getPaymentMethodBadge, getPaymentStatusBadge, getOrderStatusBadge } from '../../util/BadgeUtil'
-import { FolderOutput } from 'lucide-react'
 import OrderDetail from "./OrderDetail"
 
 export default function OrderManagement({ activeTab }) {
@@ -25,13 +24,6 @@ export default function OrderManagement({ activeTab }) {
     paymentStatus: '',
     paymentMethod: ''
   })
-  const stateIcons = {
-    processing: { icon: "bi bi-boxes", color: "text-primary", label: "Tổng sản phẩm" },
-    confirmed: { icon: "bi bi-check-circle", color: "text-success", label: "Còn hàng" },
-    shipping: { icon: "bi bi-exclamation-triangle", color: "text-warning", label: "Sắp hết hàng" },
-    delivered: { icon: "bi bi-x-circle", color: "text-danger", label: "Hết hàng" },
-    cancelled: { icon: "bi bi-tags", color: "text-info", label: "Giảm giá" },
-  }
 
   useEffect(() => {
     if (activeTab !== "order") return
@@ -53,7 +45,7 @@ export default function OrderManagement({ activeTab }) {
     timeoutSearchOrderRef.current = setTimeout(async () => {
       try {
         const options = encodeURIComponent(JSON.stringify(filterSelections))
-        const response = await axios.get(`/orders/filter?options=${options}`)
+        const response = await axios.get(`/orders/manage/filter?options=${options}`)
 
         setOrders(response.data)
         setCurrentPage(1)
@@ -128,19 +120,17 @@ export default function OrderManagement({ activeTab }) {
           <Col lg={6}>
             <div className="d-flex justify-content-between align-items-center flex-wrap">
               <div>
-                <h1 className="h2 text-dark mb-1">Quản lý đơn hàng</h1>
-                <p className="text-muted">Quản lý và theo dõi tất cả đơn hàng</p>
+                <h1 className="h2 text-dark mb-1">Order management</h1>
+                <p className="text-muted">Manage and track all orders</p>
               </div>
             </div>
           </Col>
           {Object?.entries(orderStates)?.map(([key, value]) => {
-            const icon = stateIcons[key]?.icon || "bi bi-box"
-            const color = stateIcons[key]?.color || "text-muted"
             const isActive = filterSelections.orderStatus === key
 
             return (
               <Col md={3} key={key} className="mb-3">
-                <StateProductCard handleFilter={handleFilter} type="order" label={key} value={value} icon={icon} color={color} isActive={isActive} />
+                <StatusItemCard handleFilter={handleFilter} type="order" label={key} value={value} isActive={isActive} />
               </Col>
             )
           })}
@@ -155,7 +145,7 @@ export default function OrderManagement({ activeTab }) {
                   <Form.Control
                     type="text"
                     name='searchTerm'
-                    placeholder="Tìm kiếm theo ID, tên, email, SĐT..."
+                    placeholder="Search by order id, name, email"
                     value={filterSelections?.searchTerm ?? ""}
                     onChange={(e) => handleFilter(e.target.name, e.target.value)}
                   />
@@ -217,9 +207,6 @@ export default function OrderManagement({ activeTab }) {
         </Card>
 
         <Card>
-          <Card.Header>
-            <Card.Title className="mb-0">Danh sách đơn hàng ({orders?.length})</Card.Title>
-          </Card.Header>
           <Card.Body className="p-0">
             <div className="table-responsive">
               <Table striped hover className="mb-0">

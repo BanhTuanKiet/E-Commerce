@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import ErrorException from "../Util/error.js"
+import ErrorException from "../util/errorException.js"
 import { getRefreshToken } from "../service/usersService.js"
 import { generateToken } from "../util/tokenUtil.js"
 

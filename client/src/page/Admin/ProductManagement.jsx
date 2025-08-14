@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Card, Col, Container, Row } from 'react-bootstrap'
 import axios from '../../util/AxiosConfig'
 import PaginationProducts from '../../component/Pagination'
-import StateProductCard from '../../component/Card/StateProductCard'
+import StatusItemCard from '../../component/Card/StatusItemCard'
 import ProductDetail from './ProductDetail'
 import { getProductState, getStatusBadge } from '../../util/BadgeUtil'
 import AddModal from '../../component/Modal/AddModal'
@@ -22,14 +22,6 @@ export default function ProductManagement({ activeTab }) {
   const [filterSelections, setFilterSelections] = useState({})
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const stateIcons = {
-    total: { icon: "bi bi-boxes", color: "text-primary", label: "Tổng sản phẩm" },
-    inStock: { icon: "bi bi-check-circle", color: "text-success", label: "Còn hàng" },
-    lowStock: { icon: "bi bi-exclamation-triangle", color: "text-warning", label: "Sắp hết hàng" },
-    outOfStock: { icon: "bi bi-x-circle", color: "text-danger", label: "Hết hàng" },
-    sale: { icon: "bi bi-tags", color: "text-info", label: "Giảm giá" },
-    new: { icon: "bi bi-star", color: "text-secondary", label: "Mới về" }
-  }
   const [productId, setProductId] = useState()
   const [show, setShow] = useState(false)
 
@@ -143,13 +135,11 @@ export default function ProductManagement({ activeTab }) {
             <p className="text-muted">Manage your store's product list</p>
           </Col>
           {Object?.entries(productStates)?.map(([key, value]) => {
-            const icon = stateIcons[key]?.icon || "bi bi-box"
-            const color = stateIcons[key]?.color || "text-muted"
             const isActive = filterSelections.state === key
-
+            
             return (
               <Col md={3} key={key} className="mb-3">
-                <StateProductCard handleFilter={handleFilter} type="product" label={key} value={value} icon={icon} color={color} isActive={isActive} />
+                <StatusItemCard handleFilter={handleFilter} type="product" label={key} value={value} isActive={isActive} />
               </Col>
             )
           })}
@@ -295,7 +285,7 @@ export default function ProductManagement({ activeTab }) {
           </Card.Body>
         </Card>
 
-        <AddModal type={"product"} show={show} setShow={setShow} />
+        <AddModal show={show} setShow={setShow} />
       </Container>
     </div>
   )

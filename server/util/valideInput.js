@@ -40,9 +40,9 @@ export const voucherSchema = Joi.object({
     'number.base': 'Quantity must be an integer',
     'number.min': 'Quantity must be greater than 0',
   }),
-  usageLimitPerUser: Joi.number().integer().min(1).required().messages({
+  usageLimitPerUser: Joi.number().integer().min(1).optional().messages({
     'number.base': 'Limit per user must be an integer',
-    'number.min': 'Limit per user must be >= 1',
+    'number.min': 'Limit per user must be = 1',
   }),
   startDate: Joi.date().iso().required().messages({
     'date.base': 'Invalid start date',
@@ -64,6 +64,72 @@ export const voucherSchema = Joi.object({
   updatedAt: Joi.any().optional(),
   usageLimitPerUser: Joi.any().optional(),
   used: Joi.any().optional(),
+})
+
+export const newVoucherSchema = Joi.object({
+  code: Joi.string().trim().required().messages({
+    'string.base': 'Code must be a string',
+    'string.empty': 'Code cannot be empty',
+  }),
+  description: Joi.string().trim().required().messages({
+    'string.base': 'Description must be a string',
+    'string.empty': 'Description cannot be empty',
+  }),
+  discountType: Joi.string().valid('percentage', 'fixed').required().messages({
+    'any.only': 'Discount type must be "percentage" or "fixed"',
+    'string.empty': 'Discount cannot be empty',
+  }),
+  discountValue: Joi.number().positive().required()
+    .when('discountType', {
+      is: 'percentage',
+      then: Joi.number().positive().less(100).messages({
+        'number.less': 'Discount value must be less than 100 when type is percentage',
+        'number.positive': 'Discount value must be greater than 0',
+        'any.required': 'Discount value required',
+        'number.base': 'Discount value must be a number'
+      }),
+      otherwise: Joi.number().positive().messages({
+        'number.positive': 'Discount value must be greater than 0',
+        'any.required': 'Discount value required',
+        'number.base': 'Discount value must be a number'
+      })
+    }),
+  maxDiscount: Joi.number().min(0).allow(null).messages({
+    'number.base': 'Maximum discount must be a number',
+    'number.min': 'Maximum discount cannot be negative',
+  }),
+  minOrderValue: Joi.number().min(0).allow(null).messages({
+    'number.base': 'Minimum order value must be a number',
+    'number.min': 'Minimum order value cannot be negative',
+  }),
+  quantity: Joi.number().integer().min(1).required().messages({
+    'number.base': 'Quantity must be an integer',
+    'number.min': 'Quantity must be greater than 0',
+  }),
+  usageLimitPerUser: Joi.number().integer().min(1).max(1).optional().messages({
+    'number.base': 'Limit per user must be an integer',
+    'number.min': 'Limit per user must be = 1',
+  }),
+  startDate: Joi.date().iso().required().messages({
+    'date.base': 'Invalid start date',
+    'any.required': 'Start date is required',
+  }),
+  endDate: Joi.date().iso().greater(Joi.ref('startDate')).required().messages({
+    'date.base': 'Invalid end date',
+    'date.greater': 'End date must be after start date',
+  }),
+  
+  categories: Joi.array().items(Joi.string().trim()).min(1).unique().required().messages({
+    'array.base': 'Category must be an array',
+    'array.min': 'Must contain at least one category',
+    'array.unique': 'Cannot copy list',
+  }),
+
+  _id: Joi.any().optional(),
+  createdAt: Joi.any().optional(),
+  updatedAt: Joi.any().optional(),
+  used: Joi.any().optional(),
+  isActive: Joi.boolean().optional(),
 })
 
 const baseProductSchema = Joi.object({

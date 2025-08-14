@@ -1,5 +1,5 @@
 import { createUser, findUserById, saveRefreshToken, userIsExist, updateUser } from "../service/usersService.js"
-import ErrorException from "../util/error.js"
+import ErrorException from "../util/errorException.js"
 import { sendMail } from "../util/mailUtl.js"
 import { generateOTP, verifyOTP } from "../util/otpUtil.js"
 import client from "../config/redis.js"

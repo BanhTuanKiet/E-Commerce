@@ -4,73 +4,73 @@ import { Copy, Phone, Mail, Star, ArrowLeft, Trash2, Flag, Check, ThumbsUp, Eye,
 import axios from '../../util/AxiosConfig'
 
 function ReviewDetail({ reviewId, setReviewId }) {
-  const reviewDetails = {
-    _id: "review1",
-    customer: {
-      _id: "user1",
-      name: "Nguyễn Văn An",
-      email: "an.nguyen@email.com",
-      phone: "0901234567",
-      avatar: "/api/placeholder/80/80",
-      joinDate: "2023-05-15T00:00:00Z",
-      totalOrders: 12,
-      totalReviews: 8,
-    },
-    product: {
-      _id: "prod1",
-      name: "iPhone 15 Pro Max 256GB Titan Tự Nhiên",
-      image: "/api/placeholder/120/120",
-      sku: "IP15PM-256-TI",
-      price: 29990000,
-      category: "Điện thoại",
-      brand: "Apple",
-    },
-    order: {
-      _id: "674a1b2c3d4e5f6789012345",
-      orderNumber: "ORD001",
-      orderDate: "2024-01-20T10:30:00Z",
-      totalAmount: 32000000,
-      status: "delivered",
-    },
-    rating: 5,
-    title: "Sản phẩm tuyệt vời, rất hài lòng!",
-    content: "iPhone 15 Pro Max thực sự xuất sắc và vượt ngoài mong đợi của tôi. Camera 48MP chụp ảnh cực kỳ sắc nét, đặc biệt là chế độ chụp đêm. Chip A17 Pro xử lý mượt mà, không bao giờ bị lag kể cả khi chơi game nặng hay chỉnh sửa video 4K.\n\nThiết kế titan cao cấp, cầm nắm chắc chắn và sang trọng. Màn hình Super Retina XDR 6.7 inch hiển thị màu sắc rực rỡ, độ sáng cao ngay cả dưới ánh nắng mặt trời.\n\nPin kéo dài cả ngày sử dụng nặng. Sạc nhanh và sạc không dây rất tiện lợi. Đóng gói cẩn thận, giao hàng nhanh chóng. Dịch vụ khách hàng tận tình. Chắc chắn sẽ giới thiệu cho bạn bè!",
-    status: "approved",
-    isVerifiedPurchase: true,
-    helpfulCount: 24,
-    viewCount: 156,
-    createdAt: "2024-01-25T14:30:00Z",
-    updatedAt: "2024-01-25T15:00:00Z",
-    statusHistory: [
-      {
-        status: "pending",
-        timestamp: "2024-01-25T14:30:00Z",
-        note: "Đánh giá được tạo",
-        updatedBy: "System",
-      },
-      {
-        status: "approved",
-        timestamp: "2024-01-25T15:00:00Z",
-        note: "Đánh giá đã được duyệt và công khai",
-        updatedBy: "Admin",
-      },
-    ],
-    adminReplies: [
-      {
-        id: "reply1",
-        content: "Cảm ơn bạn đã dành thời gian đánh giá chi tiết! Chúng tôi rất vui khi bạn hài lòng với iPhone 15 Pro Max. Hy vọng sản phẩm sẽ đồng hành cùng bạn trong thời gian dài.",
-        author: "Admin",
-        authorRole: "Quản trị viên",
-        createdAt: "2024-01-25T16:00:00Z",
-      },
-    ],
-    interactions: {
-      likes: 24,
-      dislikes: 1,
-      shares: 3,
-      reports: 0,
-    },
-  };
+  // const reviewDetails = {
+  //   _id: "review1",
+  //   customer: {
+  //     _id: "user1",
+  //     name: "Nguyễn Văn An",
+  //     email: "an.nguyen@email.com",
+  //     phone: "0901234567",
+  //     avatar: "/api/placeholder/80/80",
+  //     joinDate: "2023-05-15T00:00:00Z",
+  //     totalOrders: 12,
+  //     totalReviews: 8,
+  //   },
+  //   product: {
+  //     _id: "prod1",
+  //     name: "iPhone 15 Pro Max 256GB Titan Tự Nhiên",
+  //     image: "/api/placeholder/120/120",
+  //     sku: "IP15PM-256-TI",
+  //     price: 29990000,
+  //     category: "Điện thoại",
+  //     brand: "Apple",
+  //   },
+  //   order: {
+  //     _id: "674a1b2c3d4e5f6789012345",
+  //     orderNumber: "ORD001",
+  //     orderDate: "2024-01-20T10:30:00Z",
+  //     totalAmount: 32000000,
+  //     status: "delivered",
+  //   },
+  //   rating: 5,
+  //   title: "Sản phẩm tuyệt vời, rất hài lòng!",
+  //   content: "iPhone 15 Pro Max thực sự xuất sắc và vượt ngoài mong đợi của tôi. Camera 48MP chụp ảnh cực kỳ sắc nét, đặc biệt là chế độ chụp đêm. Chip A17 Pro xử lý mượt mà, không bao giờ bị lag kể cả khi chơi game nặng hay chỉnh sửa video 4K.\n\nThiết kế titan cao cấp, cầm nắm chắc chắn và sang trọng. Màn hình Super Retina XDR 6.7 inch hiển thị màu sắc rực rỡ, độ sáng cao ngay cả dưới ánh nắng mặt trời.\n\nPin kéo dài cả ngày sử dụng nặng. Sạc nhanh và sạc không dây rất tiện lợi. Đóng gói cẩn thận, giao hàng nhanh chóng. Dịch vụ khách hàng tận tình. Chắc chắn sẽ giới thiệu cho bạn bè!",
+  //   status: "approved",
+  //   isVerifiedPurchase: true,
+  //   helpfulCount: 24,
+  //   viewCount: 156,
+  //   createdAt: "2024-01-25T14:30:00Z",
+  //   updatedAt: "2024-01-25T15:00:00Z",
+  //   statusHistory: [
+  //     {
+  //       status: "pending",
+  //       timestamp: "2024-01-25T14:30:00Z",
+  //       note: "Đánh giá được tạo",
+  //       updatedBy: "System",
+  //     },
+  //     {
+  //       status: "approved",
+  //       timestamp: "2024-01-25T15:00:00Z",
+  //       note: "Đánh giá đã được duyệt và công khai",
+  //       updatedBy: "Admin",
+  //     },
+  //   ],
+  //   adminReplies: [
+  //     {
+  //       id: "reply1",
+  //       content: "Cảm ơn bạn đã dành thời gian đánh giá chi tiết! Chúng tôi rất vui khi bạn hài lòng với iPhone 15 Pro Max. Hy vọng sản phẩm sẽ đồng hành cùng bạn trong thời gian dài.",
+  //       author: "Admin",
+  //       authorRole: "Quản trị viên",
+  //       createdAt: "2024-01-25T16:00:00Z",
+  //     },
+  //   ],
+  //   interactions: {
+  //     likes: 24,
+  //     dislikes: 1,
+  //     shares: 3,
+  //     reports: 0,
+  //   },
+  // };
   const [review, setReview] = useState()
   const [replyContent, setReplyContent] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -118,7 +118,12 @@ function ReviewDetail({ reviewId, setReviewId }) {
     setTimeout(() => setShowAlert({ show: false, message: "", variant: "success" }), 3000);
   };
 
-  const handleReply = () => {
+  const handleReply = async () => {
+    try {
+      await axios.put(`/reviews/reply`, { content: replyContent.trim(), reviewId: review?._id })
+    } catch (error) {
+      console.log(error)
+    }
     if (replyContent.trim()) {
       setShowAlert({
         show: true,
@@ -169,8 +174,8 @@ function ReviewDetail({ reviewId, setReviewId }) {
                 <div>
                   <h1 className="display-6 fw-bold text-dark mb-1">Chi tiết đánh giá</h1>
                   <p className="text-muted mb-0">
-                    Đánh giá #{reviewDetails._id.slice(-8).toUpperCase()} • Tạo lúc{" "}
-                    {new Date(reviewDetails.createdAt).toLocaleString("vi-VN")}
+                    Review #{review?._id.toUpperCase()} • Created at{" "}
+                    {new Date(review?.createdAt).toLocaleString("vi-VN")}
                   </p>
                 </div>
               </div>
@@ -247,7 +252,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
                   </div>
                   <div>
                     <p className="small text-muted mb-1">Hữu ích</p>
-                    <p className="h4 text-info fw-bold mb-0">{reviewDetails.helpfulCount}</p>
+                    <p className="h4 text-info fw-bold mb-0">{review?.isHelpfulCount.filter(r => r.status === false).length}</p>
                   </div>
                 </div>
               </Card.Body>
@@ -262,7 +267,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
                   </div>
                   <div>
                     <p className="small text-muted mb-1">Lượt xem</p>
-                    <p className="h4 text-warning fw-bold mb-0">{reviewDetails.viewCount}</p>
+                    <p className="h4 text-warning fw-bold mb-0">{review?.isHelpfulCount.length}</p>
                   </div>
                 </div>
               </Card.Body>
@@ -282,7 +287,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
               <Card.Body>
                 <div className="mb-4">
                   <p className="text-dark lh-lg" style={{ whiteSpace: "pre-line" }}>
-                    {review?.content}
+                    {review?.content[0].content}
                   </p>
                 </div>
               </Card.Body>
@@ -296,13 +301,17 @@ function ReviewDetail({ reviewId, setReviewId }) {
                 </Card.Title>
               </Card.Header>
               <Card.Body>
-                {reviewDetails.adminReplies.map((reply) => (
-                  <div key={reply.id} className="p-3 bg-primary bg-opacity-10 rounded mb-3">
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      <span className="fw-medium">{reply.author}</span>
-                      <Badge bg="secondary" className="small">
-                        {reply.authorRole}
-                      </Badge>
+                {review?.content?.map((reply) => (
+                  <div
+                    key={reply._id}
+                    className={`p-3 bg-primary bg-opacity-10 rounded mb-3 w-75 ${reply.role === "admin" ? "ms-auto text-end" : ""
+                      }`}
+                  >
+                    <div
+                      className={`d-flex align-items-center gap-2 mb-2 ${reply.role === "admin" ? "flex-row-reverse" : ""
+                        }`}
+                    >
+                      <span className="fw-medium">{reply.role}</span>
                       <span className="small text-muted">
                         {new Date(reply.createdAt).toLocaleString("vi-VN")}
                       </span>
@@ -310,7 +319,6 @@ function ReviewDetail({ reviewId, setReviewId }) {
                     <p className="text-dark mb-0">{reply.content}</p>
                   </div>
                 ))}
-
                 <div>
                   <Form.Label htmlFor="reply">Thêm phản hồi mới</Form.Label>
                   <Form.Control
@@ -324,7 +332,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
                   />
                   <Button variant="primary" onClick={handleReply}>
                     <Reply size={16} className="me-2" />
-                    Gửi phản hồi
+                    Reply
                   </Button>
                 </div>
               </Card.Body>

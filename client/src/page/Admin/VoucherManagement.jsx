@@ -3,12 +3,14 @@ import { Container, Row, Col, Card, Table, Button, Form, Badge, ProgressBar, Mod
 import axios from '../../util/AxiosConfig'
 import { getVoucherStatus } from '../../util/BadgeUtil'
 import VoucherDetailModal from '../../component/Modal/VoucherDetailModal'
-import StateProductCard from '../../component/Card/StateProductCard'
+import StatusItemCard from '../../component/Card/StatusItemCard'
 import PaginationProducts from '../../component/Pagination'
+import AddVoucherModal from '../../component/Modal/AddVoucherModal'
 
 export default function VoucherManagement({ activeTab }) {
   const [vouchers, setVouchers] = useState()
   const [selectedVoucher, setSelectedVoucher] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [filterSelections, setFilterSelections] = useState({})
   const timeoutVouchertRef = useRef(null)
@@ -21,33 +23,6 @@ export default function VoucherManagement({ activeTab }) {
     expired: 0,
     upcoming: 0,
   })
-  const voucherStateIcons = {
-    total: {
-      icon: "bi bi-collection",
-      color: "text-primary",
-      description: "Total number of vouchers"
-    },
-    active: {
-      icon: "bi bi-check-circle",
-      color: "text-success",
-      description: "Currently active vouchers"
-    },
-    pause: {
-      icon: "bi bi-pause-circle",
-      color: "text-warning",
-      description: "Temporarily paused vouchers"
-    },
-    expired: {
-      icon: "bi bi-x-circle",
-      color: "text-danger",
-      description: "Vouchers that have expired"
-    },
-    upcoming: {
-      icon: "bi bi-clock",
-      color: "text-info",
-      description: "Vouchers starting soon"
-    }
-  };
 
   useEffect(() => {
     if (activeTab !== "product") return
@@ -113,18 +88,15 @@ export default function VoucherManagement({ activeTab }) {
 
         <Row className="mb-4">
           <Col md={6}>
-            <h1 className="display-5 fw-bold text-dark">Quản lý Voucher</h1>
-            <p className="text-muted">Quản lý mã giảm giá và khuyến mãi</p>
+            <h1 className="display-5 fw-bold text-dark">Voucher management</h1>
+            <p className="text-muted">Manage voucher and promotions</p>
           </Col>
           {Object?.entries(voucherStates)?.map(([key, value]) => {
-            const icon = voucherStateIcons[key]?.icon || "bi bi-box"
-            const color = voucherStateIcons[key]?.color || "text-muted"
-            const description = voucherStateIcons[key]?.description || ""
             const isActive = filterSelections.state === key
 
             return (
               <Col md={3} key={key} className="mb-3">
-                <StateProductCard handleFilter={handleFilter} type="voucher" label={key} value={value} icon={icon} color={color} description={description} isActive={isActive} />
+                <StatusItemCard handleFilter={handleFilter} type="voucher" label={key} value={value} isActive={isActive} />
               </Col>
             )
           })}
@@ -158,8 +130,8 @@ export default function VoucherManagement({ activeTab }) {
                 </Form.Select>
               </Col>
               <Col lg={2} className="d-flex align-items-center justify-content-end">
-                <Button variant="primary">
-                  ➕ Tạo Voucher
+                <Button variant="primary" onClick={() => setShowAddModal(true)}>
+                  ➕ Add voucher
                 </Button>
               </Col>
             </Row>
@@ -167,9 +139,6 @@ export default function VoucherManagement({ activeTab }) {
         </Card>
 
         <Card>
-          <Card.Header>
-            <Card.Title>Danh sách Voucher ({vouchers?.length})</Card.Title>
-          </Card.Header>
           <Card.Body>
             {vouchers?.length === 0 ? (
               <Alert variant="info" className="text-center">
@@ -182,14 +151,14 @@ export default function VoucherManagement({ activeTab }) {
                 <Table hover>
                   <thead>
                     <tr>
-                      <th>Mã Voucher</th>
-                      <th>Mô tả</th>
-                      <th>Giảm giá</th>
-                      <th>Điều kiện</th>
-                      <th>Sử dụng</th>
-                      <th>Thời gian</th>
-                      <th>Trạng thái</th>
-                      <th className="text-end">Thao tác</th>
+                      <th>Voucher Id</th>
+                      <th>Description</th>
+                      <th>Discount</th>
+                      <th>Condition</th>
+                      <th>Used</th>
+                      <th>Validity period</th>
+                      <th>Status</th>
+                      <th className="text-end">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -232,7 +201,7 @@ export default function VoucherManagement({ activeTab }) {
                             )}
                             {voucher.maxDiscount && (
                               <div className="small text-muted mt-1">
-                                Tối đa: {voucher.maxDiscount.toLocaleString('vi-VN')}
+                                Max: {voucher.maxDiscount.toLocaleString('vi-VN')}
                               </div>
                             )}
                           </div>
@@ -241,11 +210,11 @@ export default function VoucherManagement({ activeTab }) {
                           <div className="small">
                             {voucher.minOrderValue && (
                               <div>
-                                Đơn tối thiểu: {voucher.minOrderValue.toLocaleString('vi-VN')}
+                                Min order value: {voucher.minOrderValue.toLocaleString('vi-VN')}
                               </div>
                             )}
                             <div className="text-muted">
-                              Giới hạn: {voucher.usageLimitPerUser} lần/người
+                              Limit: {voucher.usageLimitPerUser} time/person
                             </div>
                           </div>
                         </td>
@@ -253,22 +222,22 @@ export default function VoucherManagement({ activeTab }) {
                           <div>
                             <div className="d-flex align-items-center gap-2 mb-1">
                               <span className="small fw-medium">
-                                {voucher.usedCount}/{voucher.quantity}
+                                {voucher.used}/{voucher.quantity}
                               </span>
                             </div>
                             <ProgressBar
-                              now={(voucher.usedCount / voucher.quantity) * 100}
+                              now={(voucher.used / voucher.quantity) * 100}
                               style={{ height: '6px' }}
                             />
                             <div className="small text-muted mt-1">
-                              {((voucher.usedCount / voucher.quantity) * 100).toFixed(1)}% đã dùng
+                              {((voucher.used / voucher.quantity) * 100).toFixed(1)}% used
                             </div>
                           </div>
                         </td>
                         <td>
                           <div className="small">
-                            <div>Từ: {new Date(voucher.startDate).toLocaleDateString("vi-VN")}</div>
-                            <div>Đến: {new Date(voucher.endDate).toLocaleDateString("vi-VN")}</div>
+                            <div>From: {new Date(voucher.startDate).toLocaleDateString("vi-VN")}</div>
+                            <div>To: {new Date(voucher.endDate).toLocaleDateString("vi-VN")}</div>
                           </div>
                         </td>
                         <td>{getVoucherStatus(voucher)}</td>
@@ -294,6 +263,7 @@ export default function VoucherManagement({ activeTab }) {
           <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
         </Card>
 
+        <AddVoucherModal show={showAddModal} setShow={setShowAddModal} />
         <VoucherDetailModal selectedVoucher={selectedVoucher} showDetailModal={showDetailModal} setShowDetailModal={setShowDetailModal} />
       </Container>
     </div>

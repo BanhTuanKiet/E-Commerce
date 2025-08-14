@@ -5,6 +5,6 @@ const productFieldsRoute = expres.Router()
 
 productFieldsRoute.use(authToken)
 
-productFieldsRoute.get('/', getProductFields)
+productFieldsRoute.get('/:type', getProductFields)
 
 export default productFieldsRoute

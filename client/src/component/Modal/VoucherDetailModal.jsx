@@ -90,7 +90,16 @@ export default function VoucherDetailModal({ selectedVoucher, showDetailModal, s
     setVoucherEditing((prev) => ({
       ...prev,
       categories: [...prev.categories, category.name],
-    }));
+    }))
+  }
+
+  const handleDeleteVoucher = async () => {
+    try {
+      const response = await axios.delete(`/vouchers/${voucherEditing?._id}`)
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -385,7 +394,7 @@ export default function VoucherDetailModal({ selectedVoucher, showDetailModal, s
               </Button>
 
             }
-            <Button variant='danger' >
+            <Button variant='danger' onClick={handleDeleteVoucher} >
               <Delete size={16} className="me-2" />
               {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>

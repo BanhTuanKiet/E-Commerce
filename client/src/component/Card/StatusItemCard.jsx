@@ -1,7 +1,13 @@
 import { Card } from 'react-bootstrap'
 import { formatStateLabel } from '../../util/DataClassify'
+import { itemStatusIcons } from '../../util/StatusIcon'
 
-export default function StateProductCard({ handleFilter, type, label, value, icon, color, description, isActive }) {
+export default function StatusItemCard({ handleFilter, type, label, value, isActive }) {
+  const statusIcons = itemStatusIcons[type]
+  const icon = statusIcons[label]?.icon || "bi bi-box"
+  const color = statusIcons[label]?.color || "text-muted"
+  const description = statusIcons[label]?.description || ""
+
   const state = {
     product: "state",
     order: "orderStatus",

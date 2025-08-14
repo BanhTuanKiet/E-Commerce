@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import { countOrderByState, postOrder, findOrdersByCustomerId, findOrdersByStatus, findOrderById, findPresentOrder, getAllOrders, getFilterProducts, updateOrderStatus, hasUsedVoucher } from "../service/orderServcie.js"
+import { countOrderByState, postOrder, findOrderById, findPresentOrder, getAllOrders, getFilterProducts, updateOrderStatus, hasUsedVoucher, filterOrdersByCustomerAndOpions } from "../service/orderServcie.js"
 import { getProductImage } from "../util/getProductImage.js"
-import ErrorException from "../util/error.js"
+import ErrorException from "../util/errorException.js"
 import { sendMailUpdateOrderStatus } from "../util/mailUtl.js"
 import { minusQuantityProduct } from "../service/productsService.js"
 import { minusQuantityVoucher } from "../service/vouchersService.js"
@@ -72,21 +72,6 @@ export const getOrders = async (req, res, next) => {
     next(error)
   }
 }
-//order page -> customer
-export const filterOrdersByStatus = async (req, res, next) => {
-  try {
-    const { user } = req
-    const { status } = req.params
-
-    const orders = await findOrdersByStatus(user._id, status)
-
-    if (!Array.isArray(products)) throw new ErrorException(500, "Invalid product list")
-
-    return res.json({ data: orders })
-  } catch (error) {
-    next(error)
-  }
-}
 
 export const getOrder = async (req, res, next) => {
   try {
@@ -133,6 +118,23 @@ export const getPresentOrder = async (req, res, next) => {
     if (!order) throw new ErrorException(500, "Order not found")
 
     return res.json({ data: order })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const filterOrdersByCustomerId = async (req, res, next) => {
+  try {
+    let { options, page } = req.query
+    const { user } = req
+    const decodedOptions = JSON.parse(options)
+    if (!page) page = 1
+
+    const { orders, totalPages } = await filterOrdersByCustomerAndOpions(user._id, decodedOptions, page)
+
+    if (!Array.isArray(orders) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid order list")
+
+    return res.json({ data: orders, totalPages: totalPages })
   } catch (error) {
     next(error)
   }
@@ -185,7 +187,7 @@ export const putOrderStatus = async (req, res, next) => {
       throw new ErrorException(400, "Can only mark as failed when order is cancelled")
     }
 
-    const updatedOrder = await updateOrderStatus(order, orderStatus, paymentStatus)
+    await updateOrderStatus(order, orderStatus, paymentStatus)
 
     try {
       await sendMailUpdateOrderStatus("kiett5153@gmail.com", orderStatus)

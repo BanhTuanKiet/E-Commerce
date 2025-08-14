@@ -65,6 +65,7 @@ export const getPaymentMethodBadge = (method) => {
   return <Badge bg={config.variant} pill>{config.label}</Badge>
 }
 
+
 export const renderStars = (rating) => {
   if (rating === 0) {
     return (
@@ -72,40 +73,39 @@ export const renderStars = (rating) => {
     )
   }
   return (
-    <div className="d-flex align-items-center">
+    <div className="d-flex align-items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
           size={16}
-          className={star <= rating ? "text-warning" : "text-muted"}
-          fill={star <= rating ? "currentColor" : "none"}
+          className={star <= rating ? "text-warning fill-warning" : "text-secondary"}
+          fill={star <= rating ? "#facc15" : "none"}
         />
       ))}
-      {/* <span className="ms-2 small">{rating}</span> */}
     </div>
   )
 }
 
 export const getVoucherStatus = (voucher) => {
-  const now = new Date();
-  const startDate = new Date(voucher.startDate);
-  const endDate = new Date(voucher.endDate);
+  const now = new Date()
+  const startDate = new Date(voucher.startDate)
+  const endDate = new Date(voucher.endDate)
 
   if (!voucher.isActive) {
-    return <Badge bg="secondary">Tạm dừng</Badge>;
+    return <Badge bg="secondary">Pause</Badge>
   }
 
   if (now < startDate) {
-    return <Badge bg="info">Sắp diễn ra</Badge>;
+    return <Badge bg="info">Upcoming</Badge>
   }
 
   if (now > endDate) {
-    return <Badge bg="danger">Hết hạn</Badge>;
+    return <Badge bg="danger">Expired</Badge>
   }
 
   if (voucher.usedCount >= voucher.quantity) {
-    return <Badge bg="danger">Hết lượt</Badge>;
+    return <Badge bg="danger">Unavailable</Badge>
   }
 
-  return <Badge bg="success">Đang hoạt động</Badge>;
+  return <Badge bg="success">Available</Badge>
 };

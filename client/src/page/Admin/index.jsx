@@ -5,6 +5,7 @@ import OrderManagement from './OrderManagement'
 import { useState, useEffect } from 'react'
 import ReviewManagement from './ReviewManagement'
 import VoucherManagement from './VoucherManagement'
+import FilterOptions from './FilterOptions'
 
 export default function AdminDashboard() {
   const hash = window.location.hash?.replace('#', '') || 'info'
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
           <Col xs={12} md={2} className="mb-3 mb-md-0">
             <Nav variant="pills" className="flex-column">
               <Nav.Item>
-                <Nav.Link eventKey="info" onClick={() => handleTabChange('info')}>
+                <Nav.Link eventKey="profile" onClick={() => handleTabChange('profile')}>
                   Info
                 </Nav.Link>
               </Nav.Item>
@@ -58,12 +59,17 @@ export default function AdminDashboard() {
                   Voucher
                 </Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="filterOptions" onClick={() => handleTabChange('filterOptions')}>
+                  Filter Options
+                </Nav.Link>
+              </Nav.Item>
             </Nav>
           </Col>
 
           <Col xs={12} md={10}>
             <Tab.Content>
-              <Tab.Pane eventKey="info">
+              <Tab.Pane eventKey="profile">
                 <Profile activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="product">
@@ -77,6 +83,9 @@ export default function AdminDashboard() {
               </Tab.Pane>
               <Tab.Pane eventKey="voucher">
                 <VoucherManagement activeTab={activeTab} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="filterOptions">
+                <FilterOptions activeTab={activeTab} />
               </Tab.Pane>
             </Tab.Content>
           </Col>

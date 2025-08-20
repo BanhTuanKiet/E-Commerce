@@ -4,6 +4,7 @@ import { findReviews, findReviewById, addReview, updateReview, findReviewsByProd
 import ErrorException from "../util/errorException.js"
 import { findOrderById } from "../service/orderServcie.js"
 import { getProductImage } from "../util/getProductImage.js"
+import { sendMessage } from "../config/webSocket.js"
 
 export const getReviewByReviewId = async (req, res, next) => {
   try {
@@ -22,6 +23,7 @@ export const getReviewByReviewId = async (req, res, next) => {
 export const getReview = async (req, res, next) => {
   try {
     const { user } = req
+
     const { orderId, productId } = req.params
 
     if (!orderId || !productId) throw new ErrorException(500, "Missing orderId or productId")
@@ -179,13 +181,17 @@ export const replyReview = async (req, res, next) => {
   try {
     const { reviewId, content } = req.body
     const { user } = req
-
+    console.log(user, reviewId, content)
     const savedReply = await saveReply(reviewId, user, content, session)
-
     if (!savedReply) throw new ErrorException(400, "Reply failed")
 
-    await session.commitTransaction()
+    const contentLength = savedReply.content.length
+    const newMessage = savedReply.content[contentLength - 1].toObject()
 
+    delete newMessage._id
+    sendMessage(newMessage)
+
+    await session.commitTransaction()
     return res.json({ message: "Replied successful" })
   } catch (error) {
     await session.abortTransaction()

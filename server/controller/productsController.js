@@ -1,9 +1,8 @@
 import { getFilterOptionsByCategory } from "../service/filterOptionsService.js"
-import { addProuct, findFirstProduct, countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions, updateProduct, removeProduct } from "../service/productsService.js"
+import { addProuct, findFirstProduct, countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, findProductBySearchTerm, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions, updateProduct, removeProduct } from "../service/productsService.js"
 import { getProductImage } from "../util/getProductImage.js"
 import ErrorException from "../util/errorException.js"
 import { getList } from "../service/categoriesService.js"
-import { validateProduct } from "../util/valideInput.js"
 import { handleImageUpload } from "../util/uploadImageUtil.js"
 import mongoose from "mongoose"
 
@@ -37,7 +36,7 @@ export const getProductsByCategory = async (req, res, next) => {
     if (!Array.isArray(products) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
 
     const productsWithImages = products.map((product) => {
-      if (!product.images || product.images.length === 0) {
+      if (!product.images) {
         return product
       }
 
@@ -93,8 +92,6 @@ export const filterProductsByCategory = async (req, res, next) => {
     if (!category || category.trim() === '') {
       throw new ErrorException(400, "Category is required")
     }
-
-    if (typeof page !== 'number') throw new ErrorException(400, "Invalid page")
 
     const decodedOptions = JSON.parse(decodeURIComponent(options))
 
@@ -288,21 +285,12 @@ export const postProduct = async (req, res, next) => {
   session.startTransaction()
 
   try {
-    const { product } = req.body
-
-    if (!product) throw new ErrorException(400, "Product data is required")
-
-    const { error } = validateProduct.validate(req.body.product, { abortEarly: false })
-
-    if (error) {
-      const message = error.details.length > 1 ? "Please enter complete information" : error.details[0].message
-      throw new ErrorException(400, message)
-    }
+    const product = req.body
 
     const imageUrls = await handleImageUpload(product.images)
 
     if (!imageUrls) {
-      throw new ErrorException(400, 'Image upload failed');
+      throw new ErrorException(400, 'Image upload failed')
     }
 
     product.images = imageUrls
@@ -334,6 +322,33 @@ export const deleteProduct = async (req, res, next) => {
     if (!product.deletedCount || !product.acknowledged) throw new ErrorException(400, "Delete product failed")
 
     return res.json({ message: "Delete product succesful" })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const searchProduct = async (req, res, next) => {
+  try {
+    const { searchTerm } = req.query
+
+    if (!searchTerm || !searchTerm.length) throw new ErrorException(400, 'You need write something')
+
+    const splitedTerm = searchTerm.split(' ')
+
+    const products = await findProductBySearchTerm(splitedTerm)
+
+    const productsWithImages = products.map(product => {
+      if (!product.images) return product
+
+      const images = getProductImage(product.images)
+
+      return {
+        ...product?.toObject(),
+        images: images
+      }
+    })
+
+    return res.json({ data: productsWithImages })
   } catch (error) {
     next(error)
   }

@@ -23,6 +23,16 @@ export const findOrdersByCustomerId = async (customerId) => {
   return await Order.find({ customerId: customerId })
 }
 
+export const findOrderBasic = async (customerId) => {
+  return await Order.find(
+    { customerId },
+    { items: 1 } // chỉ lấy items từ Order
+  )
+  .populate({
+    path: 'items.productId',
+    select: 'model' // chỉ lấy trường model của Product
+  })
+}
 export const filterOrdersByCustomerAndOpions = async (customerId, options, page) => {
   const query = { customerId }
   const skipIndex = (page - 1) * itemsPerPage

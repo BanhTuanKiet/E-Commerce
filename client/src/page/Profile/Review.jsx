@@ -1,21 +1,62 @@
-import { Col, Container, Row, Accordion, ListGroup, Badge } from 'react-bootstrap';
+import { useEffect, useRef, useState } from 'react'
+import { Col, Container, Row, Accordion, ListGroup } from 'react-bootstrap'
+import axios from '../../util/AxiosConfig'
+import ReplyComponent from '../../component/ReplyComponent'
+import BoxChat from '../../component/BoxChat'
+import { useContext } from 'react'
+import { ChatContext } from '../../context/ChatContext'
 
 export default function Review() {
-  const orders = [
-    {
-      orderId: '123',
-      products: [
-        { id: 'p1', name: 'Product A', status: 'Has reply' },
-        { id: 'p2', name: 'Product B', status: 'Pending' },
-      ]
-    },
-    {
-      orderId: '124',
-      products: [
-        { id: 'p3', name: 'Product C', status: 'Not reviewed' },
-      ]
+  const [orders, setOrders] = useState()
+  const [review, setReview] = useState()
+  const reviewRef = useRef(null)
+  const replyRef = useRef(null)
+  const [replyContent, setReplyContent] = useState()
+  const { messages, setMessages } = useContext(ChatContext)
+
+  useEffect(() => {
+    const fetchOrdes = async () => {
+      try {
+        const response = await axios.get(`/orders/basic`)
+        setOrders(response.data)
+      } catch (error) {
+        console.log(error)
+      }
     }
-  ];
+
+    fetchOrdes()
+  }, [])
+
+  const fetchReview = async (orderId, productId) => {
+    if (reviewRef.current) {
+      clearTimeout(reviewRef.current)
+    }
+
+    reviewRef.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(`/reviews/${orderId}/${productId}`)
+        setReview(response.data)
+        // setMessages(response.data.content)
+        setMessages(response.data.content || [])
+      } catch (error) {
+        console.log(error)
+      }
+    }, 500)
+  }
+
+  const handleReply = () => {
+    if (replyRef.current) {
+      clearTimeout(replyRef.current)
+    }
+  
+    replyRef.current = setTimeout(async () => {
+      try {
+        await axios.put(`/reviews/reply`, { reviewId: review?._id, content: replyContent })
+      } catch (error) {
+        console.log(error)
+      }
+    }, 500)
+  }
 
   return (
     <Container fluid>
@@ -24,24 +65,19 @@ export default function Review() {
         <Col md={3} className="border-end bg-light vh-100 p-0">
           <h5 className="p-3 border-bottom">My Orders</h5>
           <Accordion alwaysOpen>
-            {orders.map((order, idx) => (
-              <Accordion.Item eventKey={String(idx)} key={order.orderId}>
-                <Accordion.Header>Order #{order.orderId}</Accordion.Header>
+            {orders?.map((order, idx) => (
+              <Accordion.Item eventKey={String(idx)} key={order._id}>
+                <Accordion.Header>Order #{order._id.toUpperCase().slice(-10) + "..."}</Accordion.Header>
                 <Accordion.Body className="p-0">
                   <ListGroup variant="flush">
-                    {order.products.map(product => (
+                    {order.items.map(product => (
                       <ListGroup.Item
                         action
-                        key={product.id}
+                        key={product.productId._id}
                         className="d-flex justify-content-between align-items-center"
+                        onClick={() => fetchReview(order._id, product.productId._id)}
                       >
-                        {product.name}
-                        <Badge bg={
-                          product.status === 'Has reply' ? 'success' :
-                          product.status === 'Pending' ? 'warning' : 'secondary'
-                        }>
-                          {product.status}
-                        </Badge>
+                        {product.productId.model}
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -51,12 +87,20 @@ export default function Review() {
           </Accordion>
         </Col>
 
-        {/* Main content */}
-        <Col md={9} className="p-4">
-          <h4>Review & Chat Box</h4>
-          <p>Select a product from the sidebar to view or write your review.</p>
+        <Col md={9} className="p-4 d-flex flex-column" style={{ height: '100vh' }}>
+          <div className="flex-grow-1 overflow-auto">
+            <BoxChat view={'customer'} content={messages} />
+          </div>
+
+          <div className="border-top pt-2 bg-white" style={{ position: 'sticky', bottom: 0 }}>
+            <ReplyComponent
+              replyContent={replyContent}
+              setReplyContent={setReplyContent}
+              handleReply={handleReply}
+            />
+          </div>
         </Col>
       </Row>
     </Container>
-  );
+  )
 }

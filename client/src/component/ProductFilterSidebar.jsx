@@ -25,8 +25,8 @@ export default function ProductFilterSidebar({ keysFilter, handleCheckboxChange 
 
   const handlePriceChange = (e, key) => {
     const value = parseInt(e.target.value)
-    setPriceRange(value) // cập nhật ngay để slider trượt mượt
-    debouncedPriceFilter(key, value) // debounce chỉ phần gọi lọc
+    setPriceRange(value)
+    debouncedPriceFilter(key, value)
   }
 
   return (
@@ -73,7 +73,8 @@ export default function ProductFilterSidebar({ keysFilter, handleCheckboxChange 
                   {key?.values?.map((item, idx) => (
                     <div key={idx} className="filter-item form-check mb-1">
                       <input
-                        type="checkbox"
+                        type={key.type}
+                        name={key.key}
                         className="form-check-input"
                         id={`${key.key}-${idx}`}
                         onChange={() => handleCheckboxChange(key.key, item)}

@@ -9,7 +9,7 @@ import mongoose from "mongoose"
 
 export const signup = async (req, res, next) => {
   try {
-    const { user } = req.body
+    const user = req.body
 
     const isExist = await userIsExist(user)
 
@@ -85,8 +85,8 @@ export const signin = async (req, res, next) => {
     })
 
     await saveRefreshToken(isExist.email, refreshToken)
-
-    return res.json({ data: { role: isExist.role, name: isExist.name }, message: "Signin successful!" })
+    
+    return res.json({ data: { role: isExist.role, name: isExist.name }, token: accessToken, message: "Signin successful!" })
   } catch (error) {
     next(error)
   }

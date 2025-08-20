@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import connectDB from "./config/database.js"
 import corsConfig from "./config/cors.js"
 import cookieParser from "cookie-parser"
+import { WebSocketServer } from "ws"
+import http from 'http'
 
 import productsRoute from "./route/productsRoute.js"
 import filterOptionsRoute from "./route/filterOptionsRoute.js"
@@ -14,6 +16,7 @@ import vouchersRoute from "./route/vouchersRoute.js"
 import ordersRoute from "./route/ordersRoute.js"
 import reviewsRoute from "./route/reviewsRoute.js"
 import productFieldsRoute from "./route/productFiledsRoute.js"
+import { initWebSocketServer } from "./config/webSocket.js"
 
 dotenv.config()
 
@@ -23,6 +26,10 @@ const port = process.env.SERVER_PORT
 app.use(express.json())
 app.use(corsConfig)
 app.use(cookieParser())
+
+const server = http.createServer(app)
+
+initWebSocketServer(server)
 
 connectDB().then(() => {
   app.use('/categories', categoriesRoute)
@@ -37,7 +44,7 @@ connectDB().then(() => {
 
   app.use(errorException)
 
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`🚀 Server running at http://localhost:${port}`)
   })
 })

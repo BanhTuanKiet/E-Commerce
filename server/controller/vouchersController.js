@@ -1,7 +1,6 @@
 import mongoose from "mongoose"
 import { addVoucher, updateVoucher, findVouchers, findVoucherByCode, findVoucherId, updateVoucherStatus, getFilterVouchers, deleteVoucher } from "../service/vouchersService.js"
 import ErrorException from "../Util/errorException.js"
-import { newVoucherSchema, voucherSchema } from "../util/valideInput.js"
 
 export const getVoucher = async (req, res, next) => {
   try {
@@ -112,18 +111,7 @@ export const postVoucher = async (req, res, next) => {
   session.startTransaction()
 
   try {
-    const { voucher } = req.body
-
-    if (!voucher || Object.keys(voucher).length === 0) {
-      throw new ErrorException(400, "Voucher data is required")
-    }
-
-    const { error } = newVoucherSchema.validate(voucher, { abortEarly: false })
-
-    if (error) {
-      const errorMessages = error.details.map((err) => err.message)
-      throw new ErrorException(400, errorMessages.join(', '))
-    }
+    const voucher = req.body
 
     const addedVoucher = await addVoucher(voucher, session)
 

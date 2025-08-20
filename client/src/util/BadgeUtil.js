@@ -109,3 +109,16 @@ export const getVoucherStatus = (voucher) => {
 
   return <Badge bg="success">Available</Badge>
 };
+
+export const getTypeFilter = (type) => {
+    switch (type) {
+      case "checkbox":
+        return <Badge bg="primary" className="text-capitalize">checkbox</Badge>
+      case "range":
+        return <Badge bg="success" className="text-capitalize">range</Badge>
+      case "radio":
+        return <Badge bg="warning" className="text-capitalize">radio</Badge>
+      default:
+        return <Badge bg="dark">{type}</Badge>
+    }
+  }

@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { countOrderByState, postOrder, findOrderById, findPresentOrder, getAllOrders, getFilterProducts, updateOrderStatus, hasUsedVoucher, filterOrdersByCustomerAndOpions } from "../service/orderServcie.js"
+import { countOrderByState, postOrder, findOrderById, findPresentOrder, getAllOrders, getFilterProducts, updateOrderStatus, hasUsedVoucher, filterOrdersByCustomerAndOpions, findOrderBasic } from "../service/orderServcie.js"
 import { getProductImage } from "../util/getProductImage.js"
 import ErrorException from "../util/errorException.js"
 import { sendMailUpdateOrderStatus } from "../util/mailUtl.js"
@@ -49,6 +49,18 @@ export const placeOrder = async (req, res, next) => {
     next(error)
   } finally {
     session.endSession()
+  }
+}
+
+export const getOrderBasic = async (req, res, next) => {
+  try {
+    const { user } = req
+
+    const orders = await findOrderBasic(user._id)
+
+    return res.json({ data: orders })
+  } catch (error) {
+    next(error)
   }
 }
 

@@ -104,7 +104,7 @@ export default function Cart() {
     timeoutCartRef.current = setTimeout(() => {
       const updateCart = async () => {
         try {
-          await axios.put(`/carts`, { cart: cart })
+          await axios.put(`/carts`, cart)
         } catch (err) {
           console.error("Failed to update cart:", err)
         }

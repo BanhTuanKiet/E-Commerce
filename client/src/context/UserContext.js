@@ -18,6 +18,7 @@ const UserProvider = ({ children }) => {
             ward: "",
             city: "",
         },
+        role: ""
     })
 
     useEffect(() => {
@@ -29,7 +30,7 @@ const UserProvider = ({ children }) => {
             }
 
             const paredUserCookie = JSON.parse(userCookie)
-            setUser({ ...user, name: paredUserCookie.name })
+            setUser({ ...user, name: paredUserCookie.name, role: paredUserCookie.role })
         }
 
         getUserName()
@@ -41,10 +42,9 @@ const UserProvider = ({ children }) => {
     }
 
     const signin = (role, name) => {
-        Cookies.set('user', JSON.stringify({ name: name }), { expires: 1 / 24 })
+        Cookies.set('user', JSON.stringify({ name: name, role: role }), { expires: 1 / 24 })
         setUser({ ...user, name: name, role: role })
         const prevPage = localStorage.getItem('prevPage')
-        console.log(prevPage)
         navigate(prevPage.toString())
     }
 

@@ -6,14 +6,9 @@ export const getCartByCustomer = async (customerId) => {
 }
 
 export const updateCartByCustomerId = async (customerId, clientCart, session) => {
-  const items = clientCart.map(product => ({
-    _id: product._id,
-    quantity: product.quantity
-  }))
-
   return await cartsModel.updateOne(
     { customerId: new mongoose.Types.ObjectId(customerId) },
-    { $set: { items } },
+    { $set: { items: clientCart } },
     { session }
   )
 }

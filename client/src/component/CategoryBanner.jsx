@@ -7,33 +7,34 @@ const CategoryBanner = ({ category }) => {
     Home: [
       {
         id: 1,
-        image: 'https://images.unsplash.com/photo-1603899122644-619f6a877d90?w=1200&h=400&fit=crop',
+        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=400&fit=crop',
         title: 'Back to School Sale',
         subtitle: 'Giảm đến 30% cho laptop và tablet',
         link: '/promotion/back-to-school'
       },
       {
         id: 2,
-        image: 'https://images.unsplash.com/photo-1587574293340-ec9c404d4b4e?w=1200&h=400&fit=crop',
+        image: 'https://images.unsplash.com/photo-1522202222206-6b3b62dc1b47?w=1200&h=400&fit=crop',
         title: 'Summer Deals 2025',
         subtitle: 'Sắm điện thoại mới, nhận quà cực chất',
         link: '/promotion/summer-deals'
       },
       {
         id: 3,
-        image: 'https://images.unsplash.com/photo-1606813909401-5b51e764bf0a?w=1200&h=400&fit=crop',
+        image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200&h=400&fit=crop',
         title: 'Headphones & Audio Sale',
         subtitle: 'Giảm sốc tai nghe Sony, JBL, Bose',
         link: '/promotion/audio-sale'
       },
       {
         id: 4,
-        image: 'https://images.unsplash.com/photo-1609943243050-8b740b02c1b0?w=1200&h=400&fit=crop',
+        image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=1200&h=400&fit=crop',
         title: 'Flash Sale Mỗi Ngày',
         subtitle: 'Deal siêu hot chỉ trong hôm nay!',
         link: '/flash-sale'
       }
     ],
+
     Phone: [
       {
         id: 1,

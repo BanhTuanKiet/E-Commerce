@@ -2,6 +2,7 @@ import { Star, ThumbsUp, ThumbsDown, ChevronDown } from "lucide-react"
 import { Button, Badge, Form, ProgressBar, Image, Card, Row, Col } from "react-bootstrap"
 import { renderStars } from "../../util/BadgeUtil"
 import axios from '../../util/AxiosConfig'
+import BoxChat from "../BoxChat"
 
 export default function ProductReviews({ product, reviews, rating }) {
   const handleVoteReview = async (reviewId, status) => {
@@ -69,23 +70,7 @@ export default function ProductReviews({ product, reviews, rating }) {
                 {renderStars(review.rating)}
               </div>
 
-              {/* Hiển thị content theo role */}
-              {review?.content?.map((reply, idx) => (
-                <div
-                  key={idx}
-                  className={`p-3 bg-primary bg-opacity-10 rounded mb-3 w-75 ${reply.role === "admin" ? "ms-auto text-end" : ""}`}
-                >
-                  <div
-                    className={`d-flex align-items-center gap-2 mb-2 ${reply.role === "admin" ? "flex-row-reverse" : ""}`}
-                  >
-                    <span className="fw-medium">{reply.role}</span>
-                    <span className="small text-muted">
-                      {new Date(reply.createdAt).toLocaleString("vi-VN")}
-                    </span>
-                  </div>
-                  <p className="text-dark mb-0">{reply.content}</p>
-                </div>
-              ))}
+              <BoxChat view={'customer'} content={review?.content} />
 
               <div className="d-flex gap-3">
                 <Button

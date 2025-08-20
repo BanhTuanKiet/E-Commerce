@@ -1,80 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Form, Image, Modal, Alert } from 'react-bootstrap'
 import { Copy, Phone, Mail, Star, ArrowLeft, Trash2, Flag, Check, ThumbsUp, Eye, MessageSquare, Reply, User, Package } from 'lucide-react'
 import axios from '../../util/AxiosConfig'
+import ReplyComponent from '../../component/ReplyComponent'
+import BoxChat from '../../component/BoxChat'
+import { ChatContext } from '../../context/ChatContext'
 
 function ReviewDetail({ reviewId, setReviewId }) {
-  // const reviewDetails = {
-  //   _id: "review1",
-  //   customer: {
-  //     _id: "user1",
-  //     name: "Nguyễn Văn An",
-  //     email: "an.nguyen@email.com",
-  //     phone: "0901234567",
-  //     avatar: "/api/placeholder/80/80",
-  //     joinDate: "2023-05-15T00:00:00Z",
-  //     totalOrders: 12,
-  //     totalReviews: 8,
-  //   },
-  //   product: {
-  //     _id: "prod1",
-  //     name: "iPhone 15 Pro Max 256GB Titan Tự Nhiên",
-  //     image: "/api/placeholder/120/120",
-  //     sku: "IP15PM-256-TI",
-  //     price: 29990000,
-  //     category: "Điện thoại",
-  //     brand: "Apple",
-  //   },
-  //   order: {
-  //     _id: "674a1b2c3d4e5f6789012345",
-  //     orderNumber: "ORD001",
-  //     orderDate: "2024-01-20T10:30:00Z",
-  //     totalAmount: 32000000,
-  //     status: "delivered",
-  //   },
-  //   rating: 5,
-  //   title: "Sản phẩm tuyệt vời, rất hài lòng!",
-  //   content: "iPhone 15 Pro Max thực sự xuất sắc và vượt ngoài mong đợi của tôi. Camera 48MP chụp ảnh cực kỳ sắc nét, đặc biệt là chế độ chụp đêm. Chip A17 Pro xử lý mượt mà, không bao giờ bị lag kể cả khi chơi game nặng hay chỉnh sửa video 4K.\n\nThiết kế titan cao cấp, cầm nắm chắc chắn và sang trọng. Màn hình Super Retina XDR 6.7 inch hiển thị màu sắc rực rỡ, độ sáng cao ngay cả dưới ánh nắng mặt trời.\n\nPin kéo dài cả ngày sử dụng nặng. Sạc nhanh và sạc không dây rất tiện lợi. Đóng gói cẩn thận, giao hàng nhanh chóng. Dịch vụ khách hàng tận tình. Chắc chắn sẽ giới thiệu cho bạn bè!",
-  //   status: "approved",
-  //   isVerifiedPurchase: true,
-  //   helpfulCount: 24,
-  //   viewCount: 156,
-  //   createdAt: "2024-01-25T14:30:00Z",
-  //   updatedAt: "2024-01-25T15:00:00Z",
-  //   statusHistory: [
-  //     {
-  //       status: "pending",
-  //       timestamp: "2024-01-25T14:30:00Z",
-  //       note: "Đánh giá được tạo",
-  //       updatedBy: "System",
-  //     },
-  //     {
-  //       status: "approved",
-  //       timestamp: "2024-01-25T15:00:00Z",
-  //       note: "Đánh giá đã được duyệt và công khai",
-  //       updatedBy: "Admin",
-  //     },
-  //   ],
-  //   adminReplies: [
-  //     {
-  //       id: "reply1",
-  //       content: "Cảm ơn bạn đã dành thời gian đánh giá chi tiết! Chúng tôi rất vui khi bạn hài lòng với iPhone 15 Pro Max. Hy vọng sản phẩm sẽ đồng hành cùng bạn trong thời gian dài.",
-  //       author: "Admin",
-  //       authorRole: "Quản trị viên",
-  //       createdAt: "2024-01-25T16:00:00Z",
-  //     },
-  //   ],
-  //   interactions: {
-  //     likes: 24,
-  //     dislikes: 1,
-  //     shares: 3,
-  //     reports: 0,
-  //   },
-  // };
   const [review, setReview] = useState()
-  const [replyContent, setReplyContent] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showAlert, setShowAlert] = useState({ show: false, message: "", variant: "success" });
+  const { messages, setMessages } = useContext(ChatContext)
+  const [replyContent, setReplyContent] = useState("")
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const replyRef = useRef(null)
 
   useEffect(() => {
     if (!reviewId) return
@@ -82,7 +19,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
     const fetchReview = async () => {
       try {
         const response = await axios.get(`/reviews/detail/${reviewId}`)
-        console.log(response.data)
+        setMessages(response.data.content || [])
         setReview(response.data)
       } catch (error) {
         console.log(error)
@@ -90,7 +27,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
     }
 
     fetchReview()
-  }, [reviewId])
+  }, [reviewId, setMessages])
 
   const renderStars = (rating, size = "sm") => {
     const starSize = size === "lg" ? 24 : 16;
@@ -107,62 +44,25 @@ function ReviewDetail({ reviewId, setReviewId }) {
         </span>
       </div>
     );
-  };
+  }
 
-  const handleUpdateStatus = (newStatus) => {
-    setShowAlert({
-      show: true,
-      message: `Cập nhật trạng thái đánh giá thành: ${newStatus}`,
-      variant: "success"
-    });
-    setTimeout(() => setShowAlert({ show: false, message: "", variant: "success" }), 3000);
-  };
-
-  const handleReply = async () => {
-    try {
-      await axios.put(`/reviews/reply`, { content: replyContent.trim(), reviewId: review?._id })
-    } catch (error) {
-      console.log(error)
+  const handleReply = () => {
+    if (replyRef.current) {
+      clearTimeout(replyRef.current)
     }
-    if (replyContent.trim()) {
-      setShowAlert({
-        show: true,
-        message: "Gửi phản hồi thành công!",
-        variant: "success"
-      });
-      setReplyContent("");
-      setTimeout(() => setShowAlert({ show: false, message: "", variant: "success" }), 3000);
-    }
-  };
 
-  const handleDelete = () => {
-    setShowAlert({
-      show: true,
-      message: "Xóa đánh giá thành công!",
-      variant: "success"
-    });
-    setShowDeleteModal(false);
-    setTimeout(() => setShowAlert({ show: false, message: "", variant: "success" }), 3000);
-  };
-
-  const handleFlag = () => {
-    setShowAlert({
-      show: true,
-      message: "Báo cáo đánh giá thành công!",
-      variant: "info"
-    });
-    setTimeout(() => setShowAlert({ show: false, message: "", variant: "success" }), 3000);
-  };
+    replyRef.current = setTimeout(async () => {
+      try {
+        await axios.put(`/reviews/reply`, { reviewId: review?._id, content: replyContent })
+      } catch (error) {
+        console.log(error)
+      }
+    }, 500)
+  }
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
       <Container fluid className="p-4">
-        {showAlert.show && (
-          <Alert variant={showAlert.variant} className="position-fixed" style={{ top: "20px", right: "20px", zIndex: 1050 }}>
-            {showAlert.message}
-          </Alert>
-        )}
-
         <Row className="mb-4">
           <Col>
             <div className="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
@@ -180,13 +80,13 @@ function ReviewDetail({ reviewId, setReviewId }) {
                 </div>
               </div>
               <div className="d-flex align-items-center gap-2">
-                <Form.Select style={{ width: "200px" }} onChange={(e) => handleUpdateStatus(e.target.value)}>
+                <Form.Select style={{ width: "200px" }} >
                   <option value="">Cập nhật trạng thái</option>
                   <option value="pending">Chờ duyệt</option>
                   <option value="approved">Duyệt</option>
                   <option value="rejected">Từ chối</option>
                 </Form.Select>
-                <Button variant="outline-warning" onClick={handleFlag}>
+                <Button variant="outline-warning">
                   <Flag size={16} className="me-2" />
                   Báo cáo
                 </Button>
@@ -301,40 +201,9 @@ function ReviewDetail({ reviewId, setReviewId }) {
                 </Card.Title>
               </Card.Header>
               <Card.Body>
-                {review?.content?.map((reply) => (
-                  <div
-                    key={reply._id}
-                    className={`p-3 bg-primary bg-opacity-10 rounded mb-3 w-75 ${reply.role === "admin" ? "ms-auto text-end" : ""
-                      }`}
-                  >
-                    <div
-                      className={`d-flex align-items-center gap-2 mb-2 ${reply.role === "admin" ? "flex-row-reverse" : ""
-                        }`}
-                    >
-                      <span className="fw-medium">{reply.role}</span>
-                      <span className="small text-muted">
-                        {new Date(reply.createdAt).toLocaleString("vi-VN")}
-                      </span>
-                    </div>
-                    <p className="text-dark mb-0">{reply.content}</p>
-                  </div>
-                ))}
-                <div>
-                  <Form.Label htmlFor="reply">Thêm phản hồi mới</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    id="reply"
-                    rows={4}
-                    placeholder="Nhập phản hồi của bạn..."
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    className="mb-3"
-                  />
-                  <Button variant="primary" onClick={handleReply}>
-                    <Reply size={16} className="me-2" />
-                    Reply
-                  </Button>
-                </div>
+                <BoxChat view={'admin'} content={messages} />
+
+                <ReplyComponent replyContent={replyContent} setReplyContent={setReplyContent} handleReply={handleReply} />
               </Card.Body>
             </Card>
           </Col>
@@ -441,7 +310,7 @@ function ReviewDetail({ reviewId, setReviewId }) {
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
               Hủy
             </Button>
-            <Button variant="danger" onClick={handleDelete}>
+            <Button variant="danger">
               Xóa
             </Button>
           </Modal.Footer>

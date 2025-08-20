@@ -36,7 +36,7 @@ export default function Signup() {
     const errorsCount = validateForm(user, "signup")
     if (errorsCount > 0) return
     try {
-      await axios.post(`/users/signup`, { user: user })
+      await axios.post(`/users/signup`, user)
       setShowOtpModal(true)
     } catch (err) {
       console.error(err)

@@ -41,7 +41,6 @@ export default function AddModal({ show, setShow }) {
   }, [formData?.category, categories])
 
   const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true)
 
   const handleSubmitChange = (e) => {
     let name = e.target.name
@@ -111,8 +110,7 @@ export default function AddModal({ show, setShow }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      console.log(formData)
-      const response = await axios.post(`/products/manage`, { product: formData })
+      await axios.post(`/products/manage`, formData)
     } catch (error) {
       console.error("Error adding product:", error)
     }
@@ -154,6 +152,7 @@ export default function AddModal({ show, setShow }) {
               </Col>
 
               {primitiveKeys && typeof primitiveKeys === 'object' && Object.entries(primitiveKeys).map(([key, value], index) => {
+                console.log(key, value)
                 return (
                   <Col md={6}>
                     <Form.Group className="mb-3">
@@ -227,12 +226,10 @@ export default function AddModal({ show, setShow }) {
                     ))}
                 </>
               )}
-
             </Row>
 
             <Form.Group className="mb-3">
               <Form.Label>Product Images</Form.Label>
-
               <Row className="mb-3">
                 <Col xs="auto">
                   <input
@@ -271,7 +268,7 @@ export default function AddModal({ show, setShow }) {
                     <Badge bg="secondary">{formData.images.length}</Badge>
                   </div>
                   <Row>
-                    {formData.images.map((image, index) => (
+                    {formData?.images?.map((image, index) => (
                       <Col xs={6} md={4} key={index} className="mb-3">
                         <Card className="position-relative">
                           <div

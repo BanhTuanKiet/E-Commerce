@@ -4,10 +4,12 @@ import { Container, Row, Col, Form, Button, InputGroup } from "react-bootstrap"
 import { ValideFormContext } from "../context/ValideForm"
 import { UserContext } from "../context/UserContext"
 import axios from "../util/AxiosConfig"
+import { ChatContext } from "../context/ChatContext"
 
 export default function Signin() {
     const { formErrors, validateForm, validateField } = useContext(ValideFormContext)
     const { user, setUser, signin } = useContext(UserContext)
+    const { connectWS } = useContext(ChatContext)
 
     const handleChange = (e) => {
         setUser((prev) => ({
@@ -22,7 +24,9 @@ export default function Signin() {
         if (errsCount > 0) return
         try {
             const reseponse = await axios.post(`/users/signin`, { user: user })
+            console.log(reseponse.data)
             signin(reseponse.data.role, reseponse.data.name)
+            connectWS(reseponse.token)
         } catch (error) {
             console.log(error)
         }

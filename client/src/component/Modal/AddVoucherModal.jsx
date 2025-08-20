@@ -12,7 +12,6 @@ export default function AddVoucherModal({ show, setShow }) {
     const fetchKeys = async () => {
       try {
         const response = await axios.get(`/productFields/${"voucher"}`)
-        console.log(response.data)
         setKeys(response.data)
       } catch (error) {
         console.log(error)
@@ -44,7 +43,7 @@ export default function AddVoucherModal({ show, setShow }) {
   }
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`/vouchers`, { voucher: formData })
+      await axios.post(`/vouchers`, formData)
     } catch (error) {
       console.log(error)
     }

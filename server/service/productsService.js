@@ -133,12 +133,24 @@ export const minusQuantityProduct = async (id, quantity, session) => {
 export const updateReviewProduct = async (id, avgScore, totalReviews, session) => {
   return await Product.updateOne(
     { _id: id },
-    { 
+    {
       $set: {
         avgScore: avgScore,
         reviews: totalReviews
       }
     },
-    {session}
+    { session }
   )
+}
+
+export const findProductBySearchTerm = async (terms) => {
+  const conditions = terms.map(term => ({
+    $or: [
+      { model: { $regex: term, $options: "i" } },
+      { brand: { $regex: term, $options: "i" } },
+      { category: { $regex: term, $options: "i" } },
+    ]
+  }))
+
+  return await Product.find({ $and: conditions })
 }

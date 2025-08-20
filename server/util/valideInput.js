@@ -1,5 +1,90 @@
 import Joi from 'joi'
 
+export const newUser = Joi.object({
+  name: Joi.string().trim().required(),
+  email: Joi.string().email().required(),
+  phoneNumber: Joi.string().trim().required(),
+  gender: Joi.string().valid('male', 'female').required(),
+  password: Joi.string().min(6).required(),
+  passwordConfirmed: Joi.string().valid(Joi.ref('password')).required()
+    .messages({ 'any.only': 'Password confirmation does not match password' }),
+  location: Joi.object({
+    address: Joi.string().trim().required(),
+    ward: Joi.string().trim().required(),
+    city: Joi.string().trim().required()
+  }),
+  role: Joi.optional()
+})
+
+export const newFilterOptionsSchema = Joi.object({
+  key: Joi.string().trim().required().messages({
+    'string.base': 'Key must be a string',
+    'string.empty': 'Key cannot be empty',
+  }),
+  label: Joi.string().trim().required().messages({
+    'string.base': 'Label must be a string',
+    'string.empty': 'Label cannot be empty',
+  }),
+  type: Joi.string().valid('checkbox', 'radio', 'range').required().messages({
+    'any.only': 'Type must be "checkbox", "radio" or "range"',
+    'string.empty': 'Type cannot be empty',
+  }),
+  values: Joi.array()
+    .items(
+      Joi.string().trim().required().messages({
+        'string.base': 'Each value must be a string',
+        'string.empty': 'Value cannot be empty',
+      })
+    )
+    .messages({
+      'array.base': 'Values must be an array of strings',
+    }),
+})
+
+export const updateFilterOptionsSchema = Joi.array()
+  .items(
+    Joi.object({
+      key: Joi.string().trim().required().messages({
+        'string.base': 'Key must be a string',
+        'string.empty': 'Key cannot be empty',
+        'any.required': 'Key is required',
+      }),
+      label: Joi.string().trim().required().messages({
+        'string.base': 'Label must be a string',
+        'string.empty': 'Label cannot be empty',
+        'any.required': 'Label is required',
+      }),
+      type: Joi.string().valid('checkbox', 'radio', 'range').required().messages({
+        'any.only': 'Type must be "checkbox", "radio" or "range"',
+        'string.empty': 'Type cannot be empty',
+        'any.required': 'Type is required',
+      }),
+      values: Joi.array()
+        .items(
+          Joi.string().trim().required().messages({
+            'string.base': 'Each value must be a string',
+            'string.empty': 'Value cannot be empty',
+          })
+        )
+        .messages({
+          'array.base': 'Values must be an array of strings',
+        }),
+      path: Joi.string().trim().required().messages({
+        'string.base': 'Path must be a string',
+        'string.empty': 'Path cannot be empty',
+        'any.required': 'Path is required',
+      }),
+      match: Joi.optional()
+    }).unknown(false) // không cho thêm field ngoài, muốn cho phép thì để true
+  )
+  .min(1) // ít nhất 1 object trong filters
+  .required()
+  .messages({
+    'array.base': 'Filters must be an array of objects',
+    'array.min': 'At least one filter is required',
+    'any.required': 'Filters are required',
+  })
+
 export const voucherSchema = Joi.object({
   code: Joi.string().trim().required().messages({
     'string.base': 'Code must be a string',
@@ -52,7 +137,6 @@ export const voucherSchema = Joi.object({
     'date.base': 'Invalid end date',
     'date.greater': 'End date must be after start date',
   }),
-  isActive: Joi.boolean().required(),
   categories: Joi.array().items(Joi.string().trim()).min(1).unique().required().messages({
     'array.base': 'Category must be an array',
     'array.min': 'Must contain at least one category',
@@ -118,7 +202,7 @@ export const newVoucherSchema = Joi.object({
     'date.base': 'Invalid end date',
     'date.greater': 'End date must be after start date',
   }),
-  
+
   categories: Joi.array().items(Joi.string().trim()).min(1).unique().required().messages({
     'array.base': 'Category must be an array',
     'array.min': 'Must contain at least one category',
@@ -232,8 +316,9 @@ export const laptopSchema = Joi.object({
   }).required()
 })
 
-export const validateProduct = Joi.alternatives().conditional(Joi.object({ category: Joi.string().valid('Phone') }).unknown(), {
+export const productSchema = Joi.alternatives().conditional(Joi.object({ category: Joi.string().valid('Phone') }).unknown(), {
   then: baseProductSchema.concat(phoneSchema),
 }).conditional(Joi.object({ category: Joi.string().valid('Laptop') }).unknown(), {
   then: baseProductSchema.concat(laptopSchema),
 })
+

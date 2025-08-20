@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from '../util/AxiosConfig'
 import { getPrimitive } from '../util/DataClassify'
@@ -7,10 +7,10 @@ import ProductCard from '../component/Card/ProductCard'
 import { Col, Row } from 'react-bootstrap'
 import ProductFilterSidebar from '../component/ProductFilterSidebar'
 import CompareBar from '../component/CompareBar'
-import { warning } from '../util/NotifyUtil'
 import CategoryBanner from '../component/CategoryBanner'
 import "../style/Category.css"
 import PaginationProducts from '../component/Pagination'
+import { SearchContext } from '../context/SearchContext'
 
 export default function Category() {
   const { category } = useParams()
@@ -19,9 +19,9 @@ export default function Category() {
   const [keysFilter, setKeysFilter] = useState()
   const [filterSelections, setFilterSelections] = useState({})
   const [sortOrder, setSortOrder] = useState("default")
-  const [productsCompare, setProductsCompare] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
+  const { productsCompare, setProductsCompare, handleCompareProducts } = useContext(SearchContext)
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
@@ -49,6 +49,7 @@ export default function Category() {
     const fetchProducts = async () => {
       try {
         let response
+        console.log(filterSelections)
         if (Object.keys(filterSelections).length === 0) {
           response = await axios.get(`/products/${category}?page=${currentPage}`)
         } else {
@@ -91,7 +92,7 @@ export default function Category() {
       setFilterSelections(prev => ({ ...prev, price: { min: value.min, max: value.max } }))
       return
     }
-    console.log(key, value)
+
     if (typeof value === "string") {
       if (value.includes("inch")) {
         value = value.split(" ")[0]
@@ -99,7 +100,6 @@ export default function Category() {
         const end = parseFloat(value.replace(/[^\d.]/g, ""))
         value = { start: 0, end }
       } else if (value.startsWith(">")) {
-        console.log(1)
         const start = parseFloat(value.replace(/[^\d.]/g, ""))
         value = { start, end: start * start }
       } else if (value.includes("-") && !"USB".indexOf(value)) {
@@ -107,8 +107,12 @@ export default function Category() {
         value = { start: parseFloat(start), end: parseFloat(end) }
       }
     }
-    console.log(value)
+
     setFilterSelections(prev => {
+      if (value === 'true' || value === 'false') {
+
+        return { ...prev, [key]: [value === 'true'] }
+      }
       const prevValues = prev[key] || []
       const alreadySelected = prevValues.some(v => JSON.stringify(v) === JSON.stringify(value))
 
@@ -123,13 +127,6 @@ export default function Category() {
 
       return { ...prev, [key]: newValues }
     })
-  }
-
-  const handleCompareProducts = (product) => {
-    if (productsCompare.length > 0 && productsCompare[0].category !== product.category) return warning("Only compare products in the same category")
-    if (productsCompare.length > 2) return warning("Only up to 3 products can be compared")
-    if (productsCompare.some(p => p._id === product._id)) return warning("Product already in comparison list")
-    setProductsCompare(prev => [...prev, product])
   }
 
   return (

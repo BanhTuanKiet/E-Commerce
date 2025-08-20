@@ -4,14 +4,15 @@ import { UserContext } from "../context/UserContext"
 import { useNavigate } from "react-router-dom"
 import axios from "../util/AxiosConfig"
 import "../style/Header.css"
+import { SearchContext } from "../context/SearchContext"
 
 export default function Header() {
   const { user } = useContext(UserContext)
+  const { searchTerm, setSearchTerm, handleSearch } = useContext(SearchContext)
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [categories, setCategories] = useState([])
-  const [searchQuery, setSearchQuery] = useState("")
   const [cartCount] = useState(0)
 
   useEffect(() => {
@@ -28,13 +29,6 @@ export default function Header() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`)
-    }
-  }
-
   const navigateToCategory = (categoryName) => {
     navigate(`/${categoryName}`)
     setIsMenuOpen(false)
@@ -42,6 +36,7 @@ export default function Header() {
 
   const handleLinkClick = (path) => {
     navigate(path)
+    setIsMenuOpen(false)
   }
 
   const handleMouseEnter = () => setIsDropdownOpen(true)
@@ -56,6 +51,7 @@ export default function Header() {
     <>
       <nav className="navbar navbar-expand-lg navbar-custom sticky-header">
         <div className="container-fluid px-3 px-lg-4" style={{ width: "80%" }}>
+          {/* logo */}
           <button
             onClick={() => handleLinkClick('/')}
             className="navbar-brand d-flex align-items-center gap-2 border-0 bg-transparent p-0"
@@ -64,6 +60,7 @@ export default function Header() {
             <span className="logo-text d-none d-sm-block">TechStore</span>
           </button>
 
+          {/* desktop categories */}
           <div className="d-none d-lg-flex navbar-nav mx-4">
             {categories.map((item) => (
               <button
@@ -76,30 +73,30 @@ export default function Header() {
             ))}
           </div>
 
+          {/* desktop search */}
           <div className="d-none d-md-flex flex-grow-1 justify-content-center mx-4">
             <div className="search-container w-100">
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                placeholder="Tìm kiếm sản phẩm..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search product..."
                 className="form-control search-input w-100"
               />
-              <button
-                onClick={handleSearch}
-                className="search-btn"
-              >
+              <button onClick={handleSearch} className="search-btn">
                 <Search size={16} />
               </button>
             </div>
           </div>
 
+          {/* right section */}
           <div className="d-flex align-items-center gap-2 gap-md-3">
+            {/* search mobile */}
             <button className="cart-btn d-md-none">
               <Search size={20} />
             </button>
 
+            {/* cart */}
             <button
               onClick={() => handleLinkClick('/cart')}
               className="cart-btn"
@@ -110,6 +107,7 @@ export default function Header() {
               )}
             </button>
 
+            {/* user */}
             {user.name ? (
               <div
                 className="user-dropdown-container d-none d-md-flex align-items-center position-relative"
@@ -126,24 +124,34 @@ export default function Header() {
                   }}
                 >
                   <User size={16} />
-                  {/* <span>{user?.name.split(" ").slice(-1)}</span> */}
                   <span>{user?.role}</span>
                 </div>
 
-                {isDropdownOpen && user?.role !== "customer"
-                  ?
-                  (
-                    <div className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2" style={{ zIndex: 999 }}>
-                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/profile')}>Hồ sơ</div>
-                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/order')}>Đơn hàng</div>
-                      <div className="dropdown-item py-1" onClick={() => handleDropdownClick('/review')}>Đánh giá</div>
+                {isDropdownOpen && user?.role === "customer" && (
+                  <div
+                    className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2"
+                    style={{ zIndex: 999 }}
+                  >
+                    <div
+                      className="dropdown-item py-1"
+                      onClick={() => handleDropdownClick('/profile')}
+                    >
+                      Hồ sơ
                     </div>
-                  )
-                  :
-                  (
-                    <></>
-                  )
-                }
+                    <div
+                      className="dropdown-item py-1"
+                      onClick={() => handleDropdownClick('/order')}
+                    >
+                      Đơn hàng
+                    </div>
+                    <div
+                      className="dropdown-item py-1"
+                      onClick={() => handleDropdownClick('/review')}
+                    >
+                      Đánh giá
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <button
@@ -155,6 +163,7 @@ export default function Header() {
               </button>
             )}
 
+            {/* toggle button mobile */}
             <button
               onClick={toggleMenu}
               className="menu-toggle d-lg-none"
@@ -165,6 +174,68 @@ export default function Header() {
           </div>
         </div>
       </nav>
+
+      {/* mobile menu */}
+      {isMenuOpen && (
+        <div className="mobile-menu d-lg-none bg-white shadow p-3">
+          {/* search mobile */}
+          <div className="mb-3">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm kiếm sản phẩm..."
+              className="form-control"
+            />
+          </div>
+
+          {/* categories */}
+          <div className="d-flex flex-column gap-2">
+            {categories.map((item) => (
+              <button
+                key={item._id}
+                onClick={() => navigateToCategory(item.name)}
+                className="btn btn-link text-start"
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+
+          {/* user mobile */}
+          <div className="mt-3">
+            {user.name ? (
+              <>
+                <button
+                  onClick={() => handleDropdownClick('/profile')}
+                  className="btn btn-link d-block text-start"
+                >
+                  Hồ sơ
+                </button>
+                <button
+                  onClick={() => handleDropdownClick('/order')}
+                  className="btn btn-link d-block text-start"
+                >
+                  Đơn hàng
+                </button>
+                <button
+                  onClick={() => handleDropdownClick('/review')}
+                  className="btn btn-link d-block text-start"
+                >
+                  Đánh giá
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => handleLinkClick('/signin')}
+                className="btn btn-primary w-100"
+              >
+                Đăng nhập
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 }

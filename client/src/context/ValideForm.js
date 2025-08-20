@@ -23,7 +23,6 @@ const ValideFormProvider = ({ children }) => {
 
   const validateForm = (formData, type) => {
     const errors = {}
-    console.log(formData)
     const fieldNames = {
       name: "name",
       phoneNumber: "phone number",
@@ -56,7 +55,7 @@ const ValideFormProvider = ({ children }) => {
             errors[childKey] = `Please enter ${fieldNames[childKey]}`
           }
         })
-      } else if (!value) {
+      } else if (!value && key !== 'role') {
         if (key === "gender") {
           errors[key] = `Please select ${fieldNames[key]}`
         } else {
@@ -91,12 +90,6 @@ const ValideFormProvider = ({ children }) => {
 
       if (passwordErrors.length > 0) {
         errors.password = `Password must be ${passwordErrors.join(", ")}`
-      }
-    }
-
-    if (requiredFields.includes("passwordConfirmed") && formData.passwordConfirmed && !errors.passwordConfirmed) {
-      if (formData.password !== formData.passwordConfirmed) {
-        errors.passwordConfirmed = "Mật khẩu xác nhận không khớp với mật khẩu đã nhập"
       }
     }
 

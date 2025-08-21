@@ -11,6 +11,20 @@ export const findReviewByReviewId = async (reviewId) => {
   return await Review.findById(reviewId).populate('productId').populate('userId').populate('orderId')
 }
 
+export const findBasicReview = async (userId, orderId, productId) => {
+  return await Review.findOne(
+    { userId, orderId, productId },
+    {
+      content: { $slice: 1 }, // chỉ lấy phần tử đầu tiên
+      // rating: 1,
+      // userId: 1,
+      // orderId: 1,
+      // productId: 1,
+      // createdAt: 1
+    }
+  )
+}
+
 export const findReviewById = async (user, orderId, productId) => {
   return await Review.findOne({
     userId: user._id,
@@ -23,18 +37,20 @@ export const findReviews = async () => {
   return await Review.find().populate('productId').populate('userId')
 }
 
-export const addReview = async (userId, review, orderId, productId) => {
-  return await Review.create({
+export const addReview = async (userId, review, orderId, productId, session) => {
+  return await Review.create([{
     orderId,
     productId,
     userId,
     rating: review.rating,
-    content: {
-      content: review.content,
-      role: "customer",
-      _id: userId
-    }
-  })
+    content: [
+      {
+        content: review.content,
+        role: "customer",
+        _id: userId
+      }
+    ]
+  }], { session })
 }
 
 export const updateReview = async (reviewId, reviewData) => {
@@ -43,8 +59,8 @@ export const updateReview = async (reviewId, reviewData) => {
     {
       $set: {
         rating: reviewData.rating,
-        content: reviewData.content,
-        updatedAt: Date.now()
+        "content.0.content": reviewData.content,
+        "content.0.createdAt": Date.now()
       }
     },
     { new: true }

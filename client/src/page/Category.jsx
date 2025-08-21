@@ -57,15 +57,12 @@ export default function Category() {
           response = await axios.get(`/products/${category}/filter/${options}?page=${currentPage}`)
         }
 
-        let sortedProducts = response.data
-
-        if (sortOrder === "sale") {
-          sortedProducts = [...sortedProducts].sort((a, b) => b.discount - a.discount)
-        } else if (sortOrder === "asc") {
-          sortedProducts = [...sortedProducts].sort((a, b) => a.price - b.price)
-        } else if (sortOrder === "desc") {
-          sortedProducts = [...sortedProducts].sort((a, b) => b.price - a.price)
-        }
+        const sortedProducts = [...(response.data || [])].sort((a, b) => {
+          if (sortOrder === 'sale') return b.discount - a.discount
+          if (sortOrder === 'asc') return a.price * (1 - a.discount / 100) - b.price * (1 - b.discount / 100)
+          if (sortOrder === 'desc') return b.price * (1 - b.discount / 100) - a.price * (1 - a.discount / 100)
+          return 0
+        })
 
         setProducts(sortedProducts)
         setTotalPages(response.totalPages)
@@ -161,7 +158,7 @@ export default function Category() {
                   onChange={(e) => setSortOrder(e.target.value)}
                 >
                   <option value="default">Default</option>
-                  <option value="sale">Big discount</option>
+                  <option value="sale">Discount</option>
                   <option value="asc">Price Ascending</option>
                   <option value="desc">Price Descending</option>
                 </select>

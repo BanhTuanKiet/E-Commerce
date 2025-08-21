@@ -16,7 +16,7 @@ export const inputValidation = (schema, property) => {
         throw new ErrorException(400, errorMessages.join(', '))
       }
       console.log(error)
-      // next()
+      next()
     } catch (error) {
       next(error)
     }

@@ -142,7 +142,8 @@ export default function ProductDetail({ productId, setProductId }) {
 
   const handleSave = async () => {
     try {
-      await axios.put(`/products`, { product: product })
+      const { state, createdAt, reviews, sold, avgScore, ...safeProduct } = product
+      await axios.put(`/products`,  safeProduct)
     } catch (error) {
       console.log(error)
     }

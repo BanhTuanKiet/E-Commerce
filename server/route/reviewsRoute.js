@@ -2,9 +2,11 @@ import expres from "express"
 import { voteReview, getDetailRating, getReviewByProductId, replyReview, getReview, getReviews, postReview, getRating, filterReviews, getReviewByReviewId } from "../controller/reviewsController.js"
 import authToken from "../middleware/authToken.js"
 import { authRole } from "../middleware/authRole.js"
+import { inputValidation } from "../middleware/inputValidation.js"
+import { newReview } from "../util/valideInput.js"
 const reviewsRoute = expres.Router()
 
-reviewsRoute.post(`/`, authToken, postReview)
+reviewsRoute.post(`/`, authToken, inputValidation(newReview, 'body'), postReview)
 reviewsRoute.get('/', authToken, getReviews)
 reviewsRoute.put('/reply', authToken, replyReview)
 reviewsRoute.get('/filter', authToken, authRole('admin'), filterReviews)

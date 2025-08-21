@@ -21,7 +21,7 @@ productsRoute.get('/:category/filter/:options', filterProductsByCategory)
 productsRoute.get('/detail/:id/', getProductDetail)
 productsRoute.get('/other_options/:model', getOtherOptions)
 productsRoute.get('/first/:category', getFristProduct)
-productsRoute.put('/', authRole('admin'), putProduct)
+productsRoute.put('/', inputValidation(productSchema, 'body'), authToken, authRole('admin'), putProduct)
 productsRoute.post('/manage', authToken, authRole('admin'), inputValidation(productSchema, 'body'), postProduct)
 productsRoute.delete('/manage/:id', deleteProduct)
 export default productsRoute

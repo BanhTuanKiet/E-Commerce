@@ -36,7 +36,7 @@ const SearchProvider = ({ children }) => {
   }
 
   return (
-    <SearchContext.Provider value={{ products, searchTerm, setSearchTerm, handleSearch, productsCompare, setProductsCompare, handleCompareProducts }}>
+    <SearchContext.Provider value={{ products, setProducts, searchTerm, setSearchTerm, handleSearch, productsCompare, setProductsCompare, handleCompareProducts }}>
       {children}
     </SearchContext.Provider>
   )

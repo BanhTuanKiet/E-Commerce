@@ -7,11 +7,13 @@ import { Col, Row } from 'react-bootstrap'
 import ProductCard from '../component/Card/ProductCard'
 import { getPrimitive } from '../util/DataClassify'
 import CompareBar from '../component/CompareBar'
+import Sort from '../component/Sort'
 
 export default function Home() {
   const [saleProducts, setSaleProducts] = useState()
   const [keys, setKeys] = useState()
-  const { products, productsCompare, setProductsCompare, handleCompareProducts } = useContext(SearchContext)
+  const { products, setProducts, productsCompare, setProductsCompare, handleCompareProducts } = useContext(SearchContext)
+  const [sortOrder, setSortOrder] = useState('default')
 
   useEffect(() => {
     const fetchSaleProducts = async () => {
@@ -27,6 +29,19 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    if (!products || !sortOrder) return
+
+    const sortedProducts = [...(products || [])].sort((a, b) => {
+      if (sortOrder === 'sale') return b.discount - a.discount
+      if (sortOrder === 'asc') return a.price * (1 - a.discount / 100) - b.price * (1 - b.discount / 100)
+      if (sortOrder === 'desc') return b.price * (1 - b.discount / 100) - a.price * (1 - a.discount / 100)
+      return 0
+    })
+
+    setProducts(sortedProducts)
+  }, [sortOrder])
+
+  useEffect(() => {
     if (products && products.length > 0) {
       setKeys(getPrimitive(products[0]))
     }
@@ -39,7 +54,8 @@ export default function Home() {
 
         {products && products.length > 0 ? (
           <>
-            <Row className="g-3 row-cols-5">
+            <Sort sortOrder={sortOrder} setSortOrder={setSortOrder} />
+            <Row className="g-3 row-cols-5 mt-3">
               {products.map((product, index) => (
                 <div key={index} className="col">
                   <ProductCard

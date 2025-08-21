@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 import { getProductById, updateReviewProduct } from "../service/productsService.js"
-import { findReviews, findReviewById, addReview, updateReview, findReviewsByProductId, saveReply, getFilterReviews, findReviewByReviewId, findReviewsCustomerByProductId, findReview, firstVote, removeVote, changeVote } from "../service/reviewsService.js"
+import { findReviews, findReviewById, addReview, updateReview, findReviewsByProductId, saveReply, getFilterReviews, findReviewByReviewId, findReviewsCustomerByProductId, findReview, firstVote, removeVote, changeVote, findBasicReview } from "../service/reviewsService.js"
 import ErrorException from "../util/errorException.js"
 import { findOrderById } from "../service/orderServcie.js"
 import { getProductImage } from "../util/getProductImage.js"
@@ -28,7 +28,7 @@ export const getReview = async (req, res, next) => {
 
     if (!orderId || !productId) throw new ErrorException(500, "Missing orderId or productId")
 
-    const review = await findReviewById(user, orderId, productId)
+    const review = await findBasicReview(user, orderId, productId)
 
     if (!review) {
       return res.json({ state: false })
@@ -100,7 +100,7 @@ export const postReview = async (req, res, next) => {
 
     product.$session(session)
 
-    const existingReview = await findReviewById(user, orderId, productId, session)
+    const existingReview = await findBasicReview(user, orderId, productId)
 
     let totalScore = product.avgScore * product.reviews
     let totalReviews = product.reviews
@@ -114,7 +114,7 @@ export const postReview = async (req, res, next) => {
 
       await updateReviewProduct(product._id, newAvg, totalReviews, session)
     }
-    else if (existingReview.rating !== review.rating) {
+    else if (existingReview.rating !== review.rating || existingReview.content[0].content !== review.content) {
       totalScore = totalScore - existingReview.rating + review.rating
       newAvg = parseFloat((totalScore / totalReviews).toFixed(1))
 
@@ -124,7 +124,6 @@ export const postReview = async (req, res, next) => {
 
     await session.commitTransaction()
     return res.json({ message: "Review submitted successfully!" })
-
   } catch (error) {
     await session.abortTransaction()
     next(error)
@@ -181,7 +180,7 @@ export const replyReview = async (req, res, next) => {
   try {
     const { reviewId, content } = req.body
     const { user } = req
-    console.log(user, reviewId, content)
+
     const savedReply = await saveReply(reviewId, user, content, session)
     if (!savedReply) throw new ErrorException(400, "Reply failed")
 
@@ -257,9 +256,7 @@ export const voteReview = async (req, res, next) => {
       return res.json({ message: "Removed" })
     }
 
-    const target = review.isHelpfulCount.find(v => v.userId.toString() === userId.toString())
-
-    votedReview = await changeVote(review, target, user._id, session)
+    votedReview = await changeVote(review, hasVoted, user._id, session)
 
     if (!votedReview) throw new ErrorException(400, "Change vote review failed")
 

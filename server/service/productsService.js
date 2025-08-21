@@ -107,7 +107,11 @@ export const countProductByState = async (state) => {
 }
 
 export const updateProduct = async (product, session) => {
-  return await Product.updateOne({ _id: product._id }, product, { session })
+  return await Product.updateOne(
+    { _id: product._id },
+    { $set: { ...product } },
+    { session }
+  )
 }
 
 export const findFirstProduct = async (category) => {

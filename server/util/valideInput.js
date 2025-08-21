@@ -1,5 +1,26 @@
 import Joi from 'joi'
 
+export const newReview = Joi.object({
+  review: Joi.object({
+    content: Joi.string().max(200).required().messages({
+      'string.max': 'Review content cannot exceed 200 characters',
+      'string.empty': 'Review content is required'
+    }),
+    rating: Joi.number().min(1).max(5).required().messages({
+      'number.base': 'Rating must be a number',
+      'number.min': 'Rating must be at least 1',
+      'number.max': 'Rating cannot be more than 5',
+      'any.required': 'Rating is required'
+    })
+  }).required(),
+  orderId: Joi.string().required().messages({
+    'string.empty': 'Order ID is required'
+  }),
+  productId: Joi.string().required().messages({
+    'string.empty': 'Product ID is required'
+  })
+})
+
 export const newUser = Joi.object({
   name: Joi.string().trim().required(),
   email: Joi.string().email().required(),
@@ -228,8 +249,7 @@ const baseProductSchema = Joi.object({
     'number.base': 'Stock must be a number',
     'number.min': 'Stock cannot be negative',
   }),
-  category: Joi.string().valid().required().messages({
-    'any.only': 'Invalid category',
+  category: Joi.string().required().messages({
     'string.empty': 'Category is required',
   }),
   brand: Joi.string().required().messages({
@@ -238,6 +258,13 @@ const baseProductSchema = Joi.object({
   images: Joi.array().items(Joi.string()).min(1).required().messages({
     'array.min': 'At least one image is required',
   }),
+
+  _id: Joi.optional(),
+  // reviews: Joi.forbidden().messages({ 'any.unknown': 'reviews is not allowed' }),
+  // state: Joi.forbidden().messages({ 'any.unknown': 'state is not allowed' }),
+  // sold: Joi.forbidden().messages({ 'any.unknown': 'sold is not allowed' }),
+  // avgScore: Joi.forbidden().messages({ 'any.unknown': 'avgScore is not allowed' }),
+  // createdAt: Joi.forbidden().messages({ 'any.unknown': 'createdAt is not allowed' }),
 })
 
 export const phoneSchema = Joi.object({

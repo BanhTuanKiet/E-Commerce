@@ -8,11 +8,12 @@ import ProductCard from '../component/Card/ProductCard'
 import { getPrimitive } from '../util/DataClassify'
 import CompareBar from '../component/CompareBar'
 import Sort from '../component/Sort'
+import NotFoundSearch from '../component/NotFoundSearch'
 
 export default function Home() {
   const [saleProducts, setSaleProducts] = useState()
   const [keys, setKeys] = useState()
-  const { products, setProducts, productsCompare, setProductsCompare, handleCompareProducts } = useContext(SearchContext)
+  const { searchTerm, products, setProducts, productsCompare, setProductsCompare, handleCompareProducts } = useContext(SearchContext)
   const [sortOrder, setSortOrder] = useState('default')
 
   useEffect(() => {
@@ -52,7 +53,14 @@ export default function Home() {
       <div className="mx-auto w-75">
         <CategoryBanner category="Home" />
 
-        {products && products.length > 0 ? (
+        {searchTerm && searchTerm !== '' && !products?.length ? (
+          // 1. Không tìm thấy sản phẩm
+          <NotFoundSearch
+            type="product"
+            onClear={() => setProducts([])} // ví dụ clear search/filter
+          />
+        ) : products && products.length ? (
+          // 2. Có sản phẩm hiển thị
           <>
             <Sort sortOrder={sortOrder} setSortOrder={setSortOrder} />
             <Row className="g-3 row-cols-5 mt-3">
@@ -80,6 +88,7 @@ export default function Home() {
             )}
           </>
         ) : (
+          // 3. Trang Home mặc định (Sale carousel)
           saleProducts?.map((item, index) => (
             <div key={index} className="mb-5">
               <SaleProductCarousel saleProducts={item} />
@@ -89,4 +98,5 @@ export default function Home() {
       </div>
     </div>
   )
+
 }

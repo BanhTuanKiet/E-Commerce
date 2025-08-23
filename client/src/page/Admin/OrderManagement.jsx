@@ -5,6 +5,7 @@ import StatusItemCard from '../../component/Card/StatusItemCard'
 import PaginationProducts from '../../component/Pagination'
 import { getPaymentMethodBadge, getPaymentStatusBadge, getOrderStatusBadge } from '../../util/BadgeUtil'
 import OrderDetail from "./OrderDetail"
+import NotFoundSearch from '../../component/NotFoundSearch'
 
 export default function OrderManagement({ activeTab }) {
   const [orders, setOrders] = useState()
@@ -207,85 +208,88 @@ export default function OrderManagement({ activeTab }) {
         </Card>
 
         <Card>
-          <Card.Body className="p-0">
-            <div className="table-responsive">
-              <Table striped hover className="mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Order Id</th>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th>Total</th>
-                    <th>Payment</th>
-                    <th>Order State</th>
-                    <th>Created At</th>
-                    <th className='text-end'>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders?.map((order) => (
-                    <tr key={order._id} className='align-middle'>
-                      <td>
-                        <code className="small">#{order._id.slice(-8).toUpperCase()}</code>
-                      </td>
-                      <td>
-                        <div>
-                          <div className="fw-medium">{order.customerId.name}</div>
-                          <small className="text-muted">{order.customerId.phone}</small>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <div className="small fw-medium">{order.items.length} sản phẩm</div>
-                        </div>
-                      </td>
-                      <td>
-                        <div>
-                          <div className="fw-semibold">{order.totalAmount.toLocaleString('vi-VN')}</div>
-                          {order.voucher.discountAmount > 0 && (
-                            <small className="text-success">
-                              Giảm {(order.voucher.discountAmount)}
-                            </small>
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex flex-column gap-1">
-                          {getPaymentMethodBadge(order.paymentMethod)}
-                          {getPaymentStatusBadge(order.paymentStatus)}
-                        </div>
-                      </td>
-                      <td>{getOrderStatusBadge(order.orderStatus)}</td>
-                      <td>
-                        <div className="small">
-                          {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-                        </div>
-                        <div className="small text-muted">
-                          {new Date(order.createdAt).toLocaleTimeString("vi-VN", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </div>
-                      </td>
-                      <td className="text-end">
-                        <div className="d-flex justify-content-end gap-1">
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => setOrderId(order?._id)}
-                          >
-                            Detail
-                          </Button>
-                        </div>
-                      </td>
+          {!orders?.length
+            ? <NotFoundSearch type={'order'} onClear={() => setFilterSelections({})} />
+            : <Card.Body className="p-0">
+              <div className="table-responsive">
+                <Table striped hover className="mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Order Id</th>
+                      <th>Customer</th>
+                      <th>Product</th>
+                      <th>Total</th>
+                      <th>Payment</th>
+                      <th>Order State</th>
+                      <th>Created At</th>
+                      <th className='text-end'>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {orders?.map((order) => (
+                      <tr key={order._id} className='align-middle'>
+                        <td>
+                          <code className="small">#{order._id.slice(-8).toUpperCase()}</code>
+                        </td>
+                        <td>
+                          <div>
+                            <div className="fw-medium">{order.customerId.name}</div>
+                            <small className="text-muted">{order.customerId.phone}</small>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <div className="small fw-medium">{order.items.length} sản phẩm</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div>
+                            <div className="fw-semibold">{order.totalAmount.toLocaleString('vi-VN')}</div>
+                            {order.voucher.discountAmount > 0 && (
+                              <small className="text-success">
+                                Giảm {(order.voucher.discountAmount)}
+                              </small>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="d-flex flex-column gap-1">
+                            {getPaymentMethodBadge(order.paymentMethod)}
+                            {getPaymentStatusBadge(order.paymentStatus)}
+                          </div>
+                        </td>
+                        <td>{getOrderStatusBadge(order.orderStatus)}</td>
+                        <td>
+                          <div className="small">
+                            {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                          </div>
+                          <div className="small text-muted">
+                            {new Date(order.createdAt).toLocaleTimeString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </td>
+                        <td className="text-end">
+                          <div className="d-flex justify-content-end gap-1">
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => setOrderId(order?._id)}
+                            >
+                              Detail
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
 
-            <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
-          </Card.Body>
+              <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            </Card.Body>
+          }
         </Card>
       </Container>
     </div>

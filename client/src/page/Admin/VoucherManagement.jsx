@@ -6,6 +6,7 @@ import VoucherDetailModal from '../../component/Modal/VoucherDetailModal'
 import StatusItemCard from '../../component/Card/StatusItemCard'
 import PaginationProducts from '../../component/Pagination'
 import AddVoucherModal from '../../component/Modal/AddVoucherModal'
+import NotFoundSearch from '../../component/NotFoundSearch'
 
 export default function VoucherManagement({ activeTab }) {
   const [vouchers, setVouchers] = useState()
@@ -141,11 +142,7 @@ export default function VoucherManagement({ activeTab }) {
         <Card>
           <Card.Body>
             {vouchers?.length === 0 ? (
-              <Alert variant="info" className="text-center">
-                <div className="fs-1 mb-3">🏷️</div>
-                <h5>Không tìm thấy voucher</h5>
-                <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
-              </Alert>
+              <NotFoundSearch type={'voucher'} onClear={() => setFilterSelections({})} />
             ) : (
               <div className="table-responsive">
                 <Table hover>

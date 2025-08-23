@@ -18,7 +18,7 @@ export default function Signin() {
         validateField(e.target.nam, e.target.value)
     }
 
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault()
         const errsCount = validateForm(user, "signin")
         if (errsCount > 0) return
@@ -26,7 +26,21 @@ export default function Signin() {
             const reseponse = await axios.post(`/users/signin`, { user: user })
             console.log(reseponse.data)
             signin(reseponse.data.role, reseponse.data.name)
-            connectWS(reseponse.token)
+            // connectWS(reseponse.token)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleLoginGG = async (e) => {
+        e.preventDefault()
+        const errsCount = validateForm(user, "signin")
+        if (errsCount > 0) return
+        try {
+            const reseponse = await axios.post(`/users/signin/google`, { user: user })
+            console.log(reseponse.data)
+            signin(reseponse.data.role, reseponse.data.name)
+            // connectWS(reseponse.token)
         } catch (error) {
             console.log(error)
         }
@@ -39,7 +53,7 @@ export default function Signin() {
                     <Col xs={12} md={8} lg={6}>
                         <div className="bg-white p-5 rounded-4 shadow-sm">
                             <h2 className="text-center mb-4 fw-bold">Signin</h2>
-                            <Form onSubmit={handleSubmit} noValidate>
+                            <Form noValidate>
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
                                     <InputGroup>
@@ -85,6 +99,7 @@ export default function Signin() {
                                             size="md"
                                             className="w-100 rounded-pill fw-semibold py-3 shadow-sm"
                                             variant="outline-primary"
+                                            onClick={handleLogin}
                                         >
                                             Đăng nhập
                                         </Button>
@@ -95,6 +110,7 @@ export default function Signin() {
                                             size="md"
                                             className="w-100 rounded-pill fw-semibold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
                                             variant="outline-danger"
+                                            onClick={handleLoginGG}
                                         >
                                             <img
                                                 src="https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000"

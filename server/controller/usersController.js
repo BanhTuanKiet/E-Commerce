@@ -4,14 +4,15 @@ import { sendMail } from "../util/mailUtl.js"
 import { generateOTP, verifyOTP } from "../util/otpUtil.js"
 import client from "../config/redis.js"
 import { comparePassword, hashPassword } from "../util/passwordUtil.js"
-import { generateToken } from "../util/tokenUtil.js"
 import mongoose from "mongoose"
+import { auth } from "../config/firebase.js"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 
 export const signup = async (req, res, next) => {
   try {
     const user = req.body
 
-    const isExist = await userIsExist(user)
+    const isExist = await userIsExist(user.email)
 
     if (isExist) {
       throw new ErrorException(400, "Account is exist!")
@@ -20,7 +21,7 @@ export const signup = async (req, res, next) => {
     const { secret, otp } = generateOTP()
 
     await client.set(user.email, JSON.stringify(secret), { EX: 15 * 60 })
-    sendMail("kiett5153@gmail.com", otp)
+    await sendMail("kiett5153@gmail.com", otp)
 
     return res.json({ data: user })
   } catch (error) {
@@ -31,7 +32,9 @@ export const signup = async (req, res, next) => {
 export const authOTP = async (req, res, next) => {
   try {
     const { user, otp } = req.body
+    const originalPassword = user.password
     const secret = await client.get(user.email)
+    
     const otpNumber = Number(otp.join(''))
 
     const state = verifyOTP(JSON.parse(secret), otpNumber)
@@ -46,11 +49,14 @@ export const authOTP = async (req, res, next) => {
       user.password = hashedPassword
     }
 
-    if (user.role === undefined) {
+    if (user.role === undefined || user.role === '') {
       user.role = "customer"
     }
-
+    
+    const userCredential = await createUserWithEmailAndPassword(auth, user.email, originalPassword)
+    user.firebaseID = userCredential.user.uid
     await createUser(user)
+    await client.del(user.email)
 
     return res.json({ data: user.email, message: "Signin successful!" })
   } catch (error) {
@@ -60,35 +66,46 @@ export const authOTP = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   try {
-    const { user } = req.body
+    const { email, password } = req.body.user
 
-    const isExist = await userIsExist(user)
-
-    if (!isExist) {
-      throw new ErrorException(400, "Account is not exist! Please try again!")
+    if (!email || !password) {
+      throw new Error("Missing email or password")
     }
 
-    const isMatch = await comparePassword(user.password, isExist.password)
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const userDB = await userIsExist(email)
 
-    if (!isMatch) {
-      throw new ErrorException(400, "Wrong password! Please try again!")
-    }
+    const user = userCredential.user
+    const idToken = await user.getIdToken(true)
+    const { accessToken, refreshToken, expirationTime } = user.stsTokenManager
 
-    const accessToken = generateToken(isExist._id, isExist.role, '1h')
-    const refreshToken = generateToken(isExist._id, isExist.role, '8h')
-
-    res.cookie('accessToken', accessToken, {
+    res.cookie("accessToken", idToken, {
       httpOnly: true,
-      sameSite: 'none',
-      maxAge: 3600 * 8 * 1000,
-      secure: true
+      sameSite: "none",
+      secure: true,
+      maxAge: 3600 * 1000,
     })
 
-    await saveRefreshToken(isExist.email, refreshToken)
-    
-    return res.json({ data: { role: isExist.role, name: isExist.name }, token: accessToken, message: "Signin successful!" })
+    await saveRefreshToken(user.email, refreshToken)
+
+    return res.json({ data: { role: userDB.role, name: userDB.name }, message: "Signin successful via Firebase!" })
   } catch (error) {
-    next(error)
+    let message = "Login failed"
+    let status = 400
+
+    if (error.code === "auth/user-not-found") {
+      message = "Account does not exist"
+    } else if (error.code === "auth/wrong password") {
+      message = "Wrong password"
+    } else if (error.code === "auth/invalid-email") {
+      message = "Invalid email"
+    } else if (error.code === "auth/invalid-credential") {
+      message = "Incorrect email or password"
+    } else if (error.code === "auth/too-many-requests") {
+      message = "You have entered the wrong credentials too many times, please try again later"
+    }
+
+    next(new ErrorException(status, message))
   }
 }
 
@@ -120,6 +137,6 @@ export const putUser = async (req, res, next) => {
 
     return res.json({ message: "Update successful!" })
   } catch (error) {
-    console.log(error)
+    next(error)
   }
 }

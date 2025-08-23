@@ -4,6 +4,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap'
 import axios from "../util/AxiosConfig"
 import { formatLabel, getPrimitive } from '../util/DataClassify'
 import VoucherModal from '../component/Modal/VoucherModal'
+import NotFoundSearch from '../component/NotFoundSearch'
 
 export default function Cart() {
   const [cart, setCart] = useState()
@@ -24,8 +25,9 @@ export default function Cart() {
     const fetchCart = async () => {
       try {
         const response = await axios.get(`/carts`)
+        console.log(response.data)
         setCart(response.data)
-        const objectKeys = getPrimitive(response.data[0]._id)
+        const objectKeys = getPrimitive(response?.data[0]?._id)
         setKeys(objectKeys.filter(key => !['_id', 'stock', 'price', 'model'].includes(key)))
       } catch (error) {
         console.log(error)
@@ -231,6 +233,12 @@ export default function Cart() {
         console.error("Lỗi đặt hàng:", error)
       }
     }, 500)
+  }
+
+  if (cart?.length) {
+    return (
+      <NotFoundSearch type={'cart'} />
+    )
   }
 
   return (

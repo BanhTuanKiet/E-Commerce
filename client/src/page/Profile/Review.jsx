@@ -5,6 +5,7 @@ import ReplyComponent from '../../component/ReplyComponent'
 import BoxChat from '../../component/BoxChat'
 import { useContext } from 'react'
 import { ChatContext } from '../../context/ChatContext'
+import NotFoundSearch from '../../component/NotFoundSearch'
 
 export default function Review() {
   const [orders, setOrders] = useState()
@@ -56,6 +57,12 @@ export default function Review() {
         console.log(error)
       }
     }, 500)
+  }
+
+  if (!orders.length) {
+    return (
+      <NotFoundSearch type={'review'} />
+    )
   }
 
   return (

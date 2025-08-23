@@ -11,6 +11,7 @@ import CategoryBanner from '../component/CategoryBanner'
 import "../style/Category.css"
 import PaginationProducts from '../component/Pagination'
 import { SearchContext } from '../context/SearchContext'
+import NotFoundSearch from '../component/NotFoundSearch'
 
 export default function Category() {
   const { category } = useParams()
@@ -144,8 +145,8 @@ export default function Category() {
           <div className="border rounded p-4 bg-white">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3 px-2">
               <p className="text-muted mb-0 fs-6">
-                <strong>{products.length} </strong>
-                {products.length > 1 ? "products" : "product"} found
+                <strong>More {Math.floor(products?.length * totalPages / 10) * 10} </strong>
+                {products?.length > 1 ? "products" : "product"} found
               </p>
               <div className="d-flex align-items-center gap-2">
                 <label htmlFor="sortSelect" className="text-muted small mb-0">
@@ -166,15 +167,7 @@ export default function Category() {
             </div>
 
             {products.length === 0 ? (
-              <div className="text-center py-5">
-                <img
-                  src="https://via.placeholder.com/150?text=No+Products"
-                  alt="No products"
-                  className="img-fluid mb-3"
-                  style={{ maxWidth: '150px' }}
-                />
-                <p className="text-muted">No products found for this category.</p>
-              </div>
+              <NotFoundSearch type={'product'} onClear={() => setFilterSelections({})} />
             ) : (
               <Row className="g-3">
                 {products.map((product, index) => (

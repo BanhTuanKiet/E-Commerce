@@ -6,6 +6,7 @@ import { Col, Form, InputGroup, Row } from 'react-bootstrap'
 import "../../style/Orders.css"
 import OrderStatusBar from '../../component/OrderStatusBar'
 import PaginationProducts from '../../component/Pagination'
+import NotFoundSearch from '../../component/NotFoundSearch'
 
 export default function Order() {
   const [order, setOrder] = useState()
@@ -105,6 +106,12 @@ export default function Order() {
       ...prev,
       [e.target.name]: e.target.value
     }))
+  }
+
+  if (!orders?.length) {
+    return (
+      <NotFoundSearch type={'order'} />
+    )
   }
 
   return (

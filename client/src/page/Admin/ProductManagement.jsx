@@ -6,6 +6,7 @@ import StatusItemCard from '../../component/Card/StatusItemCard'
 import ProductDetail from './ProductDetail'
 import { getProductState, getStatusBadge } from '../../util/BadgeUtil'
 import AddModal from '../../component/Modal/AddModal'
+import NotFoundSearch from '../../component/NotFoundSearch'
 
 export default function ProductManagement({ activeTab }) {
   const [categories, setCategories] = useState()
@@ -189,11 +190,7 @@ export default function ProductManagement({ activeTab }) {
         <Card>
           <Card.Body className="p-0">
             {products?.length === 0 ? (
-              <Alert variant="info" className="text-center">
-                <div className="fs-1 mb-3">🏷️</div>
-                <h5>Không tìm thấy product</h5>
-                <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
-              </Alert>
+              <NotFoundSearch type={'product'} onClear={() => setFilterSelections({})} />
             ) : (
               <div className="table-responsive">
                 <table className="table table-hover mb-0 text-center">

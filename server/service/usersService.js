@@ -5,8 +5,8 @@ export const createUser = async (user) => {
     return await users.create(JSON.parse(JSON.stringify(user)))
 }
 
-export const userIsExist = async (user) => {
-    return await users.findOne({ email: user.email })
+export const userIsExist = async (email) => {
+    return await users.findOne({ email: email })
 }
 
 export const saveSecretKey = async (email, otpSecret) => {

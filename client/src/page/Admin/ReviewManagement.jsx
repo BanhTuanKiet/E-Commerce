@@ -6,6 +6,7 @@ import axios from "../../util/AxiosConfig"
 import { renderStars } from "../../util/BadgeUtil"
 import PaginationProducts from "../../component/Pagination"
 import ReviewDetail from "./ReviewDetail"
+import NotFoundSearch from "../../component/NotFoundSearch"
 
 export default function ReviewManagement({ activeTab }) {
   const [reviewId, setReviewId] = useState()
@@ -50,7 +51,6 @@ export default function ReviewManagement({ activeTab }) {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`/categories`)
-        console.log(response.data)
         setCategories(response.data)
       } catch (error) {
         console.log(error)
@@ -74,6 +74,7 @@ export default function ReviewManagement({ activeTab }) {
     try {
       const options = encodeURIComponent(JSON.stringify(filterSelections))
       const response = await axios.get(`/reviews/filter?options=${options}&page=${currentPage}`)
+      console.log(response.data)
       setReviews(response.data)
       setTotalPages(response.totalPages)
     } catch (error) {
@@ -214,154 +215,157 @@ export default function ReviewManagement({ activeTab }) {
         </Card>
 
         <Card>
-          <Card.Body className="p-0">
-            {reviews?.length === 0 ? (
-              <Alert variant="info" className="text-center">
-                <div className="fs-1 mb-3">🏷️</div>
-                <h5>Không tìm thấy review</h5>
-                <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
-              </Alert>
-            ) : (
-              <>
-                {viewMode === "individual" ? (
-                  <Table responsive hover className="mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Customer</th>
-                        <th>Product</th>
-                        <th>Review</th>
-                        <th>Status</th>
-                        <th>Created at</th>
-                        <th className="text-end">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reviews?.map((review) => (
-                        <tr key={review._id}>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <div>
-                                <div className="fw-medium">{review?.userId.name}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span className="fw-medium">{review.productId.model}</span>
-                            </div>
-                          </td>
-                          <td>{renderStars(review.rating)}</td>
-                          <td>
-                            {!review.isFlagged ? (
-                              <Badge bg="success" className="small">
-                                Verified
-                              </Badge>
-                            ) : (
-                              <Badge bg="danger" className="small">
-                                Unverified
-                              </Badge>
-                            )}
-                          </td>
-                          <td className="small">
-                            <div className="small">{new Date(review.createdAt).toLocaleDateString("vi-VN")}</div>
-                            <div className="small text-muted">
-                              {new Date(review.createdAt).toLocaleTimeString("vi-VN", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </div>
-                          </td>
-                          <td className="text-end">
-                            <div className="d-flex justify-content-end gap-2">
-                              <Button variant="outline-secondary" size="sm" onClick={() => setReviewId(review?._id)}>
-                                <Eye size={16} />
-                              </Button>
-                            </div>
-                          </td>
+          {!reviews?.length
+            ? <NotFoundSearch type={'review'} onClear={() => setFilterSelections({})} />
+            : <Card.Body className="p-0">
+              {reviews?.length === 0 ? (
+                <Alert variant="info" className="text-center">
+                  <div className="fs-1 mb-3">🏷️</div>
+                  <h5>Không tìm thấy review</h5>
+                  <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                </Alert>
+              ) : (
+                <>
+                  {viewMode === "individual" ? (
+                    <Table responsive hover className="mb-0">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Customer</th>
+                          <th>Product</th>
+                          <th>Review</th>
+                          <th>Status</th>
+                          <th>Created at</th>
+                          <th className="text-end">Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                ) : (
-                  <Table responsive hover className="mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Index</th>
-                        <th>Image</th>
-                        <th>Sản phẩm</th>
-                        <th>Đánh giá trung bình</th>
-                        <th>Tổng số đánh giá</th>
-                        <th>Đánh giá</th>
-                        <th className="text-end">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {productAverages?.map((product, index) => (
-                        <tr key={product?._id}>
-                          <td>
-                            <div className="fw-medium" style={{ maxWidth: '200px' }}>
-                              <div className="text-truncate">{index + 1 + (10 * (currentPage - 1))}</div>
-                            </div>
-                          </td>
-                          <td>
-                            <img
-                              src={product.images[0]}
-                              alt={product.model}
-                              width="50"
-                              height="50"
-                              className="rounded object-fit-cover"
-                            />
-                          </td>
-                          <td className="">
-                            <div className="d-flex align-items-center">
-                              <div>
-                                <div className="fw-medium">{product?.model}</div>
+                      </thead>
+                      <tbody>
+                        {reviews?.map((review) => (
+                          <tr key={review._id}>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <div>
+                                  <div className="fw-medium">{review?.userId.name}</div>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              {renderStars(Math.round(product?.avgScore))}
-                            </div>
-                          </td>
-                          <td>
-                            <span className="fw-medium">{product?.reviews}</span>
-                          </td>
-                          <td>
-                            {product?.avgScore >= 4.0 ? (
-                              <Badge bg="success" className="small">
-                                Highly rated
-                              </Badge>
-                            ) : (
-                              <Badge bg="danger" className="small">
-                                Needs improvement
-                              </Badge>
-                            )}
-                          </td>
-                          <td className="text-end">
-                            <div className="d-flex justify-content-end gap-2">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                onClick={() => {
-                                  // Switch to individual view and filter by this product
-                                  setViewMode("individual")
-                                  // Add product filter logic here
-                                }}
-                              >
-                                <Eye size={16} />
-                              </Button>
-                            </div>
-                          </td>
+                            </td>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <span className="fw-medium">{review.productId.model}</span>
+                              </div>
+                            </td>
+                            <td>{renderStars(review.rating)}</td>
+                            <td>
+                              {!review.isFlagged ? (
+                                <Badge bg="success" className="small">
+                                  Verified
+                                </Badge>
+                              ) : (
+                                <Badge bg="danger" className="small">
+                                  Unverified
+                                </Badge>
+                              )}
+                            </td>
+                            <td className="small">
+                              <div className="small">{new Date(review.createdAt).toLocaleDateString("vi-VN")}</div>
+                              <div className="small text-muted">
+                                {new Date(review.createdAt).toLocaleTimeString("vi-VN", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                            </td>
+                            <td className="text-end">
+                              <div className="d-flex justify-content-end gap-2">
+                                <Button variant="outline-secondary" size="sm" onClick={() => setReviewId(review?._id)}>
+                                  <Eye size={16} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : (
+                    <Table responsive hover className="mb-0">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Index</th>
+                          <th>Image</th>
+                          <th>Sản phẩm</th>
+                          <th>Đánh giá trung bình</th>
+                          <th>Tổng số đánh giá</th>
+                          <th>Đánh giá</th>
+                          <th className="text-end">Thao tác</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
-              </>
-            )}
-            <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
-          </Card.Body>
+                      </thead>
+                      <tbody>
+                        {productAverages?.map((product, index) => (
+                          <tr key={product?._id}>
+                            <td>
+                              <div className="fw-medium" style={{ maxWidth: '200px' }}>
+                                <div className="text-truncate">{index + 1 + (10 * (currentPage - 1))}</div>
+                              </div>
+                            </td>
+                            <td>
+                              <img
+                                src={product.images[0]}
+                                alt={product.model}
+                                width="50"
+                                height="50"
+                                className="rounded object-fit-cover"
+                              />
+                            </td>
+                            <td className="">
+                              <div className="d-flex align-items-center">
+                                <div>
+                                  <div className="fw-medium">{product?.model}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                {renderStars(Math.round(product?.avgScore))}
+                              </div>
+                            </td>
+                            <td>
+                              <span className="fw-medium">{product?.reviews}</span>
+                            </td>
+                            <td>
+                              {product?.avgScore >= 4.0 ? (
+                                <Badge bg="success" className="small">
+                                  Highly rated
+                                </Badge>
+                              ) : (
+                                <Badge bg="danger" className="small">
+                                  Needs improvement
+                                </Badge>
+                              )}
+                            </td>
+                            <td className="text-end">
+                              <div className="d-flex justify-content-end gap-2">
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => {
+                                    // Switch to individual view and filter by this product
+                                    setViewMode("individual")
+                                    // Add product filter logic here
+                                  }}
+                                >
+                                  <Eye size={16} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  )}
+                </>
+              )}
+              <PaginationProducts totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            </Card.Body>
+          }
         </Card>
       </Container>
     </div>

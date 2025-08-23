@@ -1,10 +1,11 @@
 import expres from "express"
 import { getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } from "../controller/ordersController.js"
 import authToken from "../middleware/authToken.js"
+import authTokenFirebase from "../middleware/authTokenFirebase.js"
 import { authRole } from "../middleware/authRole.js"
 const ordersRoute = expres.Router()
 
-ordersRoute.use(authToken)
+ordersRoute.use(authTokenFirebase)
 
 ordersRoute.post("/", placeOrder)
 ordersRoute.get('/', getOrders)

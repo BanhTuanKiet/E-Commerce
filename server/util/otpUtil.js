@@ -7,7 +7,7 @@ export const generateOTP = () => {
         secret: secret.base32,
         encoding: 'base32'
     })
-
+    console.log(otp)
     return { secret: secret, otp: otp }
 }
 

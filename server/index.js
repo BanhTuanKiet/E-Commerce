@@ -3,8 +3,8 @@ import dotenv from "dotenv"
 import connectDB from "./config/database.js"
 import corsConfig from "./config/cors.js"
 import cookieParser from "cookie-parser"
-import { WebSocketServer } from "ws"
 import http from 'http'
+import admin from "firebase-admin"
 
 import productsRoute from "./route/productsRoute.js"
 import filterOptionsRoute from "./route/filterOptionsRoute.js"
@@ -18,6 +18,8 @@ import reviewsRoute from "./route/reviewsRoute.js"
 import productFieldsRoute from "./route/productFiledsRoute.js"
 import { initWebSocketServer } from "./config/webSocket.js"
 
+import serviceAccount from "./config/serviceAccount.js"
+
 dotenv.config()
 
 const app = express()
@@ -26,6 +28,10 @@ const port = process.env.SERVER_PORT
 app.use(express.json())
 app.use(corsConfig)
 app.use(cookieParser())
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+})
 
 const server = http.createServer(app)
 

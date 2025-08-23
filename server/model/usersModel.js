@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 
 const users = new mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    firebaseID: { type: String, required: true },
     email: { type: String, required: true },
     name: { type: String, required: true },
     phoneNumber: { type: String, required: true },

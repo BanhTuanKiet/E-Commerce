@@ -1,4 +1,4 @@
-import axios from "../util/AxiosConfig"
+import axios from "../config/AxiosConfig"
 import { useEffect } from "react"
 import { createContext, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"

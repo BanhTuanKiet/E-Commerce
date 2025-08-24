@@ -1,7 +1,7 @@
 import { Star, ThumbsUp, ThumbsDown, ChevronDown } from "lucide-react"
 import { Button, Badge, Form, ProgressBar, Image, Card, Row, Col } from "react-bootstrap"
 import { renderStars } from "../../util/BadgeUtil"
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import BoxChat from "../BoxChat"
 
 export default function ProductReviews({ product, reviews, rating }) {

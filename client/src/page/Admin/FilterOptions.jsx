@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { CirclePlus, Edit, Trash2, Plus, Check, Ban } from "lucide-react"
 import { Badge, Button, Card, Col, Form, FormLabel, Row } from "react-bootstrap"
-import axios from "../../util/AxiosConfig"
+import axios from "../../config/AxiosConfig"
 import { getTypeFilter } from "../../util/BadgeUtil"
 import { toReadAble } from "../../util/DataClassify"
 import AddFilterModal from "../../component/Modal/AddFilterModal"

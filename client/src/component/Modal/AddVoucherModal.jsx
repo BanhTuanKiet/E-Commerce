@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Badge, Button, Col, Form, FormLabel, Modal, Row } from 'react-bootstrap'
 import { toReadAble } from '../../util/DataClassify'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 
 export default function AddVoucherModal({ show, setShow }) {
   const [formData, setFormData] = useState({})

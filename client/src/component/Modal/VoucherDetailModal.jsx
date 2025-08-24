@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Badge, Button, ButtonGroup, Card, Col, Form, FormControl, FormLabel, Modal, Row } from 'react-bootstrap'
 import { getVoucherStatus } from '../../util/BadgeUtil'
 import { Ban, Delete, Edit, Save } from 'lucide-react'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 
 export default function VoucherDetailModal({ selectedVoucher, showDetailModal, setShowDetailModal }) {
   const [voucherEditing, setVoucherEditing] = useState()

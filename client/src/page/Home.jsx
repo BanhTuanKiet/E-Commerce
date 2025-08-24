@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import SaleProductCarousel from '../component/SaleProducts'
-import axios from '../util/AxiosConfig'
+import axios from '../config/AxiosConfig'
 import CategoryBanner from '../component/CategoryBanner'
 import { SearchContext } from '../context/SearchContext'
 import { Col, Row } from 'react-bootstrap'

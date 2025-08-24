@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import OrdersTable from '../../component/OrdersTable'
 import { getPrimitive, toReadAble } from '../../util/DataClassify'
 import { Col, Form, InputGroup, Row } from 'react-bootstrap'

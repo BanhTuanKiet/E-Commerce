@@ -1,4 +1,4 @@
-import axios from '../util/AxiosConfig'
+import axios from '../config/AxiosConfig'
 import { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Accordion } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'

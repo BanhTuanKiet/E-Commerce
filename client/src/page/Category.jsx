@@ -1,7 +1,7 @@
 
 import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import axios from '../util/AxiosConfig'
+import axios from '../config/AxiosConfig'
 import { getPrimitive } from '../util/DataClassify'
 import ProductCard from '../component/Card/ProductCard'
 import { Col, Row } from 'react-bootstrap'

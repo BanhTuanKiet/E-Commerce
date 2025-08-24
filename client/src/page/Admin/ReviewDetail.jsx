@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Form, Image, Modal, Alert } from 'react-bootstrap'
 import { Copy, Phone, Mail, Star, ArrowLeft, Trash2, Flag, Check, ThumbsUp, Eye, MessageSquare, Reply, User, Package } from 'lucide-react'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import ReplyComponent from '../../component/ReplyComponent'
 import BoxChat from '../../component/BoxChat'
 import { ChatContext } from '../../context/ChatContext'

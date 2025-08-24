@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Spinner, Form, Button } from 'react-bootstrap'
 import moment from 'moment'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 
 export default function Profile({ activeTab }) {
   const [user, setUser] = useState(null)

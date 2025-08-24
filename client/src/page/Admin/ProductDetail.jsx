@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, ButtonGroup, Card, Col, Container, Form, ProgressBar, Row, Tab, Tabs } from 'react-bootstrap'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import { toReadAble, getObject } from '../../util/DataClassify'
 import { ArrowLeft, Ban, Delete, Edit, Save } from 'lucide-react'
 

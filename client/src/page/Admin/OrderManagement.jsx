@@ -1,4 +1,4 @@
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import { useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, Card, Table, Form, Button, InputGroup } from 'react-bootstrap'
 import StatusItemCard from '../../component/Card/StatusItemCard'

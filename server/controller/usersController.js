@@ -7,6 +7,7 @@ import { comparePassword, hashPassword } from "../util/passwordUtil.js"
 import mongoose from "mongoose"
 import { auth } from "../config/firebase.js"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import admin from "firebase-admin"
 
 export const signup = async (req, res, next) => {
   try {
@@ -34,7 +35,7 @@ export const authOTP = async (req, res, next) => {
     const { user, otp } = req.body
     const originalPassword = user.password
     const secret = await client.get(user.email)
-    
+
     const otpNumber = Number(otp.join(''))
 
     const state = verifyOTP(JSON.parse(secret), otpNumber)
@@ -52,7 +53,7 @@ export const authOTP = async (req, res, next) => {
     if (user.role === undefined || user.role === '') {
       user.role = "customer"
     }
-    
+
     const userCredential = await createUserWithEmailAndPassword(auth, user.email, originalPassword)
     user.firebaseID = userCredential.user.uid
     await createUser(user)
@@ -64,12 +65,39 @@ export const authOTP = async (req, res, next) => {
   }
 }
 
+export const socialLogin = async (req, res, next) => {
+  try {
+    const { social } = req.params
+    const { token } = req.body
+
+    if (!social || !token) {
+      throw new ErrorException(400, "Missing social or token")
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(token)
+
+    const email = decodedToken.email
+    const userDB = await userIsExist(email)
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      maxAge: 3600 * 1000,
+    })
+
+    return res.json({ data: { role: userDB.role, name: userDB.name }, message: `Signin successful via ${social}!`,})
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body.user
 
     if (!email || !password) {
-      throw new Error("Missing email or password")
+      throw new ErrorException(400, "Missing email or password")
     }
 
     const userCredential = await signInWithEmailAndPassword(auth, email, password)

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from "react"
 import { Modal, Button, Form, Row, Col, Card, Badge } from "react-bootstrap"
 import { Plus, X } from "lucide-react"
-import axios from "../../util/AxiosConfig"
+import axios from "../../config/AxiosConfig"
 import { toReadAble } from "../../util/DataClassify"
 
 export default function AddModal({ show, setShow }) {

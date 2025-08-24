@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import axios from "../util/AxiosConfig"
+import axios from "../config/AxiosConfig"
 import { formatLabel, getPrimitive } from '../util/DataClassify'
 import VoucherModal from '../component/Modal/VoucherModal'
 import NotFoundSearch from '../component/NotFoundSearch'

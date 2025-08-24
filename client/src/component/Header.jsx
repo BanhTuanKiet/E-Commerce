@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { Search, ShoppingCart, User, List, X } from "lucide-react"
 import { UserContext } from "../context/UserContext"
 import { useNavigate } from "react-router-dom"
-import axios from "../util/AxiosConfig"
+import axios from "../config/AxiosConfig"
 import "../style/Header.css"
 import { SearchContext } from "../context/SearchContext"
 

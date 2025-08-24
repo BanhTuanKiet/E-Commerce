@@ -2,7 +2,7 @@ import { Accordion, Col, Row } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import { getObject, getPrimitive, toReadAble } from '../util/DataClassify'
 import { useEffect, useState } from 'react'
-import axios from '../util/AxiosConfig'
+import axios from '../config/AxiosConfig'
 import ProductCard from '../component/Card/ProductCard'
 
 export default function Compare() {

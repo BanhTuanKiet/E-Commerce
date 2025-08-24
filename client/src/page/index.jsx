@@ -1,7 +1,6 @@
 import Header from '../component/Header'
 import Footer from '../component/Footer'
 
-
 export default function index({ children }) {
     return (
         <div className='mx-auto'>

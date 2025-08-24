@@ -2,7 +2,7 @@ import { useState, useContext } from "react"
 import { Container, Row, Col, Form, Button, InputGroup, Card } from "react-bootstrap"
 import { Eye, EyeOff, CheckCircle, AlertCircle, User, Mail, Phone, MapPin, Lock } from "lucide-react"
 import { ValideFormContext } from "../context/ValideForm"
-import axios from "../util/AxiosConfig"
+import axios from "../config/AxiosConfig"
 import OTPModal from "../component/Modal/OTPModal"
 import { UserContext } from "../context/UserContext"
 

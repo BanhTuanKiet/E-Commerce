@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Card, Col, Container, Row } from 'react-bootstrap'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import PaginationProducts from '../../component/Pagination'
 import StatusItemCard from '../../component/Card/StatusItemCard'
 import ProductDetail from './ProductDetail'

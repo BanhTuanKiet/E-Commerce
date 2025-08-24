@@ -1,6 +1,6 @@
 import React, { use, useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, Card, Table, Button, Form, Badge, ProgressBar, Modal, InputGroup, Alert } from 'react-bootstrap'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import { getVoucherStatus } from '../../util/BadgeUtil'
 import VoucherDetailModal from '../../component/Modal/VoucherDetailModal'
 import StatusItemCard from '../../component/Card/StatusItemCard'

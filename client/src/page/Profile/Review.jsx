@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Col, Container, Row, Accordion, ListGroup } from 'react-bootstrap'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import ReplyComponent from '../../component/ReplyComponent'
 import BoxChat from '../../component/BoxChat'
 import { useContext } from 'react'

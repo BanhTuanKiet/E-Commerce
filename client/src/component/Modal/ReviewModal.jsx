@@ -1,4 +1,4 @@
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import { useEffect } from 'react'
 import { useRef, useState } from 'react'
 import { Modal, Button, Form, Card } from 'react-bootstrap'

@@ -5,7 +5,7 @@ import { PlusCircle, Star, Info } from 'lucide-react'
 import { useState } from 'react'
 import '../../style/ProductCard.css'
 import { useEffect } from 'react'
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 
 export default function ProductCard({ product, keys, handleCompareProducts }) {
   const { category } = useParams()

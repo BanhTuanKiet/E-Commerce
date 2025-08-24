@@ -1,4 +1,4 @@
-import axios from '../../util/AxiosConfig'
+import axios from '../../config/AxiosConfig'
 import React, { useState } from 'react'
 import { Button, Form, Modal, Badge } from 'react-bootstrap'
 import { CirclePlus } from 'lucide-react'

@@ -5,6 +5,7 @@ import ErrorException from "../util/errorException.js"
 import { sendMailUpdateOrderStatus } from "../util/mailUtl.js"
 import { minusQuantityProduct } from "../service/productsService.js"
 import { minusQuantityVoucher } from "../service/vouchersService.js"
+import vnpay from '../config/vnpayConfig.js'
 
 export const countOrder = async (req, res, next) => {
   try {
@@ -32,7 +33,7 @@ export const placeOrder = async (req, res, next) => {
     order.paymentStatus = "unpaid"
 
     const isUsed = await hasUsedVoucher(user._id, order.voucher._id)
-    
+
     if (isUsed) throw new ErrorException(400, "You have already used this voucher")
 
     const ordered = await postOrder([order], session)
@@ -49,6 +50,141 @@ export const placeOrder = async (req, res, next) => {
     next(error)
   } finally {
     session.endSession()
+  }
+}
+
+export const vnpayPayment = async (req, res, next) => {
+  try {
+    const dateFormat = (await import('dateformat')).default
+    // const vnp_IpnUrl = "http://localhost:3000/order/auth/vnpay_ipn"
+
+    const tmnCode = vnpay.globalDefaultConfig.vnp_TmnCode
+    const secretKey = vnpay.globalDefaultConfig.vnp_HashSecret
+
+    var vnpUrl = vnpay.globalDefaultConfig.vnp_Url
+    const returnUrl = vnpay.globalDefaultConfig.vnp_ReturnUrl
+
+    const date = new Date()
+
+    const createDate = dateFormat(date, 'yyyymmddHHMMss')
+    const orderId = req.body.orderId
+    const totalAmount = req.body.totalAmount
+    // var bankCode = req.body.bankCode
+    const ipAddr = '127.0.0.1'
+    const orderInfo = "Thanh+toan+don+hang+" + req.body.orderDescription || ''
+    const orderType = req.body.orderType || 'other'
+    const locale = req.body.language || 'vn'
+    const currCode = 'VND'
+    const order = req.body.order
+    const quantities = req.body.quantities
+    var vnp_Params = {}
+    vnp_Params['vnp_Version'] = '2.1.0'
+    vnp_Params['vnp_Command'] = 'pay'
+    vnp_Params['vnp_TmnCode'] = tmnCode
+    // vnp_Params['vnp_Merchant'] = ''
+    vnp_Params['vnp_Locale'] = locale
+    vnp_Params['vnp_CurrCode'] = currCode
+    vnp_Params['vnp_TxnRef'] = orderId || "1111111"
+    vnp_Params['vnp_OrderInfo'] = orderInfo
+    vnp_Params['vnp_OrderType'] = orderType
+    vnp_Params['vnp_Amount'] = totalAmount
+    vnp_Params['vnp_ReturnUrl'] = returnUrl
+    vnp_Params['vnp_IpAddr'] = ipAddr
+    vnp_Params['vnp_CreateDate'] = createDate
+    // vnp_Params['vnp_order'] = order
+    // vnp_Params['vnp_quantities'] = quantities
+    // vnp_Params['vnp_IpnUrl'] = vnp_IpnUrl
+    // if(bankCode !== null && bankCode !== ''){
+    //     vnp_Params['vnp_BankCode'] = bankCode
+    // }
+
+    vnp_Params = Object.fromEntries(Object.entries(vnp_Params).sort())
+
+    const signData = querystring.stringify(vnp_Params)
+    const hmac = crypto.createHmac('sha512', secretKey)
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
+    vnp_Params['vnp_SecureHash'] = signed
+    vnpUrl += '?' + querystring.stringify(vnp_Params)
+
+    return res.json({ vnpUrl: vnpUrl })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const HandleVNPay = async (req, res, next) => {
+  try {
+    var vnp_Params = req.query
+    const secureHash = vnp_Params['vnp_SecureHash']
+
+    delete vnp_Params['vnp_SecureHash']
+    delete vnp_Params['vnp_SecureHashType']
+
+    vnp_Params = Object.fromEntries(Object.entries(vnp_Params).sort())
+
+    const tmnCode = vnpay.globalDefaultConfig.vnp_TmnCode
+    const secretKey = vnpay.globalDefaultConfig.vnp_HashSecret
+
+    const signData = querystring.stringify(vnp_Params)
+    const hmac = crypto.createHmac("sha512", secretKey)
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex")
+
+    const transactionMessages = {
+      "00": "Transaction successful",
+      "01": "Transaction incomplete",
+      "02": "Transaction error",
+      "04": "Transaction reversed (customer was charged but transaction failed)",
+      "05": "Transaction under processing",
+      "06": "Refund request sent to the bank",
+      "07": "Transaction suspected of fraud",
+      "09": "Refund rejected"
+    }
+
+    const responseMessages = {
+      "00": "Transaction successful",
+      "07": "Transaction suspected of fraud",
+      "09": "Transaction failed: Unregistered InternetBanking",
+      "10": "Transaction failed: Too many incorrect authentication attempts",
+      "11": "Transaction failed: Payment timeout",
+      "12": "Transaction failed: Account locked",
+      "13": "Transaction failed: Incorrect OTP",
+      "24": "Transaction failed: Customer canceled",
+      "51": "Transaction failed: Insufficient balance",
+      "65": "Transaction failed: Exceeded daily transaction limit",
+      "75": "Transaction failed: Bank under maintenance",
+      "79": "Transaction failed: Too many incorrect password attempts",
+      "99": "Transaction failed: Unknown error"
+    }
+
+    const transactionStatus = vnp_Params['vnp_TransactionStatus']
+    const responseCode = vnp_Params['vnp_ResponseCode'] || "02"
+
+    if (["02", "04", "05", "06", "07", "09"].includes(transactionStatus) || ["07", "99"].includes(responseCode)) {
+      throw new ApiError(responseMessages[responseCode], 500)
+    }
+
+    if (secureHash !== signed) {
+      throw new ApiError('', 500)
+    }
+
+    const { email } = req.body
+
+    const orderId = req.body.orderId
+    const userId = await OrderService.GetUserId(email)
+
+    if (userId === null) {
+      throw new ApiError('Userid not found', 500)
+    }
+
+    const orderDetails = await OrderService.Payment(userId, orderId, 'paid')
+
+    if (orderDetails.length === 0) {
+      throw new ApiError("Failed to add new order!", 500)
+    }
+
+    return res.json({ message: responseMessages[responseCode], status: 'success' })
+  } catch (error) {
+    next(error)
   }
 }
 

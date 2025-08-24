@@ -228,7 +228,13 @@ export default function Cart() {
       }
 
       try {
-        await axios.post("/orders", { order: order })
+        if (paymentMethod === 'cod') {
+          await axios.post("/orders", { order: order })
+        } else if (paymentMethod === 'vnpay') {
+          const response = await axios.post('/oders/vnpay', order)
+          console.log(response)
+        }
+
       } catch (error) {
         console.error("Lỗi đặt hàng:", error)
       }

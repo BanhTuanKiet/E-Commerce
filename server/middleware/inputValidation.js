@@ -1,6 +1,6 @@
-import ErrorException from "../util/errorException.js"
+const ErrorException = require("../util/errorException.js")
 
-export const inputValidation = (schema, property) => {
+const inputValidation = (schema, property) => {
   return (req, res, next) => {
     try {
       const data = req[property]
@@ -22,3 +22,5 @@ export const inputValidation = (schema, property) => {
     }
   }
 }
+
+module.exports = inputValidation

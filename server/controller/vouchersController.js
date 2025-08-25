@@ -1,8 +1,17 @@
-import mongoose from "mongoose"
-import { addVoucher, updateVoucher, findVouchers, findVoucherByCode, findVoucherId, updateVoucherStatus, getFilterVouchers, deleteVoucher } from "../service/vouchersService.js"
-import ErrorException from "../Util/errorException.js"
+const mongoose = require("mongoose")
+const {
+  addVoucher,
+  updateVoucher,
+  findVouchers,
+  findVoucherByCode,
+  findVoucherId,
+  updateVoucherStatus,
+  getFilterVouchers,
+  deleteVoucher
+} = require("../service/vouchersService.js")
+const ErrorException = require("../util/errorException.js")
 
-export const getVoucher = async (req, res, next) => {
+const getVoucher = async (req, res, next) => {
   try {
     const vouchers = await findVouchers()
 
@@ -12,7 +21,7 @@ export const getVoucher = async (req, res, next) => {
   }
 }
 
-export const getVoucherByCode = async (req, res, next) => {
+const getVoucherByCode = async (req, res, next) => {
   try {
     const { voucherCode } = req.params
 
@@ -28,7 +37,7 @@ export const getVoucherByCode = async (req, res, next) => {
   }
 }
 
-export const putVoucher = async (req, res, next) => {
+const putVoucher = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -63,7 +72,7 @@ export const putVoucher = async (req, res, next) => {
   }
 }
 
-export const putVoucherStatus = async (req, res, next) => {
+const putVoucherStatus = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -88,7 +97,7 @@ export const putVoucherStatus = async (req, res, next) => {
   }
 }
 
-export const filterVouchers = async (req, res, next) => {
+const filterVouchers = async (req, res, next) => {
   try {
     let { options, page } = req.query
 
@@ -106,7 +115,7 @@ export const filterVouchers = async (req, res, next) => {
   }
 }
 
-export const postVoucher = async (req, res, next) => {
+const postVoucher = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -128,7 +137,7 @@ export const postVoucher = async (req, res, next) => {
   }
 }
 
-export const removeVoucher = async (req, res, next) => {
+const removeVoucher = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -154,4 +163,14 @@ export const removeVoucher = async (req, res, next) => {
   } finally {
     await session.endSession()
   }
+}
+
+module.exports = {
+  getVoucher,
+  getVoucherByCode,
+  putVoucher,
+  putVoucherStatus,
+  filterVouchers,
+  postVoucher,
+  removeVoucher
 }

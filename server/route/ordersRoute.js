@@ -1,9 +1,9 @@
-import expres from "express"
-import { vnpayPayment, getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } from "../controller/ordersController.js"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-import { authRole } from "../middleware/authRole.js"
-const ordersRoute = expres.Router()
+const express = require("express")
+const { vnpayPayment, getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } = require("../controller/ordersController.js")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const authRole = require("../middleware/authRole.js")
+const ordersRoute = express.Router()
 
 ordersRoute.use(authTokenFirebase)
 
@@ -18,4 +18,4 @@ ordersRoute.get('/detail/:orderId', getOrder)
 ordersRoute.get('/present', getPresentOrder)
 ordersRoute.put('/status/:orderId', authRole('admin'), putOrderStatus)
 
-export default ordersRoute
+module.exports = ordersRoute

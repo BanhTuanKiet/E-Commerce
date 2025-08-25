@@ -1,8 +1,8 @@
-import mongoose from "mongoose"
+const mongoose = require('mongoose')
 
 const categories = new mongoose.Schema({
-    _id: String,
-    name: String
+   _id: String,
+   name: String
 })
 
-export default mongoose.model('Categories', categories, 'Categories')
+module.exports = mongoose.model('Categories', categories, 'Categories')

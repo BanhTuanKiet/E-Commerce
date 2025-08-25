@@ -1,11 +1,11 @@
-import expres from "express"
-import authToken from '../middleware/authToken.js'
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-import { authRole } from '../middleware/authRole.js'
-import { postVoucher, getVoucher, getVoucherByCode, putVoucherStatus, putVoucher, filterVouchers, removeVoucher } from "../controller/vouchersController.js"
-import { inputValidation } from "../middleware/inputValidation.js"
-import { voucherSchema } from "../util/valideInput.js"
-const vouchersRoute = expres.Router()
+const express = require("express")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const authRole = require("../middleware/authRole.js")
+const { postVoucher, getVoucher, getVoucherByCode, putVoucherStatus, putVoucher, filterVouchers, removeVoucher } = require("../controller/vouchersController.js")
+const inputValidation = require("../middleware/inputValidation.js")
+const { voucherSchema } = require("../util/valideInput.js")
+const vouchersRoute = express.Router()
 
 vouchersRoute.get('/', getVoucher)
 vouchersRoute.post('/', authTokenFirebase, authRole('admin'), inputValidation(voucherSchema, 'body'), postVoucher)
@@ -15,4 +15,4 @@ vouchersRoute.put('/', authTokenFirebase, authRole('admin'), putVoucher)
 vouchersRoute.put('/status/:voucherId', authTokenFirebase, authRole('admin'), putVoucherStatus)
 vouchersRoute.delete('/:voucherId', authTokenFirebase, authRole('admin'), removeVoucher)
 
-export default vouchersRoute
+module.exports = vouchersRoute

@@ -1,143 +1,155 @@
-import mongoose from "mongoose"
-import Review from "../model/reviewsModel.js"
+const mongoose = require('mongoose')
+const Review = require('../model/reviewsModel.js')
 
 const itemsPerPage = 10
 
-export const findReview = async (reviewId) => {
-  return await Review.findById(reviewId)
+const findReview = async (reviewId) => {
+ return await Review.findById(reviewId)
 }
 
-export const findReviewByReviewId = async (reviewId) => {
-  return await Review.findById(reviewId).populate('productId').populate('userId').populate('orderId')
+const findReviewByReviewId = async (reviewId) => {
+ return await Review.findById(reviewId).populate('productId').populate('userId').populate('orderId')
 }
 
-export const findBasicReview = async (userId, orderId, productId) => {
-  return await Review.findOne(
-    { userId, orderId, productId },
-    {
-      content: { $slice: 1 }, // chỉ lấy phần tử đầu tiên
-      // rating: 1,
-      // userId: 1,
-      // orderId: 1,
-      // productId: 1,
-      // createdAt: 1
-    }
-  )
+const findBasicReview = async (userId, orderId, productId) => {
+ return await Review.findOne(
+   { userId, orderId, productId },
+   {
+     content: { $slice: 1 }
+   }
+ )
 }
 
-export const findReviewById = async (user, orderId, productId) => {
-  return await Review.findOne({
-    userId: user._id,
-    orderId: orderId,
-    productId: productId
-  })
+const findReviewById = async (user, orderId, productId) => {
+ return await Review.findOne({
+   userId: user._id,
+   orderId: orderId,
+   productId: productId
+ })
 }
 
-export const findReviews = async () => {
-  return await Review.find().populate('productId').populate('userId')
+const findReviews = async () => {
+ return await Review.find().populate('productId').populate('userId')
 }
 
-export const addReview = async (userId, review, orderId, productId, session) => {
-  return await Review.create([{
-    orderId,
-    productId,
-    userId,
-    rating: review.rating,
-    content: [
-      {
-        content: review.content,
-        role: "customer",
-        _id: userId
-      }
-    ]
-  }], { session })
+const addReview = async (userId, review, orderId, productId, session) => {
+ return await Review.create([{
+   orderId,
+   productId,
+   userId,
+   rating: review.rating,
+   content: [
+     {
+       content: review.content,
+       role: "customer",
+       _id: userId
+     }
+   ]
+ }], { session })
 }
 
-export const updateReview = async (reviewId, reviewData) => {
-  return await Review.findByIdAndUpdate(
-    reviewId,
-    {
-      $set: {
-        rating: reviewData.rating,
-        "content.0.content": reviewData.content,
-        "content.0.createdAt": Date.now()
-      }
-    },
-    { new: true }
-  )
+const updateReview = async (reviewId, reviewData) => {
+ return await Review.findByIdAndUpdate(
+   reviewId,
+   {
+     $set: {
+       rating: reviewData.rating,
+       "content.0.content": reviewData.content,
+       "content.0.createdAt": Date.now()
+     }
+   },
+   { new: true }
+ )
 }
 
-export const findReviewsByProductId = async (productId) => {
-  return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
+const findReviewsByProductId = async (productId) => {
+ return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
 }
 
-export const findReviewsCustomerByProductId = async (productId) => {
-  return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
-    .populate({
-      path: 'userId',
-      select: 'name'
-    })
-    .populate({
-      path: 'productId',
-      select: 'images'
-    })
+const findReviewsCustomerByProductId = async (productId) => {
+ return await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
+   .populate({
+     path: 'userId',
+     select: 'name'
+   })
+   .populate({
+     path: 'productId',
+     select: 'images'
+   })
 }
 
-export const saveReply = async (reviewId, user, content, session) => {
-  return await Review.findByIdAndUpdate(
-    reviewId,
-    {
-      $push: {
-        content: {
-          role: user.role,
-          content: content,
-          _id: user._id
-        }
-      }
-    },
-    { new: true, session }
-  )
+const saveReply = async (reviewId, user, content, session) => {
+ return await Review.findByIdAndUpdate(
+   reviewId,
+   {
+     $push: {
+       content: {
+         role: user.role,
+         content: content,
+         _id: user._id
+       }
+     }
+   },
+   { new: true, session }
+ )
 }
 
-export const getFilterReviews = async (options, page) => {
-  const query = {}
-  const skipIndex = (page - 1) * itemsPerPage
+const getFilterReviews = async (options, page) => {
+ const query = {}
+ const skipIndex = (page - 1) * itemsPerPage
 
-  Object.entries(options).map(([key, value]) => {
-    if (key !== '' && key !== 'total' && value !== '' && value !== 'total') {
-      query[key] = value
-    }
-  })
+ Object.entries(options).map(([key, value]) => {
+   if (key !== '' && key !== 'total' && value !== '' && value !== 'total') {
+     query[key] = value
+   }
+ })
 
-  const reviews = await Review.find(query).skip(skipIndex).limit(itemsPerPage).populate('productId').populate('userId')
-  const totalPages = await Review.countDocuments(query)
+ const reviews = await Review.find(query).skip(skipIndex).limit(itemsPerPage).populate('productId').populate('userId')
+ const totalPages = await Review.countDocuments(query)
 
-  return {
-    reviews,
-    totalPages: Math.ceil(totalPages / itemsPerPage)
-  }
+ return {
+   reviews,
+   totalPages: Math.ceil(totalPages / itemsPerPage)
+ }
 }
 
-export const firstVote = async (reviewId, userId, status, session) => {
-  return await Review.findOneAndUpdate(
-    { _id: reviewId }, // ✅ đúng filter
-    { $push: { isHelpfulCount: { userId, status } } },
-    { new: true, session }
-  )
+const firstVote = async (reviewId, userId, status, session) => {
+ return await Review.findOneAndUpdate(
+   { _id: reviewId },
+   { $push: { isHelpfulCount: { userId, status } } },
+   { new: true, session }
+ )
 }
 
-export const removeVote = async (reviewId, userId, session) => {
-  return await Review.findOneAndUpdate(
-    { _id: reviewId },
-    { $pull: { isHelpfulCount: { userId } } },
-    { new: true, session }
-  )
+const removeVote = async (reviewId, userId, session) => {
+ return await Review.findOneAndUpdate(
+   { _id: reviewId },
+   { $pull: { isHelpfulCount: { userId } } },
+   { new: true, session }
+ )
 }
 
-export const changeVote = async (review, target, userId, session) => {
-  return await Review.findOneAndUpdate(
-    { _id: review._id, "isHelpfulCount.userId": userId },
-    { $set: { "isHelpfulCount.$.status": !target.status } },
-    { new: true, session }
-  )
+const changeVote = async (review, target, userId, session) => {
+ return await Review.findOneAndUpdate(
+   { _id: review._id, "isHelpfulCount.userId": userId },
+   { $set: { "isHelpfulCount.$.status": !target.status } },
+   { new: true, session }
+ )
+}
+
+module.exports = {
+ findReview,
+ findReviewByReviewId,
+ findBasicReview,
+ findReviewById,
+ findReviews,
+ addReview,
+ updateReview,
+ findReviewsByProductId,
+ findReviewsCustomerByProductId,
+ saveReply,
+ getFilterReviews,
+ firstVote,
+ removeVote,
+ changeVote
 }

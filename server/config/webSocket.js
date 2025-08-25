@@ -1,11 +1,11 @@
-import { WebSocketServer } from 'ws'
-import jwt from "jsonwebtoken"
-import ErrorException from "../util/errorException.js"
+const { WebSocketServer } = require('ws')
+const jwt = require("jsonwebtoken")
+const ErrorException = require("../util/errorException.js")
 
 const wsClients = new Map()
 let wss = null
 
-export function initWebSocketServer(server) {
+function initWebSocketServer(server) {
   wss = new WebSocketServer({ server })
 
   wss.on('connection', async (ws, req) => {
@@ -23,7 +23,7 @@ export function initWebSocketServer(server) {
   })
 }
 
-export function sendMessage(newMessage, targetUserId = null) {
+function sendMessage(newMessage, targetUserId = null) {
   for (let [uid, client] of wsClients) {
     // if (client.readyState === client.OPEN) {zz
       // if (!targetUserId || uid === targetUserId) {
@@ -33,4 +33,8 @@ export function sendMessage(newMessage, targetUserId = null) {
   }
 }
 
-export { wsClients }
+module.exports = {
+  initWebSocketServer,
+  sendMessage,
+  wsClients
+}

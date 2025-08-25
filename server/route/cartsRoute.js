@@ -1,13 +1,14 @@
-import expres from "express"
-import { getCart, updateCart, postProductToCart } from "../controller/cartsController.js"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-const cartsRoute = expres.Router()
+const express = require("express")
+const { getCart, updateCart, postProductToCart } = require("../controller/cartsController.js")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+
+const cartsRoute = express.Router()
 
 cartsRoute.use(authTokenFirebase)
 
 cartsRoute.get("/", getCart)
-cartsRoute.put('/', updateCart)
+cartsRoute.put("/", updateCart)
 cartsRoute.post("/", postProductToCart)
 
-export default cartsRoute
+module.exports = cartsRoute

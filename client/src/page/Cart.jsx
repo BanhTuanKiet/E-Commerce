@@ -5,6 +5,7 @@ import axios from "../config/AxiosConfig"
 import { formatLabel, getPrimitive } from '../util/DataClassify'
 import VoucherModal from '../component/Modal/VoucherModal'
 import NotFoundSearch from '../component/NotFoundSearch'
+import { useNavigate } from 'react-router-dom'
 
 export default function Cart() {
   const [cart, setCart] = useState()
@@ -20,12 +21,12 @@ export default function Cart() {
   const prevCartRef = useRef()
   const timeoutOrderRef = useRef(null)
   const [paymentMethod, setPaymentMethod] = useState('COD')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const response = await axios.get(`/carts`)
-        console.log(response.data)
         setCart(response.data)
         const objectKeys = getPrimitive(response?.data[0]?._id)
         setKeys(objectKeys.filter(key => !['_id', 'stock', 'price', 'model'].includes(key)))
@@ -228,11 +229,13 @@ export default function Cart() {
       }
 
       try {
-        if (paymentMethod === 'cod') {
+        if (paymentMethod === 'COD') {
           await axios.post("/orders", { order: order })
-        } else if (paymentMethod === 'vnpay') {
-          const response = await axios.post('/oders/vnpay', order)
-          console.log(response)
+        } else if (paymentMethod === 'VNPAY') {
+          const response = await axios.post('/orders/vnpay', order)
+          console.log(response.vnpUrl)
+          console.log('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=1806000&vnp_Command=pay&vnp_CreateDate=20210801153333&vnp_CurrCode=VND&vnp_IpAddr=127.0.0.1&vnp_Locale=vn&vnp_OrderInfo=Thanh+toan+don+hang+%3A5&vnp_OrderType=other&vnp_ReturnUrl=https%3A%2F%2Fdomainmerchant.vn%2FReturnUrl&vnp_TmnCode=DEMOV210&vnp_TxnRef=5&vnp_Version=2.1.0&vnp_SecureHash=3e0d61a0c0534b2e36680b3f7277743e8784cc4e1d68fa7d276e79c23be7d6318d338b477910a27992f5057bb1582bd44bd82ae8009ffaf6d141219218625c42')
+          window.open(response.vnpUrl)
         }
 
       } catch (error) {
@@ -241,7 +244,7 @@ export default function Cart() {
     }, 500)
   }
 
-  if (cart?.length) {
+  if (!cart?.length) {
     return (
       <NotFoundSearch type={'cart'} />
     )
@@ -385,12 +388,12 @@ export default function Cart() {
                   className="form-check-input"
                   type="radio"
                   name="paymentMethod"
-                  id="cod"
-                  value="cod"
+                  id="COD"
+                  value="COD"
                   checked={paymentMethod === 'COD'}
                   onChange={() => setPaymentMethod('COD')}
                 />
-                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="cod">
+                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="COD">
                   <i className="fas fa-money-bill-wave text-success"></i>
                   <span>COD</span>
                 </label>
@@ -400,12 +403,12 @@ export default function Cart() {
                   className="form-check-input"
                   type="radio"
                   name="paymentMethod"
-                  id="vnpay"
-                  value="vnpay"
-                  checked={paymentMethod === 'vnpay'}
-                  onChange={() => setPaymentMethod('vnpay')}
+                  id="VNPAY"
+                  value="VNPAY"
+                  checked={paymentMethod === 'VNPAY'}
+                  onChange={() => setPaymentMethod('VNPAY')}
                 />
-                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="vnpay">
+                <label className="form-check-label d-flex align-items-center gap-2" htmlFor="VNPAY">
                   <i className="fas fa-credit-card text-primary"></i>
                   <span>VNPAY</span>
                 </label>

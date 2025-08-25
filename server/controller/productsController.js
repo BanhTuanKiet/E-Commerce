@@ -1,12 +1,27 @@
-import { getFilterOptionsByCategory } from "../service/filterOptionsService.js"
-import { addProuct, findFirstProduct, countProductByState, getFilterProducts, findProducts, findProductsByCategory, getProductById, findProductBySearchTerm, getOtherOptionsItem, getSaleProductsByCategory, getProductByState, getProductsByOptions, updateProduct, removeProduct } from "../service/productsService.js"
-import { getProductImage } from "../util/getProductImage.js"
-import ErrorException from "../util/errorException.js"
-import { getList } from "../service/categoriesService.js"
-import { handleImageUpload } from "../util/uploadImageUtil.js"
-import mongoose from "mongoose"
+const { getFilterOptionsByCategory } = require("../service/filterOptionsService.js")
+const {
+  addProuct,
+  findFirstProduct,
+  countProductByState,
+  getFilterProducts,
+  findProducts,
+  findProductsByCategory,
+  getProductById,
+  findProductBySearchTerm,
+  getOtherOptionsItem,
+  getSaleProductsByCategory,
+  getProductByState,
+  getProductsByOptions,
+  updateProduct,
+  removeProduct
+} = require("../service/productsService.js")
 
-export const getProducts = async (req, res, next) => {
+const { getProductImage, handleImageUpload } = require("../util/imageUtil.js")
+const ErrorException = require("../util/errorException.js")
+const { getList } = require("../service/categoriesService.js")
+const mongoose = require("mongoose")
+
+const getProducts = async (req, res, next) => {
   try {
     const { page } = req.query
 
@@ -22,7 +37,7 @@ export const getProducts = async (req, res, next) => {
   }
 }
 
-export const getProductsByCategory = async (req, res, next) => {
+const getProductsByCategory = async (req, res, next) => {
   try {
     const { category } = req.params
     const { page } = req.query
@@ -54,7 +69,7 @@ export const getProductsByCategory = async (req, res, next) => {
   }
 }
 
-export const filterProducts = async (req, res, next) => {
+const filterProducts = async (req, res, next) => {
   try {
     let { options, page } = req.query
 
@@ -84,7 +99,7 @@ export const filterProducts = async (req, res, next) => {
   }
 }
 
-export const filterProductsByCategory = async (req, res, next) => {
+const filterProductsByCategory = async (req, res, next) => {
   try {
     const { category, options } = req.params
     const { page } = req.query
@@ -119,7 +134,7 @@ export const filterProductsByCategory = async (req, res, next) => {
   }
 }
 
-export const getProductDetail = async (req, res, next) => {
+const getProductDetail = async (req, res, next) => {
   try {
     const { id } = req.params
 
@@ -137,7 +152,7 @@ export const getProductDetail = async (req, res, next) => {
   }
 }
 
-export const getOtherOptions = async (req, res, next) => {
+const getOtherOptions = async (req, res, next) => {
   try {
     const { model } = req.params
 
@@ -153,7 +168,7 @@ export const getOtherOptions = async (req, res, next) => {
   }
 }
 
-export const getSaleProducts = async (req, res, next) => {
+const getSaleProducts = async (req, res, next) => {
   try {
     const saleProducts = []
     const categories = await getList()
@@ -189,7 +204,7 @@ export const getSaleProducts = async (req, res, next) => {
   }
 }
 
-export const getProductsByState = async (req, res, next) => {
+const getProductsByState = async (req, res, next) => {
   try {
     const { state } = req.params
     const products = await getProductByState(state)
@@ -215,7 +230,7 @@ export const getProductsByState = async (req, res, next) => {
   }
 }
 
-export const countProduct = async (req, res, next) => {
+const countProduct = async (req, res, next) => {
   try {
     const { state } = req.params
 
@@ -233,7 +248,7 @@ export const countProduct = async (req, res, next) => {
   }
 }
 
-export const putProduct = async (req, res, next) => {
+const putProduct = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -264,7 +279,7 @@ export const putProduct = async (req, res, next) => {
   }
 }
 
-export const getFristProduct = async (req, res) => {
+const getFristProduct = async (req, res) => {
   try {
     const { category } = req.params
 
@@ -280,7 +295,7 @@ export const getFristProduct = async (req, res) => {
   }
 }
 
-export const postProduct = async (req, res, next) => {
+const postProduct = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -312,7 +327,7 @@ export const postProduct = async (req, res, next) => {
   }
 }
 
-export const deleteProduct = async (req, res, next) => {
+const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params
     const objectId = new mongoose.Types.ObjectId(id)
@@ -327,7 +342,7 @@ export const deleteProduct = async (req, res, next) => {
   }
 }
 
-export const searchProduct = async (req, res, next) => {
+const searchProduct = async (req, res, next) => {
   try {
     const { searchTerm } = req.query
 
@@ -352,4 +367,21 @@ export const searchProduct = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
+}
+
+module.exports = {
+  getProducts,
+  getProductsByCategory,
+  filterProducts,
+  filterProductsByCategory,
+  getProductDetail,
+  getOtherOptions,
+  getSaleProducts,
+  getProductsByState,
+  countProduct,
+  putProduct,
+  getFristProduct,
+  postProduct,
+  deleteProduct,
+  searchProduct
 }

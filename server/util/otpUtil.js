@@ -1,6 +1,6 @@
-import speakeasy from 'speakeasy'
+const speakeasy = require('speakeasy')
 
-export const generateOTP = () => {
+const generateOTP = () => {
     const secret = speakeasy.generateSecret({ length: 20 })
 
     const otp = speakeasy.totp({
@@ -11,7 +11,7 @@ export const generateOTP = () => {
     return { secret: secret, otp: otp }
 }
 
-export const verifyOTP = (secret, otp) => {
+const verifyOTP = (secret, otp) => {
     return speakeasy.totp.verify({
         secret: secret.base32,
         encoding: 'base32',
@@ -19,3 +19,5 @@ export const verifyOTP = (secret, otp) => {
         token: otp
     })
 }
+
+module.exports = { generateOTP, verifyOTP }

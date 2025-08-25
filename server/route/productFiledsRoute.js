@@ -1,11 +1,11 @@
-import expres from "express"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-import { getProductFields } from '../controller/productFieldsController.js'
-const productFieldsRoute = expres.Router()
+const express = require("express")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const { getProductFields } = require("../controller/productFieldsController.js")
+const productFieldsRoute = express.Router()
 
 productFieldsRoute.use(authTokenFirebase)
 
 productFieldsRoute.get('/:type', getProductFields)
 
-export default productFieldsRoute
+module.exports = productFieldsRoute

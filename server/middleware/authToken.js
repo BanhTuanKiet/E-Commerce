@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken"
-import ErrorException from "../util/errorException.js"
-import { getRefreshToken } from "../service/usersService.js"
-import { generateToken } from "../util/tokenUtil.js"
+const jwt = require("jsonwebtoken")
+const ErrorException = require("../util/errorException.js")
+const { getRefreshToken } = require("../service/usersService.js")
+const { generateToken } = require("../util/tokenUtil.js")
 
 const authToken = async (req, res, next) => {
     try {
@@ -36,7 +36,7 @@ const authToken = async (req, res, next) => {
             res.cookie('accessToken', accessToken, { 
                 httpOnly: true,
                 sameSite: 'strict',
-                maxAge: 3600 * 1000, 
+                maxAge: 3600 * 1000
             }) 
 
             req.user = decoded
@@ -48,4 +48,4 @@ const authToken = async (req, res, next) => {
     }
 }
 
-export default authToken
+module.exports = authToken

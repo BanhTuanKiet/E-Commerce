@@ -1,9 +1,9 @@
-import mongoose from "mongoose"
-import { getFilterOptionsByCategory, addNewOptions, updateFilterOptions } from "../service/filterOptionsService.js"
-import ErrorException from "../util/errorException.js"
-import { findFirstProduct } from "../service/productsService.js"
+const mongoose = require("mongoose")
+const { getFilterOptionsByCategory, addNewOptions, updateFilterOptions } = require("../service/filterOptionsService.js")
+const ErrorException = require("../util/errorException.js")
+const { findFirstProduct } = require("../service/productsService.js")
 
-export const getFilterOptions = async (req, res, next) => {
+const getFilterOptions = async (req, res, next) => {
   try {
     const { category } = req.params
 
@@ -16,7 +16,7 @@ export const getFilterOptions = async (req, res, next) => {
   }
 }
 
-export const putFilterOptions = async (req, res, next) => {
+const putFilterOptions = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -27,7 +27,7 @@ export const putFilterOptions = async (req, res, next) => {
     const updatedFilterOptions = await updateFilterOptions(category, filterOptions.filters, session)
 
     if (!updatedFilterOptions) throw new ErrorException(400, 'Update failed')
-      
+
     await session.commitTransaction()
     return res.json({ message: 'Updated' })
   } catch (error) {
@@ -38,7 +38,7 @@ export const putFilterOptions = async (req, res, next) => {
   }
 }
 
-export const putNewFilterOptions = async (req, res, next) => {
+const putNewFilterOptions = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -98,4 +98,10 @@ export const putNewFilterOptions = async (req, res, next) => {
   } finally {
     session.endSession()
   }
+}
+
+module.exports = {
+  getFilterOptions,
+  putFilterOptions,
+  putNewFilterOptions
 }

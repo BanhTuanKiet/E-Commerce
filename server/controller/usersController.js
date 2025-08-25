@@ -1,15 +1,15 @@
-import { createUser, findUserById, saveRefreshToken, userIsExist, updateUser } from "../service/usersService.js"
-import ErrorException from "../util/errorException.js"
-import { sendMail } from "../util/mailUtl.js"
-import { generateOTP, verifyOTP } from "../util/otpUtil.js"
-import client from "../config/redis.js"
-import { comparePassword, hashPassword } from "../util/passwordUtil.js"
-import mongoose from "mongoose"
-import { auth } from "../config/firebase.js"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
-import admin from "firebase-admin"
+const { createUser, findUserById, saveRefreshToken, userIsExist, updateUser } = require("../service/usersService.js")
+const ErrorException = require("../util/errorException.js")
+const { sendMail } = require("../util/mailUtl.js")
+const { generateOTP, verifyOTP } = require("../util/otpUtil.js")
+const client = require("../config/redis.js")
+const { comparePassword, hashPassword } = require("../util/passwordUtil.js")
+const mongoose = require("mongoose")
+const auth = require("../config/firebase.js")
+const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth")
+const admin = require("firebase-admin")
 
-export const signup = async (req, res, next) => {
+const signup = async (req, res, next) => {
   try {
     const user = req.body
 
@@ -30,7 +30,7 @@ export const signup = async (req, res, next) => {
   }
 }
 
-export const authOTP = async (req, res, next) => {
+const authOTP = async (req, res, next) => {
   try {
     const { user, otp } = req.body
     const originalPassword = user.password
@@ -65,7 +65,7 @@ export const authOTP = async (req, res, next) => {
   }
 }
 
-export const socialLogin = async (req, res, next) => {
+const socialLogin = async (req, res, next) => {
   try {
     const { social } = req.params
     const { token } = req.body
@@ -92,17 +92,17 @@ export const socialLogin = async (req, res, next) => {
   }
 }
 
-export const signin = async (req, res, next) => {
+const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body.user
 
     if (!email || !password) {
       throw new ErrorException(400, "Missing email or password")
     }
-
+    console.log(email, password)
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const userDB = await userIsExist(email)
-
+    console.log(userCredential)
     const user = userCredential.user
     const idToken = await user.getIdToken(true)
     const { accessToken, refreshToken, expirationTime } = user.stsTokenManager
@@ -137,7 +137,7 @@ export const signin = async (req, res, next) => {
   }
 }
 
-export const getUser = async (req, res, next) => {
+const getUser = async (req, res, next) => {
   try {
     const { user } = req
 
@@ -151,7 +151,7 @@ export const getUser = async (req, res, next) => {
   }
 }
 
-export const putUser = async (req, res, next) => {
+const putUser = async (req, res, next) => {
   try {
     const { user } = req
     const { newUser } = req.body
@@ -167,4 +167,13 @@ export const putUser = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
+}
+
+module.exports = {
+  signup,
+  authOTP,
+  signin,
+  socialLogin,
+  getUser,
+  putUser
 }

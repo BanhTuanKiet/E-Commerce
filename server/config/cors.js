@@ -1,4 +1,4 @@
-import cors from "cors"
+const cors = require('cors')
 
 const corsConfig = cors({
     origin: [
@@ -13,4 +13,4 @@ const corsConfig = cors({
     credentials: true // sending with cookie
 })
 
-export default corsConfig
+module.exports = corsConfig

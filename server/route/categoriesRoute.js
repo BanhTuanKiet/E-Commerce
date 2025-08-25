@@ -1,7 +1,7 @@
-import expres from "express"
-import { getCategories } from "../controller/categoriesController.js"
-const categoriesRoute = expres.Router()
+const express = require("express")
+const { getCategories } = require("../controller/categoriesController.js")
+const categoriesRoute = express.Router()
 
 categoriesRoute.get("/", getCategories)
 
-export default categoriesRoute
+module.exports = categoriesRoute

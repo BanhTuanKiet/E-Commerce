@@ -1,4 +1,4 @@
-export const errorException = (err, req, res, next) => {
+const errorException = (err, req, res, next) => {
     console.log("Error: ", err)
 
     const defaultMessage = "Something went wrong! Please try again!"
@@ -9,3 +9,5 @@ export const errorException = (err, req, res, next) => {
 
     return res.status(statusCode).json({ message: message })
 }
+
+module.exports = errorException

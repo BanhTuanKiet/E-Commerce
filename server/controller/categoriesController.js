@@ -1,11 +1,15 @@
-import { getList } from "../service/categoriesService.js"
+const { getList } = require("../service/categoriesService.js")
 
-export const getCategories = async (req, res, next) => {
-    try {
-        const categories = await getList()
+const getCategories = async (req, res, next) => {
+  try {
+    const categories = await getList()
 
-        return res.json({ data: categories })
-    } catch (error) {
-        console.log(error)
-    }
+    return res.json({ data: categories })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+module.exports = {
+  getCategories
 }

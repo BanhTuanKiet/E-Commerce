@@ -1,15 +1,15 @@
-import expres from "express"
-import { getFilterOptions, putFilterOptions, putNewFilterOptions } from "../controller/filterOptionsController.js"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-import { authRole } from '../middleware/authRole.js'
-import { inputValidation } from "../middleware/inputValidation.js"
-import { newFilterOptionsSchema, updateFilterOptionsSchema } from "../util/valideInput.js"
+const express = require("express")
+const { getFilterOptions, putFilterOptions, putNewFilterOptions } = require("../controller/filterOptionsController.js")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const authRole = require("../middleware/authRole.js")
+const inputValidation = require("../middleware/inputValidation.js")
+const { newFilterOptionsSchema, updateFilterOptionsSchema } = require("../util/valideInput.js")
 
-const filterOptionsRoute = expres.Router()
+const filterOptionsRoute = express.Router()
 
 filterOptionsRoute.put("/add/:category", inputValidation(newFilterOptionsSchema, 'body'), authTokenFirebase, authRole('admin'), putNewFilterOptions)
 filterOptionsRoute.get("/:category", getFilterOptions)
-filterOptionsRoute.put("/:category", inputValidation(updateFilterOptionsSchema, 'body'), authTokenFirebase, authRole('admin'),  putFilterOptions)
+filterOptionsRoute.put("/:category", inputValidation(updateFilterOptionsSchema, 'body'), authTokenFirebase, authRole('admin'), putFilterOptions)
 
-export default filterOptionsRoute
+module.exports = filterOptionsRoute

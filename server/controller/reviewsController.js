@@ -1,12 +1,28 @@
-import mongoose from "mongoose"
-import { getProductById, updateReviewProduct } from "../service/productsService.js"
-import { findReviews, findReviewById, addReview, updateReview, findReviewsByProductId, saveReply, getFilterReviews, findReviewByReviewId, findReviewsCustomerByProductId, findReview, firstVote, removeVote, changeVote, findBasicReview } from "../service/reviewsService.js"
-import ErrorException from "../util/errorException.js"
-import { findOrderById } from "../service/orderServcie.js"
-import { getProductImage } from "../util/getProductImage.js"
-import { sendMessage } from "../config/webSocket.js"
+const mongoose = require("mongoose")
+const { getProductById, updateReviewProduct } = require("../service/productsService.js")
+const { 
+  findReviews, 
+  findReviewById, 
+  addReview, 
+  updateReview, 
+  findReviewsByProductId, 
+  saveReply, 
+  getFilterReviews, 
+  findReviewByReviewId, 
+  findReviewsCustomerByProductId, 
+  findReview, 
+  firstVote, 
+  removeVote, 
+  changeVote, 
+  findBasicReview 
+} = require("../service/reviewsService.js")
+const ErrorException = require("../util/errorException.js")
+const { findOrderById } = require("../service/orderServcie.js")
+const { getProductImage } = require("../util/imageUtil.js")
+const { sendMessage } = require("../config/webSocket.js")
 
-export const getReviewByReviewId = async (req, res, next) => {
+
+const getReviewByReviewId = async (req, res, next) => {
   try {
     const { reviewId } = req.params
 
@@ -20,7 +36,7 @@ export const getReviewByReviewId = async (req, res, next) => {
   }
 }
 
-export const getReview = async (req, res, next) => {
+const getReview = async (req, res, next) => {
   try {
     const { user } = req
 
@@ -40,7 +56,7 @@ export const getReview = async (req, res, next) => {
   }
 }
 
-export const getReviewByProductId = async (req, res, next) => {
+const getReviewByProductId = async (req, res, next) => {
   try {
     const { productId } = req.params
 
@@ -65,7 +81,7 @@ export const getReviewByProductId = async (req, res, next) => {
   }
 }
 
-export const getReviews = async (req, res, next) => {
+const getReviews = async (req, res, next) => {
   try {
     const reviews = await findReviews()
 
@@ -77,7 +93,7 @@ export const getReviews = async (req, res, next) => {
   }
 }
 
-export const postReview = async (req, res, next) => {
+const postReview = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -132,7 +148,7 @@ export const postReview = async (req, res, next) => {
   }
 }
 
-export const getRating = async (req, res, next) => {
+const getRating = async (req, res, next) => {
   try {
     const { productId } = req.params
     const reviews = await findReviewsByProductId(productId)
@@ -151,7 +167,7 @@ export const getRating = async (req, res, next) => {
   }
 }
 
-export const getDetailRating = async (req, res, next) => {
+const getDetailRating = async (req, res, next) => {
   try {
     const { productId } = req.params
 
@@ -173,7 +189,7 @@ export const getDetailRating = async (req, res, next) => {
   }
 }
 
-export const replyReview = async (req, res, next) => {
+const replyReview = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -200,7 +216,7 @@ export const replyReview = async (req, res, next) => {
   }
 }
 
-export const filterReviews = async (req, res, next) => {
+const filterReviews = async (req, res, next) => {
   try {
     const { options, page } = req.query
     const decodedOptions = JSON.parse(decodeURIComponent(options))
@@ -215,7 +231,7 @@ export const filterReviews = async (req, res, next) => {
   }
 }
 
-export const voteReview = async (req, res, next) => {
+const voteReview = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -268,4 +284,17 @@ export const voteReview = async (req, res, next) => {
   } finally {
     await session.endSession()
   }
+}
+
+module.exports = {
+  getReviewByReviewId,
+  getReview,
+  getReviewByProductId,
+  getReviews,
+  postReview,
+  getRating,
+  getDetailRating,
+  replyReview,
+  filterReviews,
+  voteReview
 }

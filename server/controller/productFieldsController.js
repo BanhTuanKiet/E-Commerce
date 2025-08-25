@@ -1,6 +1,6 @@
-import ProductField from '../model/productFieldsModel.js'
+const ProductField = require('../model/productFieldsModel.js')
 
-export const getProductFields = async (req, res, next) => {
+const getProductFields = async (req, res, next) => {
   try {
     const { type } = req.params
     const fields = await ProductField.findOne({ type: type })
@@ -9,4 +9,8 @@ export const getProductFields = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
+}
+
+module.exports = {
+  getProductFields
 }

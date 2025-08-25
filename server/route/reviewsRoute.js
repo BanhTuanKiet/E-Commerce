@@ -1,21 +1,21 @@
-import expres from "express"
-import { voteReview, getDetailRating, getReviewByProductId, replyReview, getReview, getReviews, postReview, getRating, filterReviews, getReviewByReviewId } from "../controller/reviewsController.js"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from "../middleware/authTokenFirebase.js"
-import { authRole } from "../middleware/authRole.js"
-import { inputValidation } from "../middleware/inputValidation.js"
-import { newReview } from "../util/valideInput.js"
-const reviewsRoute = expres.Router()
+const express = require("express")
+const { voteReview, getDetailRating, getReviewByProductId, replyReview, getReview, getReviews, postReview, getRating, filterReviews, getReviewByReviewId } = require("../controller/reviewsController.js")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const authRole = require("../middleware/authRole.js")
+const inputValidation = require("../middleware/inputValidation.js")
+const { newReview } = require("../util/valideInput.js")
+const reviewsRoute = express.Router()
 
-reviewsRoute.post(`/`, inputValidation(newReview, 'body'), authTokenFirebase, postReview)
+reviewsRoute.post('/', inputValidation(newReview, 'body'), authTokenFirebase, postReview)
 reviewsRoute.get('/', authTokenFirebase, getReviews)
 reviewsRoute.put('/reply', authTokenFirebase, replyReview)
 reviewsRoute.get('/filter', authTokenFirebase, authRole('admin'), filterReviews)
 reviewsRoute.get('/rating/:productId', getRating)
 reviewsRoute.get('/rating/detail/:productId', getDetailRating)
-reviewsRoute.get(`/customer/:productId`, getReviewByProductId)
+reviewsRoute.get('/customer/:productId', getReviewByProductId)
 reviewsRoute.get('/detail/:reviewId', authTokenFirebase, authRole('admin'), getReviewByReviewId)
-reviewsRoute.get(`/:orderId/:productId`, authTokenFirebase, getReview)
+reviewsRoute.get('/:orderId/:productId', authTokenFirebase, getReview)
 reviewsRoute.put('/vote/:reviewId', authTokenFirebase, voteReview)
 
-export default reviewsRoute
+module.exports = reviewsRoute

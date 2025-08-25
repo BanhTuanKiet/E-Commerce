@@ -1,8 +1,8 @@
-import Order from "../model/ordersModel.js"
+const Order = require('../model/ordersModel.js')
 
 const itemsPerPage = 10
 
-export const getAllOrders = async (page) => {
+const getAllOrders = async (page) => {
   const skipIndex = (page - 1) * itemsPerPage
 
   const orders = await Order.find().skip(skipIndex).limit(itemsPerPage).populate('customerId')
@@ -14,26 +14,27 @@ export const getAllOrders = async (page) => {
   }
 }
 
-export const postOrder = async (order, session) => {
+const postOrder = async (order, session) => {
   const [ordered] = await Order.create(JSON.parse(JSON.stringify(order)), { session })
   return ordered
 }
 
-export const findOrdersByCustomerId = async (customerId) => {
+const findOrdersByCustomerId = async (customerId) => {
   return await Order.find({ customerId: customerId })
 }
 
-export const findOrderBasic = async (customerId) => {
+const findOrderBasic = async (customerId) => {
   return await Order.find(
     { customerId },
-    { items: 1 } // chỉ lấy items từ Order
+    { items: 1 }
   )
-  .populate({
-    path: 'items.productId',
-    select: 'model' // chỉ lấy trường model của Product
-  })
+    .populate({
+      path: 'items.productId',
+      select: 'model'
+    })
 }
-export const filterOrdersByCustomerAndOpions = async (customerId, options, page) => {
+
+const filterOrdersByCustomerAndOpions = async (customerId, options, page) => {
   const query = { customerId }
   const skipIndex = (page - 1) * itemsPerPage
   let start, end = null
@@ -79,15 +80,15 @@ export const filterOrdersByCustomerAndOpions = async (customerId, options, page)
   }
 }
 
-export const findOrdersByStatus = async (customerId, status) => {
+const findOrdersByStatus = async (customerId, status) => {
   return await Order.find({ customerId: customerId, orderStatus: status })
 }
 
-export const findOrderById = async (orderId) => {
+const findOrderById = async (orderId) => {
   return await Order.findById(orderId).populate('items.productId').populate('customerId')
 }
 
-export const findPresentOrder = async (userId) => {
+const findPresentOrder = async (userId) => {
   return await Order.findOne(
     {
       customerId: userId,
@@ -100,11 +101,11 @@ export const findPresentOrder = async (userId) => {
   )
 }
 
-export const countOrderByState = async (state) => {
+const countOrderByState = async (state) => {
   return Order.find({ orderStatus: state }).countDocuments()
 }
 
-export const getFilterProducts = async (options, page) => {
+const getFilterProducts = async (options, page) => {
   const query = {}
   const skipIndex = (page - 1) * itemsPerPage
   let searchTerm, start, end = null
@@ -160,7 +161,7 @@ export const getFilterProducts = async (options, page) => {
   }
 }
 
-export const updateOrderStatus = async (orderId, orderStatus, paymentStatus, session = null) => {
+const updateOrderStatus = async (orderId, orderStatus, paymentStatus, session = null) => {
   const update = {}
   const now = Date.now()
 
@@ -189,9 +190,25 @@ export const updateOrderStatus = async (orderId, orderStatus, paymentStatus, ses
   )
 }
 
-export const hasUsedVoucher = async (customerId, voucherId) => {
+const hasUsedVoucher = async (customerId, voucherId) => {
+  if (!voucherId) return false
   return await Order.findOne({
     customerId: customerId,
     'voucher._id': voucherId
   })
+}
+
+module.exports = {
+  getAllOrders,
+  postOrder,
+  findOrdersByCustomerId,
+  findOrderBasic,
+  filterOrdersByCustomerAndOpions,
+  findOrdersByStatus,
+  findOrderById,
+  findPresentOrder,
+  countOrderByState,
+  getFilterProducts,
+  updateOrderStatus,
+  hasUsedVoucher
 }

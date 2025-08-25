@@ -1,6 +1,6 @@
-import ErrorException from "../util/errorException.js"
+const ErrorException = require("../util/errorException.js")
 
-export const authRole = (...allowedRoles) => {
+const authRole = (...allowedRoles) => {
     return (req, res, next) => {
         try {
             const { role } = req.user
@@ -15,3 +15,5 @@ export const authRole = (...allowedRoles) => {
         }
     }
 }
+
+module.exports = authRole

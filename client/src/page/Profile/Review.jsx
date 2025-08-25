@@ -59,7 +59,7 @@ export default function Review() {
     }, 500)
   }
 
-  if (!orders.length) {
+  if (!orders?.length) {
     return (
       <NotFoundSearch type={'review'} />
     )

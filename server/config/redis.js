@@ -1,16 +1,23 @@
-import { createClient } from 'redis'
+const { createClient } = require('redis')
 
 const client = createClient({
     username: 'default',
-    password: 'rQQM8S05CU2MotB78BXhghGoWrZkcQG2',
+    password: process.env.REDIS_CLOUD_PASSWORD,
     socket: {
-        host: 'redis-19949.c1.ap-southeast-1-1.ec2.redns.redis-cloud.com',
-        port: 19949
+        host: process.env.REDIS_CLOUD_SOCKET_HOST,
+        port: process.env.REDIS_CLOUD_SOCKET_PORT
     }
 })
 
 client.on('error', err => console.log('Redis Client Error', err))
 
-await client.connect()
+async function connectRedis() {
+    if (!client.isOpen) {
+        await client.connect()
+        console.log("Redis connected ✅")
+    }
+}
 
-export default client
+connectRedis()
+
+module.exports = client

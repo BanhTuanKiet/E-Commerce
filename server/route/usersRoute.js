@@ -1,10 +1,10 @@
-import expres from "express"
-import { signup, authOTP, signin, getUser, putUser, socialLogin } from "../controller/usersController.js"
-import authToken from "../middleware/authToken.js"
-import authTokenFirebase from '../middleware/authTokenFirebase.js'
-import { inputValidation } from "../middleware/inputValidation.js"
-import { newUser } from "../util/valideInput.js"
-const usersRoute = expres.Router()
+const express = require("express")
+const { signup, authOTP, signin, getUser, putUser, socialLogin } = require("../controller/usersController.js")
+const authToken = require("../middleware/authToken.js")
+const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const inputValidation = require("../middleware/inputValidation.js")
+const { newUser } = require("../util/valideInput.js")
+const usersRoute = express.Router()
 
 usersRoute.post('/signup', inputValidation(newUser, 'body'), signup)
 usersRoute.post('/auth', authOTP)
@@ -14,4 +14,4 @@ usersRoute.get('/profile', authTokenFirebase, getUser)
 usersRoute.put('/profile', authTokenFirebase, putUser)
 // usersRoute.put('/password', null)
 
-export default usersRoute
+module.exports = usersRoute

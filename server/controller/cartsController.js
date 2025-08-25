@@ -1,10 +1,10 @@
-import mongoose from "mongoose"
-import { addProductToCart, getCartByCustomer, updateCartByCustomerId } from "../service/cartsService.js"
-import { getProductImage } from "../util/getProductImage.js"
-import { getProductById } from "../service/productsService.js"
-import ErrorException from "../util/errorException.js"
+const mongoose = require("mongoose")
+const { addProductToCart, getCartByCustomer, updateCartByCustomerId } = require("../service/cartsService.js")
+const { getProductImage } = require('../util/imageUtil.js')
+const { getProductById } = require("../service/productsService.js")
+const ErrorException = require("../util/errorException.js")
 
-export const getCart = async (req, res, next) => {
+const getCart = async (req, res, next) => {
   try {
     const { user } = req
     const cart = await getCartByCustomer(user._id)
@@ -30,7 +30,7 @@ export const getCart = async (req, res, next) => {
   }
 }
 
-export const updateCart = async (req, res, next) => {
+const updateCart = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -54,7 +54,7 @@ export const updateCart = async (req, res, next) => {
   }
 }
 
-export const postProductToCart = async (req, res, next) => {
+const postProductToCart = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
 
@@ -76,4 +76,10 @@ export const postProductToCart = async (req, res, next) => {
   } finally {
     await session.endSession()
   }
+}
+
+module.exports = {
+  getCart,
+  updateCart,
+  postProductToCart
 }

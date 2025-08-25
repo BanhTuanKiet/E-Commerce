@@ -6,4 +6,4 @@ class ErrorException extends Error {
     }
 }
 
-export default ErrorException
+module.exports = ErrorException

@@ -1,17 +1,23 @@
-import bcrypt from "bcrypt"
+const speakeasy = require('speakeasy')
 
-const saltRounds = 10
+const generateOTP = () => {
+    const secret = speakeasy.generateSecret({ length: 20 })
 
-export const hashPassword = async (plainPassword) => {
-    const salt = await bcrypt.genSalt(saltRounds)
-    return await bcrypt.hash(plainPassword, salt)
+    const otp = speakeasy.totp({
+        secret: secret.base32,
+        encoding: 'base32'
+    })
+    console.log(otp)
+    return { secret: secret, otp: otp }
 }
 
-export const comparePassword = async (plainPassword, hashedPassword) => {
-    try {
-        const isMatch = await bcrypt.compare(plainPassword, hashedPassword)
-        return isMatch
-    } catch (error) {
-        
-    }
+const verifyOTP = (secret, otp) => {
+    return speakeasy.totp.verify({
+        secret: secret.base32,
+        encoding: 'base32',
+        window: 1,
+        token: otp
+    })
 }
+
+module.exports = { generateOTP, verifyOTP }

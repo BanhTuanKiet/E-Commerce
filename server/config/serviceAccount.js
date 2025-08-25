@@ -1,4 +1,4 @@
-export default {
+const serviceAccount = {
   "type": "service_account",
   "project_id": process.env.PROJECT_ID,
   "private_key_id": process.env.PRIVATE_KEY_ID,
@@ -11,3 +11,5 @@ export default {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40e-commerce-8eeb6.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 }
+
+module.exports = serviceAccount

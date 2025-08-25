@@ -1,6 +1,6 @@
-import admin from "firebase-admin"
-import ErrorException from "../util/errorException.js"
-import { userIsExist } from "../service/usersService.js"
+const admin = require("firebase-admin")
+const ErrorException = require("../util/errorException.js")
+const { userIsExist } = require("../service/usersService.js")
 
 const authTokenFirebase = async (req, res, next) => {
   try {
@@ -18,8 +18,8 @@ const authTokenFirebase = async (req, res, next) => {
     next()
   } catch (error) {
     console.log(error)
-    next(new ErrorException(401, "Your sessiong is expiry. Please Login again!"))
+    next(new ErrorException(401, "Your session is expired. Please Login again!"))
   }
 }
 
-export default authTokenFirebase
+module.exports = authTokenFirebase

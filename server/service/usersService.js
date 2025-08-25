@@ -1,40 +1,49 @@
-import { assign } from "nodemailer/lib/shared/index.js"
-import users from "../model/usersModel.js"
+const users = require('../model/usersModel.js')
 
-export const createUser = async (user) => {
-    return await users.create(JSON.parse(JSON.stringify(user)))
+const createUser = async (user) => {
+   return await users.create(JSON.parse(JSON.stringify(user)))
 }
 
-export const userIsExist = async (email) => {
-    return await users.findOne({ email: email })
+const userIsExist = async (email) => {
+   return await users.findOne({ email: email })
 }
 
-export const saveSecretKey = async (email, otpSecret) => {
-    return await users.updateOne(
-        { email: email },
-        { $set: { otpSecret: otpSecret } }
-    )
+const saveSecretKey = async (email, otpSecret) => {
+   return await users.updateOne(
+       { email: email },
+       { $set: { otpSecret: otpSecret } }
+   )
 }
 
-export const saveRefreshToken = async (email, refreshToken) => {
-    return await users.updateOne(
-        { email: email },
-        { refreshToken: refreshToken }
-    )
+const saveRefreshToken = async (email, refreshToken) => {
+   return await users.updateOne(
+       { email: email },
+       { refreshToken: refreshToken }
+   )
 }
 
-export const getRefreshToken = async (_id) => {
-    return await users.findById(_id).select('refreshToken')
+const getRefreshToken = async (_id) => {
+   return await users.findById(_id).select('refreshToken')
 }
 
-export const findUserById = async (_id) => {
-  return await users.findById(_id).select('-password -refreshToken -__v -role')
+const findUserById = async (_id) => {
+ return await users.findById(_id).select('-password -refreshToken -__v -role')
 }
 
-export const updateUser = async (_id, user) => {
-    return await users.findOneAndUpdate(
-        { _id },          
-        { $set: { ...user } }, 
-        { new: true }     
-    )
+const updateUser = async (_id, user) => {
+   return await users.findOneAndUpdate(
+       { _id },          
+       { $set: { ...user } }, 
+       { new: true }     
+   )
+}
+
+module.exports = {
+   createUser,
+   userIsExist,
+   saveSecretKey,
+   saveRefreshToken,
+   getRefreshToken,
+   findUserById,
+   updateUser
 }

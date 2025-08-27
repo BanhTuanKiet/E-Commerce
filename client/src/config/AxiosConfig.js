@@ -2,7 +2,8 @@ import axios from "axios"
 import { success, warning, danger } from "../util/NotifyUtil"
 
 const instance = axios.create({
-    baseURL: "http://127.0.0.1:2908",
+    // baseURL: "http://127.0.0.1:2908",
+    baseURL: 'https://e-commerce-server-uvtw.onrender.com',
     withCredentials: true,
 })
 

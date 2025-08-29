@@ -13,6 +13,7 @@ import OrderDetail from '../page/Profile/OrderDetail.jsx'
 import Profile from '../page/Profile/Profile.jsx'
 import Admin from '../page/Admin/index.jsx'
 import Review from '../page/Profile/Review.jsx'
+import PaymentResultVNP from '../page/ResultPaymentVNPAY.jsx'
 
 function AppRoute() {
     return (
@@ -22,6 +23,7 @@ function AppRoute() {
             <Route path='/manage' element={<Index><Admin /></Index>} />
             <Route path='/profile' element={<Index><Profile /></Index>} />
             <Route path='/cart' element={<Index><Cart /></Index>} />
+            <Route path='/payment'element={<Index><PaymentResultVNP /></Index>} />
             <Route path='/order' element={<Index><Order /></Index>} />
             <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} />
             <Route path='/review' element={<Index><Review /></Index>} />

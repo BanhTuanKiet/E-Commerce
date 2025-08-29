@@ -19,6 +19,7 @@ const { minusQuantityVoucher } = require("../service/vouchersService.js")
 const querystring = require('qs')
 const crypto = require('crypto')
 const vnpay = require("../config/vnpayConfig.js")
+const client = require("../config/redis.js")
 
 const countOrder = async (req, res, next) => {
   try {
@@ -66,36 +67,44 @@ const placeOrder = async (req, res, next) => {
   }
 }
 
+function sortObject(obj) {
+  let sorted = {};
+  let keys = Object.keys(obj).sort();
+  keys.forEach(key => sorted[key] = obj[key]);
+  return sorted;
+}
+
 const vnpayPayment = async (req, res, next) => {
   try {
+    const { user } = req
+
+    const order = req.body
+    order.customerId = user._id.toString()
     const dateFormat = (await import('dateformat')).default
-    // const vnp_IpnUrl = "http://localhost:3000/order/auth/vnpay_ipn"p_HashSecret
-    let vnpUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'
+    let vnpUrl = vnpay.globalDefaultConfig.vnp_Url
     const date = new Date()
-    // var bankCode = req.body.bankCode
     var vnp_Params = {}
 
-    vnp_Params['vnp_Amount'] = req.body.totalAmount * 100
-    vnp_Params['vnp_Command'] = 'pay'
+    vnp_Params['vnp_Amount'] = 100000000
+    vnp_Params['vnp_Command'] = vnpay.globalDefaultConfig.vnp_Command
     vnp_Params['vnp_CreateDate'] = dateFormat(date, 'yyyymmddHHMMss')
-    vnp_Params['vnp_CurrCode'] = 'VND'
-    // vnp_Params['vnp_ExpireDate'] = dateFormat(date.getTime() + 30 * 60 * 1000, 'yyyymmddHHMMss')
+    vnp_Params['vnp_CurrCode'] = vnpay.globalDefaultConfig.vnp_CurrCode
     vnp_Params['vnp_IpAddr'] = '127.0.0.1'
-    vnp_Params['vnp_Locale'] = 'vn'
-    vnp_Params['vnp_OrderInfo'] = 'a'
-    vnp_Params['vnp_OrderType'] = 'other'
-    vnp_Params['vnp_ReturnUrl'] = 'https://domainmerchant.vn/ReturnUrl'
-    vnp_Params['vnp_TmnCode'] = '5JCKYLCW'
-    vnp_Params['vnp_TxnRef'] = Date.now().toString()
-    vnp_Params['vnp_Version'] = '2.1.0'
+    vnp_Params['vnp_Locale'] = vnpay.globalDefaultConfig.vnp_Locale
+    vnp_Params['vnp_OrderInfo'] = JSON.stringify(order)
+    vnp_Params['vnp_OrderType'] = vnpay.globalDefaultConfig.vnp_OrderType
+    vnp_Params['vnp_ReturnUrl'] = vnpay.globalDefaultConfig.vnp_ReturnUrl
+    vnp_Params['vnp_TmnCode'] = vnpay.globalDefaultConfig.vnp_TmnCode
+    vnp_Params['vnp_TxnRef'] = dateFormat(date, 'yyyymmddHHMMss') + Math.floor(Math.random() * 1000);
+    vnp_Params['vnp_Version'] = vnpay.globalDefaultConfig.vnp_Version
 
-    vnp_Params = Object.fromEntries(Object.entries(vnp_Params).sort())
-    
-    const signData = querystring.stringify(vnp_Params, { encode: false })
-    const hmac = crypto.createHmac('sha512', 'XTQG5BZMLAXUB7RA63LH222SRDU1Z3N7')
+    vnp_Params = sortObject(vnp_Params)
+
+    const signData = querystring.stringify(vnp_Params, { encode: true })
+    const hmac = crypto.createHmac(vnpay.globalDefaultConfig.hashAlgorithm, vnpay.globalDefaultConfig.vnp_HashSecret)
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
     vnp_Params['vnp_SecureHash'] = signed
-    vnpUrl += '?' + querystring.stringify(vnp_Params)
+    vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: true })
 
     return res.json({ vnpUrl: vnpUrl })
   } catch (error) {
@@ -103,18 +112,20 @@ const vnpayPayment = async (req, res, next) => {
   }
 }
 
-const HandleVNPay = async (req, res, next) => {
+const vnpayReturn = async (req, res, next) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
-    var vnp_Params = req.query
+    let vnp_Params = req.query
     const secureHash = vnp_Params['vnp_SecureHash']
 
     delete vnp_Params['vnp_SecureHash']
     delete vnp_Params['vnp_SecureHashType']
-
+    console.log(vnp_Params)
     vnp_Params = Object.fromEntries(Object.entries(vnp_Params).sort())
 
-    const tmnCode = vnpay.globalConfig.vnp_TmnCode
-    const secretKey = vnpay.globalConfig.vnp_HashSecret
+    const tmnCode = vnpay.globalDefaultConfig.vnp_TmnCode
+    const secretKey = vnpay.globalDefaultConfig.vnp_HashSecret
 
     const signData = querystring.stringify(vnp_Params)
     const hmac = crypto.createHmac("sha512", secretKey)
@@ -130,7 +141,6 @@ const HandleVNPay = async (req, res, next) => {
       "07": "Transaction suspected of fraud",
       "09": "Refund rejected"
     }
-
     const responseMessages = {
       "00": "Transaction successful",
       "07": "Transaction suspected of fraud",
@@ -147,35 +157,32 @@ const HandleVNPay = async (req, res, next) => {
       "99": "Transaction failed: Unknown error"
     }
 
+    if (signed !== secureHash) throw new ErrorException(400, "Invalid signature")
+
+    const responseCode = vnp_Params['vnp_ResponseCode']
     const transactionStatus = vnp_Params['vnp_TransactionStatus']
-    const responseCode = vnp_Params['vnp_ResponseCode'] || "02"
+    const status = transactionMessages[responseCode]
+    const message = responseMessages[transactionStatus]
 
-    if (["02", "04", "05", "06", "07", "09"].includes(transactionStatus) || ["07", "99"].includes(responseCode)) {
-      throw new ApiError(responseMessages[responseCode], 500)
-    }
+    const orderInfo = JSON.parse(vnp_Params['vnp_OrderInfo'])
+    orderInfo.orderStatus = "processing"
+    orderInfo.paymentStatus = "unpaid"
 
-    if (secureHash !== signed) {
-      throw new ApiError('', 500)
-    }
+    const ordered = await postOrder([orderInfo], session)
 
-    const { email } = req.body
 
-    const orderId = req.body.orderId
-    const userId = await OrderService.GetUserId(email)
-
-    if (userId === null) {
-      throw new ApiError('Userid not found', 500)
-    }
-
-    const orderDetails = await OrderService.Payment(userId, orderId, 'paid')
-
-    if (orderDetails.length === 0) {
-      throw new ApiError("Failed to add new order!", 500)
-    }
-
-    return res.json({ message: responseMessages[responseCode], status: 'success' })
+    await session.commitTransaction()
+    return res.redirect(
+      "http://localhost:3000/payment"
+      + "?status=" + encodeURIComponent(status)
+      + "&message=" + encodeURIComponent(message)
+      + "&transaction=" + encodeURIComponent(JSON.stringify(vnp_Params))
+    )
   } catch (error) {
+    session.abortTransaction()
     next(error)
+  } finally {
+    session.endSession()
   }
 }
 
@@ -355,12 +362,12 @@ module.exports = {
   countOrder,
   placeOrder,
   vnpayPayment,
-  HandleVNPay,
   getOrderBasic,
   getOrders,
   getOrder,
   getPresentOrder,
   filterOrdersByCustomerId,
   filterOrders,
-  putOrderStatus
+  putOrderStatus,
+  vnpayReturn
 }

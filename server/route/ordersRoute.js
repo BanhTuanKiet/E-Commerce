@@ -1,14 +1,16 @@
 const express = require("express")
-const { vnpayPayment, getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } = require("../controller/ordersController.js")
+const { vnpayReturn, vnpayPayment, getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } = require("../controller/ordersController.js")
 const authToken = require("../middleware/authToken.js")
 const authTokenFirebase = require("../middleware/authTokenFirebase.js")
 const authRole = require("../middleware/authRole.js")
 const ordersRoute = express.Router()
 
+ordersRoute.get('/vnpay_return', vnpayReturn)
 ordersRoute.use(authTokenFirebase)
 
 ordersRoute.post("/", placeOrder)
 ordersRoute.post('/vnpay', vnpayPayment)
+// ordersRoute.get('/vnpay_return', vnpayReturn)
 ordersRoute.get('/', getOrders)
 ordersRoute.get('/basic', getOrderBasic)
 ordersRoute.get('/state/count/:state', countOrder)

@@ -17,7 +17,6 @@ const authTokenFirebase = async (req, res, next) => {
     req.user = user
     next()
   } catch (error) {
-    console.log(error)
     next(new ErrorException(401, "Your session is expired. Please Login again!"))
   }
 }

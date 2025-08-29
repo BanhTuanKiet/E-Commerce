@@ -23,7 +23,7 @@ function AppRoute() {
             <Route path='/uploads' element={<Index><ImageUploader /></Index>} />
             <Route path='/manage' element={<Index><AdminDashboard /></Index>} />
             <Route path='/profile' element={<Index><CustomerDashboard /></Index>} />
-            {/* <Route path='/cart' element={<Index><Cart /></Index>} /> */}
+            <Route path='/cart' element={<Index><Cart /></Index>} />
             <Route path='/payment'element={<Index><PaymentResultVNP /></Index>} />
             {/* <Route path='/order' element={<Index><Order /></Index>} />
             <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} /> */}

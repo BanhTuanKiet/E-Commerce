@@ -1,7 +1,8 @@
 import { Tab, Nav, Row, Col } from 'react-bootstrap'
 import Profile from '../Profile/Profile'
-import OrderManagement from './Order'
+import Order from './Order'
 import { useState } from 'react'
+import Review from './Review'
 
 export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState('info')
@@ -36,11 +37,10 @@ export default function CustomerDashboard() {
                 <Profile activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="order">
-                <OrderManagement activeTab={activeTab} />
+                <Order activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="review">
-                <h4>Review Management</h4>
-                <p>Quản lý đánh giá...</p>
+                <Review />
               </Tab.Pane>
             </Tab.Content>
           </Col>

@@ -33,7 +33,6 @@ export default function Order() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        console.log(filterSelections)
         const options = encodeURIComponent(JSON.stringify(filterSelections))
         const response = await axios.get(`/orders/filter?options=${options}`)
         setOrders(response.data)

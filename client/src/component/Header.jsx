@@ -51,7 +51,6 @@ export default function Header() {
     <>
       <nav className="navbar navbar-expand-lg navbar-custom sticky-header">
         <div className="container-fluid px-3 px-lg-4" style={{ width: "80%" }}>
-          {/* logo */}
           <button
             onClick={() => handleLinkClick('/')}
             className="navbar-brand d-flex align-items-center gap-2 border-0 bg-transparent p-0"
@@ -60,7 +59,6 @@ export default function Header() {
             <span className="logo-text d-none d-sm-block">TechStore</span>
           </button>
 
-          {/* desktop categories */}
           <div className="d-none d-lg-flex navbar-nav mx-4">
             {categories.map((item) => (
               <button
@@ -73,7 +71,6 @@ export default function Header() {
             ))}
           </div>
 
-          {/* desktop search */}
           <div className="d-none d-md-flex flex-grow-1 justify-content-center mx-4">
             <div className="search-container w-100">
               <input
@@ -89,14 +86,11 @@ export default function Header() {
             </div>
           </div>
 
-          {/* right section */}
           <div className="d-flex align-items-center gap-2 gap-md-3">
-            {/* search mobile */}
             <button className="cart-btn d-md-none">
               <Search size={20} />
             </button>
 
-            {/* cart */}
             <button
               onClick={() => handleLinkClick('/cart')}
               className="cart-btn"
@@ -107,7 +101,6 @@ export default function Header() {
               )}
             </button>
 
-            {/* user */}
             {user.name ? (
               <div
                 className="user-dropdown-container d-none d-md-flex align-items-center position-relative"
@@ -118,7 +111,9 @@ export default function Header() {
                 <div
                   className="user-btn d-flex align-items-center gap-2"
                   onClick={() => {
-                    if (user?.role !== 'customer') {
+                    if (user?.role !== 'admin') {
+                      handleDropdownClick('/profile#info')
+                    } else {
                       handleDropdownClick('/manage#info')
                     }
                   }}
@@ -127,7 +122,7 @@ export default function Header() {
                   <span>{user?.role}</span>
                 </div>
 
-                {isDropdownOpen && user?.role === "customer" && (
+                {/* {isDropdownOpen && user?.role === "customer" && (
                   <div
                     className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2"
                     style={{ zIndex: 999 }}
@@ -151,7 +146,7 @@ export default function Header() {
                       Đánh giá
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             ) : (
               <button
@@ -163,7 +158,6 @@ export default function Header() {
               </button>
             )}
 
-            {/* toggle button mobile */}
             <button
               onClick={toggleMenu}
               className="menu-toggle d-lg-none"

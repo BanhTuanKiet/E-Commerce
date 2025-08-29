@@ -11,21 +11,22 @@ import Order from '../page/Profile/Order.jsx'
 import Compare from '../page/Compare.jsx'
 import OrderDetail from '../page/Profile/OrderDetail.jsx'
 import Profile from '../page/Profile/Profile.jsx'
-import Admin from '../page/Admin/index.jsx'
+import AdminDashboard from '../page/Admin/index.jsx'
 import Review from '../page/Profile/Review.jsx'
 import PaymentResultVNP from '../page/ResultPaymentVNPAY.jsx'
+import CustomerDashboard from '../page/Profile/index.jsx'
 
 function AppRoute() {
     return (
         <Routes>
             <Route path='/' element={<Index><Home /></Index>} />
             <Route path='/uploads' element={<Index><ImageUploader /></Index>} />
-            <Route path='/manage' element={<Index><Admin /></Index>} />
-            <Route path='/profile' element={<Index><Profile /></Index>} />
-            <Route path='/cart' element={<Index><Cart /></Index>} />
+            <Route path='/manage' element={<Index><AdminDashboard /></Index>} />
+            <Route path='/profile' element={<Index><CustomerDashboard /></Index>} />
+            {/* <Route path='/cart' element={<Index><Cart /></Index>} /> */}
             <Route path='/payment'element={<Index><PaymentResultVNP /></Index>} />
-            <Route path='/order' element={<Index><Order /></Index>} />
-            <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} />
+            {/* <Route path='/order' element={<Index><Order /></Index>} />
+            <Route path='/order/:orderId' element={<Index><OrderDetail /></Index>} /> */}
             <Route path='/review' element={<Index><Review /></Index>} />
             <Route path='/compare/:category/:compareIds' element={<Index><Compare /></Index>} />
             <Route path='/signin' element={<Signin />} />

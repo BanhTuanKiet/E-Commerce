@@ -19,11 +19,10 @@ export default function Profile({ activeTab }) {
   })
 
   useEffect(() => {
-    if (activeTab !== "profile") return
+    if (activeTab !== "info") return
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/users/profile`)
-        console.log(response.data)
         setUser(response.data)
       } catch (error) {
         console.log(error)

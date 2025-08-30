@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import ReviewManagement from './ReviewManagement'
 import VoucherManagement from './VoucherManagement'
 import FilterOptions from './FilterOptions'
+import UserManagement from './UserManagement'
 
 export default function AdminDashboard() {
   const hash = window.location.hash?.replace('#', '') || 'info'
@@ -40,6 +41,11 @@ export default function AdminDashboard() {
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
+                <Nav.Link eventKey="user" onClick={() => handleTabChange('user')}>
+                  User
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
                 <Nav.Link eventKey="product" onClick={() => handleTabChange('product')}>
                   Product
                 </Nav.Link>
@@ -69,8 +75,11 @@ export default function AdminDashboard() {
 
           <Col xs={12} md={10}>
             <Tab.Content>
-              <Tab.Pane eventKey="profile">
+              <Tab.Pane eventKey="info">
                 <Profile activeTab={activeTab} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="user">
+                <UserManagement activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="product">
                 <ProductManagement activeTab={activeTab} />

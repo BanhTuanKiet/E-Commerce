@@ -1,23 +1,13 @@
-const speakeasy = require('speakeasy')
+const bcrypt = require("bcrypt")
+const ErrorException = require("./errorException")
 
-const generateOTP = () => {
-    const secret = speakeasy.generateSecret({ length: 20 })
-
-    const otp = speakeasy.totp({
-        secret: secret.base32,
-        encoding: 'base32'
-    })
-    console.log(otp)
-    return { secret: secret, otp: otp }
+const hashPassword = async (password) => {
+  try {
+    const hashed = await bcrypt.hash(password, 10)
+    return hashed
+  } catch (error) {
+    throw new ErrorException(400, "Error hashing password")
+  }
 }
 
-const verifyOTP = (secret, otp) => {
-    return speakeasy.totp.verify({
-        secret: secret.base32,
-        encoding: 'base32',
-        window: 1,
-        token: otp
-    })
-}
-
-module.exports = { generateOTP, verifyOTP }
+module.exports = { hashPassword }

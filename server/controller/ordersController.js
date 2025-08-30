@@ -46,16 +46,18 @@ const placeOrder = async (req, res, next) => {
     order.orderStatus = "processing"
     order.paymentStatus = "unpaid"
 
-    const isUsed = await hasUsedVoucher(user._id, order.voucher._id)
-
-    if (isUsed) throw new ErrorException(400, "You have already used this voucher")
+    if (order.voucher?._id) {
+      const isUsed = await hasUsedVoucher(user._id, order.voucher._id)
+      if (isUsed) {
+        throw new ErrorException(400, "You have already used this voucher")
+      }
+    }
 
     const ordered = await postOrder([order], session)
 
     if (!ordered) throw new ErrorException(400, "Order failed")
 
-    const result = await minusQuantityVoucher(ordered.voucher._id, session)
-    console.log(result)
+    if (ordered.voucher?._id) await minusQuantityVoucher(ordered.voucher._id, session)
 
     await session.commitTransaction()
     return res.json({ message: "Place order successful!" })
@@ -79,6 +81,7 @@ const vnpayPayment = async (req, res, next) => {
     const { user } = req
 
     const order = req.body
+    // await client.set(user._id.toString(), user._id.toString(), { EX: 30 * 30 })
     order.customerId = user._id.toString()
     const dateFormat = (await import('dateformat')).default
     let vnpUrl = vnpay.globalDefaultConfig.vnp_Url
@@ -95,7 +98,7 @@ const vnpayPayment = async (req, res, next) => {
     vnp_Params['vnp_OrderType'] = vnpay.globalDefaultConfig.vnp_OrderType
     vnp_Params['vnp_ReturnUrl'] = vnpay.globalDefaultConfig.vnp_ReturnUrl
     vnp_Params['vnp_TmnCode'] = vnpay.globalDefaultConfig.vnp_TmnCode
-    vnp_Params['vnp_TxnRef'] = dateFormat(date, 'yyyymmddHHMMss') + Math.floor(Math.random() * 1000);
+    vnp_Params['vnp_TxnRef'] = dateFormat(date, 'yyyymmddHHMMss') + Math.floor(Math.random() * 1000)
     vnp_Params['vnp_Version'] = vnpay.globalDefaultConfig.vnp_Version
 
     vnp_Params = sortObject(vnp_Params)
@@ -115,18 +118,18 @@ const vnpayPayment = async (req, res, next) => {
 const vnpayReturn = async (req, res, next) => {
   const session = await mongoose.startSession()
   session.startTransaction()
+
   try {
     let vnp_Params = req.query
     const secureHash = vnp_Params['vnp_SecureHash']
 
     delete vnp_Params['vnp_SecureHash']
     delete vnp_Params['vnp_SecureHashType']
-    console.log(vnp_Params)
+
     vnp_Params = Object.fromEntries(Object.entries(vnp_Params).sort())
 
     const tmnCode = vnpay.globalDefaultConfig.vnp_TmnCode
     const secretKey = vnpay.globalDefaultConfig.vnp_HashSecret
-
     const signData = querystring.stringify(vnp_Params)
     const hmac = crypto.createHmac("sha512", secretKey)
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex")
@@ -170,6 +173,16 @@ const vnpayReturn = async (req, res, next) => {
 
     const ordered = await postOrder([orderInfo], session)
 
+    if (orderInfo.voucher?._id) {
+      const isUsed = await hasUsedVoucher(orderInfo.customerId, orderInfo.voucher._id)
+      if (isUsed) {
+        throw new ErrorException(400, "You have already used this voucher")
+      }
+    }
+
+    if (!ordered) throw new ErrorException(400, "Order failed")
+
+    if (ordered.voucher?._id) await minusQuantityVoucher(ordered.voucher._id, session)
 
     await session.commitTransaction()
     return res.redirect(

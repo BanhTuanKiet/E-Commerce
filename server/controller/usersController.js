@@ -1,9 +1,9 @@
-const { createUser, findUserById, saveRefreshToken, userIsExist, updateUser } = require("../service/usersService.js")
+const { createUser, findUserById, saveRefreshToken, userIsExist, updateUser, filterUsers } = require("../service/usersService.js")
 const ErrorException = require("../util/errorException.js")
 const { sendMail } = require("../util/mailUtl.js")
 const { generateOTP, verifyOTP } = require("../util/otpUtil.js")
 const client = require("../config/redis.js")
-const { comparePassword, hashPassword } = require("../util/passwordUtil.js")
+const { hashPassword } = require("../util/passwordUtil.js")
 const mongoose = require("mongoose")
 const auth = require("../config/firebase.js")
 const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth")
@@ -56,12 +56,38 @@ const authOTP = async (req, res, next) => {
 
     const userCredential = await createUserWithEmailAndPassword(auth, user.email, originalPassword)
     user.firebaseID = userCredential.user.uid
+    user.providers = ['Email/Password']
     await createUser(user)
     await client.del(user.email)
 
     return res.json({ data: user.email, message: "Signin successful!" })
   } catch (error) {
     next(error)
+  }
+}
+
+const addNewCustomer = async (req, res, next) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const admin = req.body
+    const originalPassword = admin.password
+    admin.role = 'admin'
+
+    const hashedPassword = await hashPassword(admin.password)
+
+    if (hashedPassword) admin.password = hashedPassword
+
+    const userCredential = await createUserWithEmailAndPassword(auth, admin.email, originalPassword)
+    admin.firebaseID = userCredential.user.uid
+    await createUser(admin)
+    console.log(admin)
+    return res.json({ user: admin, message: "Signin successful!" })
+  } catch (error) {
+    await session.abortTransaction()
+    next(error)
+  } finally {
+    await session.endSession()
   }
 }
 
@@ -79,6 +105,8 @@ const socialLogin = async (req, res, next) => {
     const email = decodedToken.email
     const userDB = await userIsExist(email)
 
+    if (!userIsExist) 
+
     res.cookie("accessToken", token, {
       httpOnly: true,
       sameSite: "none",
@@ -86,7 +114,7 @@ const socialLogin = async (req, res, next) => {
       maxAge: 3600 * 1000,
     })
 
-    return res.json({ data: { role: userDB.role, name: userDB.name }, message: `Signin successful via ${social}!`,})
+    return res.json({ data: { role: userDB.role, name: userDB.name }, message: `Signin successful via ${social}!`, })
   } catch (error) {
     next(error)
   }
@@ -99,10 +127,9 @@ const signin = async (req, res, next) => {
     if (!email || !password) {
       throw new ErrorException(400, "Missing email or password")
     }
-    console.log(email, password)
+
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const userDB = await userIsExist(email)
-    console.log(userCredential)
     const user = userCredential.user
     const idToken = await user.getIdToken(true)
     const { accessToken, refreshToken, expirationTime } = user.stsTokenManager
@@ -169,11 +196,30 @@ const putUser = async (req, res, next) => {
   }
 }
 
+const getFilterUsers = async (req, res, next) => {
+  try {
+    let { options, page } = req.query
+    if (!page) page = 1
+
+    const decodedOptions = JSON.parse(decodeURIComponent(options))
+
+    const { users, totalPages } = await filterUsers(decodedOptions, page)
+
+    if (!Array.isArray(users) || typeof totalPages !== 'number') throw new ErrorException(500, "Invalid product list")
+
+    return res.json({ data: users, totalPages: totalPages })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   signup,
   authOTP,
+  addNewCustomer,
   signin,
   socialLogin,
   getUser,
-  putUser
+  putUser,
+  getFilterUsers
 }

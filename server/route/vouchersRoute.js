@@ -7,7 +7,7 @@ const inputValidation = require("../middleware/inputValidation.js")
 const { voucherSchema } = require("../util/valideInput.js")
 const vouchersRoute = express.Router()
 
-vouchersRoute.get('/', getVoucher)
+vouchersRoute.get('/', authTokenFirebase, getVoucher)
 vouchersRoute.post('/', authTokenFirebase, authRole('admin'), inputValidation(voucherSchema, 'body'), postVoucher)
 vouchersRoute.get('/filter', authTokenFirebase, authRole('admin'), filterVouchers)
 vouchersRoute.get('/:voucherCode', getVoucherByCode)

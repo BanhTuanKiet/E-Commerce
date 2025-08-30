@@ -2,6 +2,28 @@ import { Badge } from "react-bootstrap"
 import { formatLabel, toReadAble } from "./DataClassify"
 import { AlertCircle, CheckCircle, Clock, Star, Truck } from "lucide-react"
 
+export const getBadgeGender = (gender) => {
+  switch (gender) {
+    case "male":
+      return <span className="badge bg-primary">{toReadAble(gender)}</span>
+    case "female":
+      return <span className="badge bg-danger">{toReadAble(gender)}</span>
+    default: 
+      return <span className="badge bg-warning">Other</span>
+  }
+}
+
+export const getBadgeRole = (role) => {
+  switch (role) {
+    case "admin":
+      return <span className="badge bg-primary">{toReadAble(role)}</span>
+    case "customer":
+      return <span className="badge bg-success">{toReadAble(role)}</span>
+    default: 
+      return <span className="badge bg-warning">Other</span>
+  }
+}
+
 export const getStatusBadge = (stock) => {
   if (stock === 0) {
     return <span className="badge bg-danger">Out of stock: {stock}</span>
@@ -111,14 +133,14 @@ export const getVoucherStatus = (voucher) => {
 };
 
 export const getTypeFilter = (type) => {
-    switch (type) {
-      case "checkbox":
-        return <Badge bg="primary" className="text-capitalize">checkbox</Badge>
-      case "range":
-        return <Badge bg="success" className="text-capitalize">range</Badge>
-      case "radio":
-        return <Badge bg="warning" className="text-capitalize">radio</Badge>
-      default:
-        return <Badge bg="dark">{type}</Badge>
-    }
+  switch (type) {
+    case "checkbox":
+      return <Badge bg="primary" className="text-capitalize">checkbox</Badge>
+    case "range":
+      return <Badge bg="success" className="text-capitalize">range</Badge>
+    case "radio":
+      return <Badge bg="warning" className="text-capitalize">radio</Badge>
+    default:
+      return <Badge bg="dark">{type}</Badge>
   }
+}

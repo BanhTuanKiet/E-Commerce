@@ -7,15 +7,31 @@ const {
   findVoucherId,
   updateVoucherStatus,
   getFilterVouchers,
-  deleteVoucher
+  deleteVoucher,
+  findVoucherAvailableForCustomer
 } = require("../service/vouchersService.js")
 const ErrorException = require("../util/errorException.js")
+const { findOrdersByCustomerId } = require("../service/orderServcie.js")
 
 const getVoucher = async (req, res, next) => {
   try {
-    const vouchers = await findVouchers()
+    const { user } = req
+    const now = new Date()
 
-    return res.json({ data: vouchers })
+    const vouchers = await findVoucherAvailableForCustomer(now)
+    const orders = await findOrdersByCustomerId(user._id)
+
+    if (!orders.length) return res.json({ data: vouchers })
+
+    const usedVoucherId = orders
+      .filter(order => order.voucher)
+      .map(order => order.voucher._id)
+
+    if (!usedVoucherId.length) return res.json({ data: vouchers })
+
+    const availableVouchers = vouchers.filter(voucher => !usedVoucherId.includes(voucher._id))
+
+    return res.json({ data: availableVouchers })
   } catch (error) {
     next(error)
   }

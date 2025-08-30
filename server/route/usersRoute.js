@@ -1,9 +1,10 @@
 const express = require("express")
-const { signup, authOTP, signin, getUser, putUser, socialLogin } = require("../controller/usersController.js")
+const { addNewCustomer, getFilterUsers, signup, authOTP, signin, getUser, putUser, socialLogin } = require("../controller/usersController.js")
 const authToken = require("../middleware/authToken.js")
+const authRole = require("../middleware/authRole.js")
 const authTokenFirebase = require("../middleware/authTokenFirebase.js")
 const inputValidation = require("../middleware/inputValidation.js")
-const { newUser } = require("../util/valideInput.js")
+const { newUser, newAdmin } = require("../util/valideInput.js")
 const usersRoute = express.Router()
 
 usersRoute.post('/signup', inputValidation(newUser, 'body'), signup)
@@ -12,6 +13,8 @@ usersRoute.post('/signin', signin)
 usersRoute.post('/signin/:social', socialLogin)
 usersRoute.get('/profile', authTokenFirebase, getUser)
 usersRoute.put('/profile', authTokenFirebase, putUser)
+usersRoute.get('/filters', authTokenFirebase, authRole('admin'), getFilterUsers)
+usersRoute.post('/signup/admin', inputValidation(newAdmin, 'body'), authTokenFirebase, authRole('admin'), addNewCustomer)
 // usersRoute.put('/password', null)
 
 module.exports = usersRoute

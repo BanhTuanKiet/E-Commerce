@@ -4,6 +4,14 @@ const findVouchers = async () => {
   return await Voucher.find()
 }
 
+const findVoucherAvailableForCustomer = async (now) => {
+  return await Voucher.find({
+    startDate: { $lte: now },
+    endDate: { $gte: now },
+    isActive: true
+  })
+}
+
 const findVoucherByCode = async (voucherCode) => {
   return await Voucher.findOne({ code: { $regex: `^${voucherCode}$`, $options: 'i' } })
 }
@@ -99,5 +107,6 @@ module.exports = {
   updateVoucherStatus,
   getFilterVouchers,
   addVoucher,
-  deleteVoucher
+  deleteVoucher,
+  findVoucherAvailableForCustomer
 }

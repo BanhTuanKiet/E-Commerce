@@ -1,5 +1,29 @@
 const Joi = require('joi')
 
+const newAdmin = Joi.object({
+  name: Joi.string().trim().required(),
+  email: Joi.string().email().required(),
+  phoneNumber: Joi.string().pattern(/^0\d{9}$/).min(10).max(10).trim().required().messages({
+    "string.pattern.base": "Phone number must be 10 digits and start with 0",
+    "string.empty": "Phone number is required",
+  }),
+  gender: Joi.string().valid('male', 'female').required(),
+  password: Joi.string()
+    .min(8)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "string.empty": "Password is required",
+    }),
+  location: Joi.object({
+    address: Joi.string().trim().required(),
+    ward: Joi.string().trim().required(),
+    city: Joi.string().trim().required()
+  })
+})
+
 const newReview = Joi.object({
   review: Joi.object({
     content: Joi.string().max(200).required().messages({
@@ -24,9 +48,17 @@ const newReview = Joi.object({
 const newUser = Joi.object({
   name: Joi.string().trim().required(),
   email: Joi.string().email().required(),
-  phoneNumber: Joi.string().trim().required(),
+  phoneNumber: Joi.string().min(10).max(10).trim().required(),
   gender: Joi.string().valid('male', 'female').required(),
-  password: Joi.string().min(6).required(),
+  password: Joi.string()
+    .min(8)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "string.empty": "Password is required",
+    }),
   passwordConfirmed: Joi.string().valid(Joi.ref('password')).required()
     .messages({ 'any.only': 'Password confirmation does not match password' }),
   location: Joi.object({
@@ -340,13 +372,15 @@ const productSchema = Joi.alternatives().conditional(Joi.object({ category: Joi.
   then: baseProductSchema.concat(laptopSchema)
 })
 
-module.exports = { 
-  newReview, 
-  newUser, 
-  newFilterOptionsSchema, 
-  updateFilterOptionsSchema, 
-  voucherSchema, 
-  newVoucherSchema, 
-  phoneSchema, 
-  laptopSchema, 
-  productSchema }
+module.exports = {
+  newReview,
+  newUser,
+  newAdmin,
+  newFilterOptionsSchema,
+  updateFilterOptionsSchema,
+  voucherSchema,
+  newVoucherSchema,
+  phoneSchema,
+  laptopSchema,
+  productSchema
+}

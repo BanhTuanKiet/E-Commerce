@@ -75,7 +75,7 @@ export default function AdminDashboard() {
 
           <Col xs={12} md={10}>
             <Tab.Content>
-              <Tab.Pane eventKey="info">
+              <Tab.Pane eventKey="profile">
                 <Profile activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="user">

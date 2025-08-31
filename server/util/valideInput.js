@@ -1,5 +1,23 @@
 const Joi = require('joi')
 
+const updateAccountByAdmin = Joi.object({
+  _id: Joi.optional(),
+  name: Joi.string().trim().required(),
+  email: Joi.string().email().required(),
+  phoneNumber: Joi.string().pattern(/^0\d{9}$/).min(10).max(10).trim().required().messages({
+    "string.pattern.base": "Phone number must be 10 digits and start with 0",
+    "string.empty": "Phone number is required",
+  }),
+  gender: Joi.string().valid('male', 'female').required(),
+  role: Joi.string().valid('admin', 'customer').required(),
+  location: Joi.object({
+    address: Joi.string().trim().required(),
+    ward: Joi.string().trim().required(),
+    city: Joi.string().trim().required()
+  }),
+  isActive: Joi.optional()
+})
+
 const newAdmin = Joi.object({
   name: Joi.string().trim().required(),
   email: Joi.string().email().required(),
@@ -382,5 +400,6 @@ module.exports = {
   newVoucherSchema,
   phoneSchema,
   laptopSchema,
-  productSchema
+  productSchema,
+  updateAccountByAdmin,
 }

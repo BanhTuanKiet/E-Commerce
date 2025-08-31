@@ -105,8 +105,6 @@ const socialLogin = async (req, res, next) => {
     const email = decodedToken.email
     const userDB = await userIsExist(email)
 
-    if (!userIsExist) 
-
     res.cookie("accessToken", token, {
       httpOnly: true,
       sameSite: "none",
@@ -183,14 +181,14 @@ const putUser = async (req, res, next) => {
     const { user } = req
     const { newUser } = req.body
     const objectId = new mongoose.Types.ObjectId(user._id)
+    console.log(newUser)
+    // const userUpdated = await updateUser(objectId, newUser)
 
-    const userUpdated = await updateUser(objectId, newUser)
+    // if (userUpdated === null) {
+    //   throw new ErrorException(400, "Error updating information!")
+    // }
 
-    if (userUpdated === null) {
-      throw new ErrorException(400, "Error updating information!")
-    }
-
-    return res.json({ message: "Update successful!" })
+    // return res.json({ message: "Update successful!" })
   } catch (error) {
     next(error)
   }
@@ -213,6 +211,26 @@ const getFilterUsers = async (req, res, next) => {
   }
 }
 
+const updateAccount = async (req, res, next) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const user = req.body
+
+    const updatedUser = await updateUser(user._id, user)
+
+    if (!updatedUser) throw new ErrorException(400, 'Update failed')
+
+    await session.commitTransaction()
+    return res.json({ data: updatedUser, message: "Update successful" })
+  } catch (error) {
+    await session.abortTransaction()
+    next(error)
+  } finally {
+    await session.endSession()
+  }
+}
+
 module.exports = {
   signup,
   authOTP,
@@ -221,5 +239,6 @@ module.exports = {
   socialLogin,
   getUser,
   putUser,
-  getFilterUsers
+  getFilterUsers,
+  updateAccount
 }

@@ -15,7 +15,12 @@ const users = new mongoose.Schema({
     city: { type: String }
   },
   providers: { type: [String], default: [] },
-  refreshToken: String
-}, { timestamps: true })
+  refreshToken: String,
+  isActive: { type: Boolean, default: true },
+}, {
+  timestamps: true,
+  collection: "Users"
+})
 
-module.exports = mongoose.model('User', users, 'Users')
+const User = mongoose.model('Users', users)
+module.exports = User

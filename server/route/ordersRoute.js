@@ -1,23 +1,98 @@
 const express = require("express")
-const { vnpayReturn, vnpayPayment, getOrderBasic, putOrderStatus, filterOrders, countOrder, placeOrder, getOrders, getOrder, getPresentOrder, filterOrdersByCustomerId } = require("../controller/ordersController.js")
-const authToken = require("../middleware/authToken.js")
-const authTokenFirebase = require("../middleware/authTokenFirebase.js")
-const authRole = require("../middleware/authRole.js")
+const { 
+  vnpayReturn, 
+  vnpayPayment, 
+  getOrderBasic, 
+  putOrderStatus, 
+  filterOrders, 
+  countOrder, 
+  placeOrder, 
+  getOrders, 
+  getOrder, 
+  getPresentOrder, 
+  filterOrdersByCustomerId 
+} = require("../controller/ordersController.js")
+const { 
+  authToken, 
+  authTokenFirebase, 
+  authRole, 
+  authAccountActive 
+} = require('../middleware/authMiddleware.js')
+
 const ordersRoute = express.Router()
 
-ordersRoute.get('/vnpay_return', vnpayReturn)
-ordersRoute.use(authTokenFirebase)
+ordersRoute.get('/vnpay_return', vnpayReturn);
 
-ordersRoute.post("/", placeOrder)
-ordersRoute.post('/vnpay', vnpayPayment)
-// ordersRoute.get('/vnpay_return', vnpayReturn)
-ordersRoute.get('/', getOrders)
-ordersRoute.get('/basic', getOrderBasic)
-ordersRoute.get('/state/count/:state', countOrder)
-ordersRoute.get('/manage/filter', authRole('admin'), filterOrders)
-ordersRoute.get('/filter', filterOrdersByCustomerId)
-ordersRoute.get('/detail/:orderId', getOrder)
-ordersRoute.get('/present', getPresentOrder)
-ordersRoute.put('/status/:orderId', authRole('admin'), putOrderStatus)
+ordersRoute.post(
+  '/', 
+  authTokenFirebase, 
+  authAccountActive, 
+  placeOrder
+)
+
+ordersRoute.post(
+  '/vnpay', 
+  authTokenFirebase, 
+  authAccountActive, 
+  vnpayPayment
+)
+
+ordersRoute.get(
+  '/', 
+  authTokenFirebase, 
+  authAccountActive, 
+  getOrders
+);
+
+ordersRoute.get(
+  '/basic', 
+  authTokenFirebase, 
+  authAccountActive, 
+  getOrderBasic
+)
+
+ordersRoute.get(
+  '/state/count/:state', 
+  authTokenFirebase, 
+  authAccountActive, 
+  countOrder
+)
+
+ordersRoute.get(
+  '/manage/filter', 
+  authTokenFirebase, 
+  authRole('admin'), 
+  authAccountActive, 
+  filterOrders
+)
+
+ordersRoute.get(
+  '/filter', 
+  authTokenFirebase, 
+  authAccountActive, 
+  filterOrdersByCustomerId
+)
+
+ordersRoute.get(
+  '/detail/:orderId', 
+  authTokenFirebase, 
+  authAccountActive, 
+  getOrder
+)
+
+ordersRoute.get(
+  '/present', 
+  authTokenFirebase, 
+  authAccountActive, 
+  getPresentOrder
+)
+
+ordersRoute.put(
+  '/status/:orderId', 
+  authTokenFirebase, 
+  authRole('admin'), 
+  authAccountActive, 
+  putOrderStatus
+)
 
 module.exports = ordersRoute

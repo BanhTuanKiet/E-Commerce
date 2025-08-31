@@ -1,38 +1,37 @@
-const usersModel = require('../model/usersModel.js')
-const users = require('../model/usersModel.js')
+const User = require('../model/usersModel.js')
 
 const createUser = async (user) => {
-  return await users.create(JSON.parse(JSON.stringify(user)))
+  return await User.create(JSON.parse(JSON.stringify(user)))
 }
 
 const userIsExist = async (email) => {
-  return await users.findOne({ email: email })
+  return await User.findOne({ email: email })
 }
 
 const saveSecretKey = async (email, otpSecret) => {
-  return await users.updateOne(
+  return await User.updateOne(
     { email: email },
     { $set: { otpSecret: otpSecret } }
   )
 }
 
 const saveRefreshToken = async (email, refreshToken) => {
-  return await users.updateOne(
+  return await User.updateOne(
     { email: email },
     { refreshToken: refreshToken }
   )
 }
 
 const getRefreshToken = async (_id) => {
-  return await users.findById(_id).select('refreshToken')
+  return await User.findById(_id).select('refreshToken')
 }
 
 const findUserById = async (_id) => {
-  return await users.findById(_id).select('-password -refreshToken -__v -role')
+  return await User.findById(_id).select('-password -refreshToken -__v -role')
 }
 
 const updateUser = async (_id, user) => {
-  return await users.findOneAndUpdate(
+  return await User.findOneAndUpdate(
     { _id },
     { $set: { ...user } },
     { new: true }
@@ -60,17 +59,22 @@ const filterUsers = async (options, page) => {
     }
   })
 
-  const users = await usersModel
+  const users = await User
     .find(query)
     .skip(skipIndex)
     .limit(itemsPerPage)
 
-  const totalUsers = await usersModel.countDocuments(query)
+  const totalUsers = await User.countDocuments(query)
 
   return {
     users,
     totalPages: Math.ceil(totalUsers / itemsPerPage),
   }
+}
+
+const checkIsActive = async (_id) => {
+  const user = await User.findById(_id).select("isActive")
+  return user?.isActive || false
 }
 
 module.exports = {
@@ -81,5 +85,6 @@ module.exports = {
   getRefreshToken,
   findUserById,
   updateUser,
-  filterUsers
+  filterUsers,
+  checkIsActive
 }

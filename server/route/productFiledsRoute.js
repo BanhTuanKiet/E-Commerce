@@ -1,11 +1,14 @@
 const express = require("express")
-const authToken = require("../middleware/authToken.js")
-const authTokenFirebase = require("../middleware/authTokenFirebase.js")
+const { authToken, authTokenFirebase, authRole, authAccountActive } = require('../middleware/authMiddleware.js')
 const { getProductFields } = require("../controller/productFieldsController.js")
+
 const productFieldsRoute = express.Router()
 
-productFieldsRoute.use(authTokenFirebase)
-
-productFieldsRoute.get('/:type', getProductFields)
+productFieldsRoute.get(
+  '/:type', 
+  authTokenFirebase, 
+  authAccountActive, 
+  getProductFields
+)
 
 module.exports = productFieldsRoute

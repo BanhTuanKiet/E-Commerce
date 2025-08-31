@@ -4,41 +4,10 @@ import PaginationProducts from '../../component/Pagination'
 import { getBadgeGender, getBadgeRole } from '../../util/BadgeUtil'
 import axios from '../../config/AxiosConfig'
 import { FaEye, FaEyeSlash } from "react-icons/fa"
+import { Lock, LockOpen } from 'lucide-react'
 
 const UserManagement = ({ activeTab }) => {
-  const mockUsers = [
-    {
-      id: "1",
-      name: "Nguyễn Văn An",
-      email: "an.nguyen@example.com",
-      gender: "male",
-      phoneNumber: 123456,
-      location: {
-        address: "Ni Su Huynh Lien",
-        ward: "Ba Hien",
-        city: "Ho Chi Minh City"
-      },
-      role: "admin",
-      status: "Active",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "Trần Thị Bình",
-      email: "binh.tran@example.com",
-      phoneNumber: 123456,
-      location: {
-        address: "Ni Su Huynh Lien",
-        ward: "Ba Hien",
-        city: "Ho Chi Minh City"
-      },
-      role: "customer",
-      status: "Active",
-      createdAt: "2024-01-20",
-    },
-  ]
-
-  const [users, setUsers] = useState(mockUsers)
+  const [users, setUsers] = useState()
   const [filterSelections, setFilterSelections] = useState({})
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -95,18 +64,29 @@ const UserManagement = ({ activeTab }) => {
   }
 
   const openEditModal = (user) => {
-    setEditingUser(user)
-    setFormData({
+    setEditingUser({
+      _id: user._id,
       name: user.name,
       email: user.email,
+      gender: user.gender,
+      phoneNumber: user.phoneNumber,
       role: user.role,
-      status: user.status,
+      location: user?.location,
+      isActive: user?.isActive
     })
     setShowEditModal(true)
   }
 
-  const handleFilter = (name, value) => {
-    setFilterSelections({ ...filterSelections, [name]: value })
+  const handleUpdateUser = async () => {
+    try {
+      const response = await axios.put(`/users/account/admin`, editingUser)
+      const updatedUser = response.data
+      setUsers(prev => prev.map(user => 
+        user._id === updatedUser._id ? updatedUser : user
+      ))
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -140,7 +120,7 @@ const UserManagement = ({ activeTab }) => {
                       name='search'
                       placeholder="Search by name, email or phone number..."
                       value={filterSelections?.search}
-                      onChange={(e) => handleFilter(e.target.name, e.target.value)}
+                      onChange={(e) => setFilterSelections({ ...filterSelections, name: e.target.value })}
                     />
                   </InputGroup>
                 </Col>
@@ -148,7 +128,7 @@ const UserManagement = ({ activeTab }) => {
                   <Form.Select
                     name='role'
                     value={filterSelections?.role}
-                    onChange={(e) => handleFilter(e.target.name, e.target.value)}
+                    onChange={(e) => setFilterSelections({ ...filterSelections, name: e.target.value })}
                   >
                     <option value="all">All role</option>
                     <option value="admin">Admin</option>
@@ -159,7 +139,7 @@ const UserManagement = ({ activeTab }) => {
                   <Form.Select
                     name='gender'
                     value={filterSelections?.gender}
-                    onChange={(e) => handleFilter(e.target.name, e.target.value)}
+                    onChange={(e) => setFilterSelections({ ...filterSelections, name: e.target.value })}
                   >
                     <option value="all">All gender</option>
                     <option value="male">Male</option>
@@ -215,12 +195,6 @@ const UserManagement = ({ activeTab }) => {
                           onClick={() => openEditModal(user)}
                         >
                           <i className="bi bi-pencil"></i>
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                        >
-                          <i className="bi bi-trash"></i>
                         </Button>
                       </td>
                     </tr>
@@ -371,31 +345,118 @@ const UserManagement = ({ activeTab }) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Chỉnh sửa người dùng</Modal.Title>
+          <Modal.Title>Edit User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Row className="mb-3">
-              <Col>
-                <Form.Label>Họ và tên</Form.Label>
+              <Col md={12} lg={6}>
+                <Form.Label>Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={formData?.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Nhập họ và tên"
+                  value={editingUser?.name}
+                  onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                  placeholder="Enter name"
                 />
               </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col>
+
+              <Col md={12} lg={6}>
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
-                  value={formData?.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Nhập địa chỉ email"
+                  value={editingUser?.email}
+                  onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                  placeholder="Enter email address"
+                />
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={12} lg={6}>
+                <Form.Label>Gender</Form.Label>
+                <Form.Select
+                  value={editingUser?.gender}
+                  onChange={(e) => setEditingUser({ ...formData, gender: e.target.value })}
+                >
+                  <option value="">-- Select gender --</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </Form.Select>
+              </Col>
+
+              <Col md={12} lg={6}>
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editingUser?.phoneNumber}
+                  onChange={(e) => setEditingUser({ ...formData, phoneNumber: e.target.value })}
+                  placeholder="Enter phone number"
+                />
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={12} lg={6}>
+                <Form.Label>Role</Form.Label>
+                <Form.Select
+                  value={editingUser?.role}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                >
+                  <option value="">-- Select role --</option>
+                  <option value="admin">Admin</option>
+                  <option value="customer">Customer</option>
+                </Form.Select>
+              </Col>
+
+              <Col md={12} lg={6}>
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editingUser?.location?.address}
+                  onChange={(e) => setEditingUser({
+                    ...editingUser,
+                    location: {
+                      ...editingUser?.location,
+                      address: e.target.value
+                    }
+                  })}
+                  placeholder="Enter address"
+                />
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={12} lg={6}>
+                <Form.Label>Ward</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editingUser?.location?.ward}
+                  onChange={(e) => setEditingUser({
+                    ...editingUser,
+                    location: {
+                      ...editingUser?.ward,
+                      ward: e.target.value
+                    }
+                  })}
+                  placeholder="Enter address"
+                />
+              </Col>
+
+              <Col md={12} lg={6}>
+                <Form.Label>City</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editingUser?.location?.city}
+                  onChange={(e) => setEditingUser({
+                    ...editingUser,
+                    location: {
+                      ...editingUser?.location,
+                      city: e.target.value
+                    }
+                  })}
+                  placeholder="Enter address"
                 />
               </Col>
             </Row>
@@ -403,10 +464,13 @@ const UserManagement = ({ activeTab }) => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Hủy
+            Cancel
           </Button>
-          <Button variant="primary">
-            Cập nhật
+          <Button variant="primary" onClick={handleUpdateUser}>
+            Update
+          </Button>
+          <Button variant="outline-danger" onClick={handleUpdateUser}>
+            {editingUser?.isActive ? <Lock /> : <LockOpen />}
           </Button>
         </Modal.Footer>
       </Modal>

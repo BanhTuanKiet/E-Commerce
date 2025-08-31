@@ -17,7 +17,9 @@ const filterOptions = new mongoose.Schema({
  category: { type: String, required: true, unique: true },
  filters: [filterItemSchema],
 }, {
- timestamps: true
+ timestamps: true,
+ collection: "FitlterOptions"
 })
 
-module.exports = mongoose.model('FilterOptions', filterOptions, 'FilterOptions')
+const FitlterOption = mongoose.model('FitlterOption', filterOptions)
+module.exports = FitlterOption

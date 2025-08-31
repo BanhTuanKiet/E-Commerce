@@ -31,7 +31,7 @@ usersRoute.post('/signin/:social', socialLogin)
 usersRoute.get(
   '/profile', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getUser
 )
 
@@ -55,7 +55,7 @@ usersRoute.get(
   '/filters', 
   authTokenFirebase, 
   authRole('admin'), 
-  authAccountActive, 
+  // authAccountActive, 
   getFilterUsers
 )
 

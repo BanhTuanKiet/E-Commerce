@@ -17,7 +17,7 @@ const vouchersRoute = express.Router()
 vouchersRoute.get(
   '/', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getVoucher
 )
 
@@ -34,7 +34,7 @@ vouchersRoute.get(
   '/filter', 
   authTokenFirebase, 
   authRole('admin'), 
-  authAccountActive, 
+  // authAccountActive, 
   filterVouchers
 )
 

@@ -7,7 +7,7 @@ const productFieldsRoute = express.Router()
 productFieldsRoute.get(
   '/:type', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getProductFields
 )
 

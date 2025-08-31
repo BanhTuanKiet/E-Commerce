@@ -28,7 +28,7 @@ reviewsRoute.post(
 reviewsRoute.get(
   '/', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getReviews
 )
 
@@ -43,7 +43,7 @@ reviewsRoute.get(
   '/filter', 
   authTokenFirebase, 
   authRole('admin'), 
-  authAccountActive, 
+  // authAccountActive, 
   filterReviews
 )
 
@@ -57,14 +57,14 @@ reviewsRoute.get(
   '/detail/:reviewId', 
   authTokenFirebase, 
   authRole('admin'), 
-  authAccountActive, 
+  // authAccountActive, 
   getReviewByReviewId
 )
 
 reviewsRoute.get(
   '/:orderId/:productId', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getReview
 )
 

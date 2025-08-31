@@ -21,7 +21,7 @@ const {
 
 const ordersRoute = express.Router()
 
-ordersRoute.get('/vnpay_return', vnpayReturn);
+ordersRoute.get('/vnpay_return', vnpayReturn)
 
 ordersRoute.post(
   '/', 
@@ -40,21 +40,21 @@ ordersRoute.post(
 ordersRoute.get(
   '/', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getOrders
-);
+)
 
 ordersRoute.get(
   '/basic', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getOrderBasic
 )
 
 ordersRoute.get(
   '/state/count/:state', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   countOrder
 )
 
@@ -62,28 +62,28 @@ ordersRoute.get(
   '/manage/filter', 
   authTokenFirebase, 
   authRole('admin'), 
-  authAccountActive, 
+  // authAccountActive, 
   filterOrders
 )
 
 ordersRoute.get(
   '/filter', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   filterOrdersByCustomerId
 )
 
 ordersRoute.get(
   '/detail/:orderId', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getOrder
 )
 
 ordersRoute.get(
   '/present', 
   authTokenFirebase, 
-  authAccountActive, 
+  // authAccountActive, 
   getPresentOrder
 )
 

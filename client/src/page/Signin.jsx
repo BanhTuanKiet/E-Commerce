@@ -37,7 +37,7 @@ export default function Signin() {
     e.preventDefault()
 
     const socialMedia = {
-      google: googleProvider,
+      Google: googleProvider,
       // facebooK: facebookProvider
     }
 
@@ -80,7 +80,7 @@ export default function Signin() {
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formPassword">
-                  <Form.Label>Mật khẩu</Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <InputGroup>
                     <InputGroup.Text>
                       <Lock size={18} className="text-primary" />
@@ -100,7 +100,7 @@ export default function Signin() {
 
                 <Row className="g-3">
                   {/* Nút đăng nhập thường */}
-                  <Col xs={12}>
+                  <Col xs={12} md={6}>
                     <Button
                       type="submit"
                       size="md"
@@ -112,14 +112,13 @@ export default function Signin() {
                     </Button>
                   </Col>
 
-                  {/* Nút đăng nhập Google + Facebook */}
                   <Col xs={12} md={6}>
                     <Button
                       type="button"
                       size="md"
                       className="w-100 rounded-pill fw-semibold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
                       variant="outline-danger"
-                      name="google"
+                      name="Google"
                       onClick={(e) => handleLoginSocial(e)}
                     >
                       <img
@@ -130,32 +129,12 @@ export default function Signin() {
                       Google
                     </Button>
                   </Col>
-
-                  <Col xs={12} md={6}>
-                    <Button
-                      type="button"
-                      size="md"
-                      className="w-100 rounded-pill fw-semibold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
-                      variant="outline-primary"
-                      name="facebook"
-                      onClick={(e) => handleLoginSocial(e)}
-                      style={{ backgroundColor: "#1877f2", borderColor: "#1877f2", color: "#fff" }}
-                    >
-                      <img
-                        src="https://img.icons8.com/?size=100&id=118497&format=png&color=ffffff"
-                        alt="Facebook"
-                        style={{ width: "20px", height: "20px" }}
-                      />
-                      Facebook
-                    </Button>
-                  </Col>
                 </Row>
 
-
                 <div className="mt-4 text-center">
-                  <span>Bạn chưa có tài khoản? </span>
+                  <span>Are you have account? </span>
                   <a href="/signup" className="text-decoration-none fw-semibold">
-                    Đăng ký ngay
+                    Signup now
                   </a>
                 </div>
               </Form>

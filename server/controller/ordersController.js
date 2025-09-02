@@ -274,9 +274,7 @@ const getPresentOrder = async (req, res, next) => {
     const objectId = new mongoose.Types.ObjectId(user._id)
     const order = await findPresentOrder(objectId)
 
-    if (!order) throw new ErrorException(500, "Order not found")
-
-    return res.json({ data: order })
+    return res.json({ data: order || null })
   } catch (error) {
     next(error)
   }

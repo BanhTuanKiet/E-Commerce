@@ -27,7 +27,6 @@ export default function Profile({ activeTab }) {
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/users/profile`)
-        console.log("AAAAAAAAAAA")
         setUser(response.data)
       } catch (error) {
         console.log(error)

@@ -8,6 +8,7 @@ const mongoose = require("mongoose")
 const auth = require("../config/firebase.js")
 const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth")
 const admin = require("firebase-admin")
+const User = require("../model/usersModel.js")
 
 const signup = async (req, res, next) => {
   try {
@@ -56,7 +57,6 @@ const authOTP = async (req, res, next) => {
 
     const userCredential = await createUserWithEmailAndPassword(auth, user.email, originalPassword)
     user.firebaseID = userCredential.user.uid
-    user.providers = ['Email/Password']
     await createUser(user)
     await client.del(user.email)
 
@@ -93,7 +93,7 @@ const addNewCustomer = async (req, res, next) => {
 
 const socialLogin = async (req, res, next) => {
   try {
-    const { social } = req.params
+    const { social } = req.params  // vd: "google.com"
     const { token } = req.body
 
     if (!social || !token) {
@@ -101,18 +101,40 @@ const socialLogin = async (req, res, next) => {
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token)
+    const { email, uid } = decodedToken
 
-    const email = decodedToken.email
-    const userDB = await userIsExist(email)
+    let userDB = await userIsExist(email)
 
+    if (!userDB) {
+      // chưa có user → tạo mới
+      const newUser = new User({
+        email,
+        firebaseID: uid,
+        providers: [social]
+      })
+      userDB = await createUser(newUser)
+    } else {
+      // đã có user → kiểm tra provider
+      if (!userDB.providers.includes(social)) {
+        throw new ErrorException(
+          400,
+          `This account was registered using ${userDB.providers.join(", ")}, please login via that method.`
+        )
+      }
+    }
+
+    // Set cookie
     res.cookie("accessToken", token, {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 3600 * 1000,
+      maxAge: 3600 * 1000
     })
 
-    return res.json({ data: { role: userDB.role, name: userDB.name }, message: `Signin successful via ${social}!`, })
+    return res.json({
+      data: { role: userDB.role, name: userDB.name },
+      message: `Signin successful via ${social}!`
+    })
   } catch (error) {
     next(error)
   }
@@ -126,36 +148,50 @@ const signin = async (req, res, next) => {
       throw new ErrorException(400, "Missing email or password")
     }
 
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const userDB = await userIsExist(email)
+    if (!userDB) {
+      throw new ErrorException(400, "Account does not exist")
+    }
+
+    if (!userDB.providers.includes("email/password")) {
+      throw new ErrorException(400, `This account was registered using ${userDB.providers.join(", ")}. Please login via that method.`)
+    }
+
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const user = userCredential.user
     const idToken = await user.getIdToken(true)
-    const { accessToken, refreshToken, expirationTime } = user.stsTokenManager
+    const { refreshToken } = user.stsTokenManager
 
     res.cookie("accessToken", idToken, {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 3600 * 1000,
+      maxAge: 3600 * 1000, // 1h
     })
 
     await saveRefreshToken(user.email, refreshToken)
 
-    return res.json({ data: { role: userDB.role, name: userDB.name }, message: "Signin successful via Firebase!" })
+    return res.json({ data: { role: userDB.role, name: userDB.name }, message: "Signin successful via Email/Password!" })
   } catch (error) {
     let message = "Login failed"
     let status = 400
 
-    if (error.code === "auth/user-not-found") {
-      message = "Account does not exist"
-    } else if (error.code === "auth/wrong password") {
-      message = "Wrong password"
-    } else if (error.code === "auth/invalid-email") {
-      message = "Invalid email"
-    } else if (error.code === "auth/invalid-credential") {
-      message = "Incorrect email or password"
-    } else if (error.code === "auth/too-many-requests") {
-      message = "You have entered the wrong credentials too many times, please try again later"
+    switch (error.code) {
+      case "auth/user-not-found":
+        message = "Account does not exist"
+        break
+      case "auth/wrong-password":
+        message = "Wrong password"
+        break
+      case "auth/invalid-email":
+        message = "Invalid email"
+        break
+      case "auth/invalid-credential":
+        message = "Incorrect email or password"
+        break
+      case "auth/too-many-requests":
+        message = "Too many failed attempts, please try again later"
+        break
     }
 
     next(new ErrorException(status, message))
@@ -247,9 +283,9 @@ const changePassword = async (req, res, next) => {
     const password = req.body
 
     await comparePassword(user.password, password.currentPasswor)
-    
+
     const hashedPassword = await hashPassword(password.passwordConfirmed)
-    
+
     await admin.auth().updateUser(user.firebaseID, { password: password.passwordConfirmed })
 
     const updatedUser = await updateUser(user._id, { password: hashedPassword })

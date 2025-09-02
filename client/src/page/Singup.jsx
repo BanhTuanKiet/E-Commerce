@@ -5,6 +5,8 @@ import { ValideFormContext } from "../context/ValideForm"
 import axios from "../config/AxiosConfig"
 import OTPModal from "../component/Modal/OTPModal"
 import { UserContext } from "../context/UserContext"
+import PasswordStrength from "../component/PasswordStrength"
+import { calculatePasswordStrength } from "../util/PasswordUtil"
 
 export default function Signup() {
   const { user, setUser, signup } = useContext(UserContext)
@@ -76,7 +78,7 @@ export default function Signup() {
             <Card className="border-0 shadow-lg rounded-4 overflow-hidden">
               <Card.Body className="p-0">
                 <Row className="g-0">
-                  <Col md={12} className="p-4 p-md-5">
+                  <Col md={12} className="p-5">
                     <div className="text-center mb-4">
                       <h2 className="fw-bold text-primary">Create an Account</h2>
                       <p className="text-muted">Please fill in the information below</p>
@@ -190,6 +192,7 @@ export default function Signup() {
                               </InputGroup.Text>
                               <Form.Control.Feedback type="invalid">{formErrors.password}</Form.Control.Feedback>
                             </InputGroup>
+                            <PasswordStrength passwordStrength={calculatePasswordStrength(user.password)} />
                           </Form.Group>
                         </Col>
 
@@ -282,25 +285,15 @@ export default function Signup() {
                         </Col>
                       </Row>
 
-                      <Row className="mt-4 g-3 justify-content-center">
+                      <Row className="mb-4 g-3 justify-content-center">
                         <Col xs={12} md={6}>
                           <Button type="submit" size="md" className="w-100 rounded-pill fw-semibold py-3 shadow-sm" variant="outline-primary">
                             Sign Up
                           </Button>
                         </Col>
-                        <Col xs={12} md={6}>
-                          <Button type="button" size="md" className="w-100 rounded-pill fw-semibold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2" variant="outline-danger">
-                            <img
-                              src="https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000"
-                              alt="Google"
-                              style={{ width: "20px", height: "20px" }}
-                            />
-                            Sign up with Google
-                          </Button>
-                        </Col>
                       </Row>
 
-                      <div className="text-center mt-4 pt-3 border-top">
+                      <div className="text-center pt-3 border-top">
                         <p className="mb-0 text-muted">
                           Already have an account?{" "}
                           <a href="/" className="fw-semibold text-primary text-decoration-none">

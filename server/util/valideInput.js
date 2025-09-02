@@ -3,11 +3,11 @@ const Joi = require('joi')
 const updatePassword = Joi.object({
   currentPassword: Joi.string()
     .min(8)
-    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+    // .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
     .required()
     .messages({
-      "string.min": "Password must be at least 8 characters long",
-      "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+      // "string.min": "Password must be at least 8 characters long",
+      // "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
       "string.empty": "Password is required",
     }),
   newPassword: Joi.string()

@@ -18,8 +18,8 @@ const filterOptions = new mongoose.Schema({
  filters: [filterItemSchema],
 }, {
  timestamps: true,
- collection: "FitlterOptions"
+ collection: "FilterOptions"
 })
 
-const FitlterOption = mongoose.model('FitlterOption', filterOptions)
+const FitlterOption = mongoose.model('FilterOption', filterOptions)
 module.exports = FitlterOption

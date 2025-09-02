@@ -11,7 +11,6 @@ export default function Header() {
   const { searchTerm, setSearchTerm, handleSearch } = useContext(SearchContext)
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [categories, setCategories] = useState([])
   const [cartCount] = useState(0)
 
@@ -39,11 +38,7 @@ export default function Header() {
     setIsMenuOpen(false)
   }
 
-  const handleMouseEnter = () => setIsDropdownOpen(true)
-  const handleMouseLeave = () => setIsDropdownOpen(false)
-
   const handleDropdownClick = (path) => {
-    setIsDropdownOpen(false)
     navigate(path)
   }
 
@@ -104,8 +99,6 @@ export default function Header() {
             {user.name ? (
               <div
                 className="user-dropdown-container d-none d-md-flex align-items-center position-relative"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
                 style={{ cursor: "pointer" }}
               >
                 <div
@@ -121,32 +114,6 @@ export default function Header() {
                   <User size={16} />
                   <span>{user?.role}</span>
                 </div>
-
-                {/* {isDropdownOpen && user?.role === "customer" && (
-                  <div
-                    className="user-dropdown-menu position-absolute top-100 mt-1 bg-white shadow rounded px-3 py-2"
-                    style={{ zIndex: 999 }}
-                  >
-                    <div
-                      className="dropdown-item py-1"
-                      onClick={() => handleDropdownClick('/profile')}
-                    >
-                      Hồ sơ
-                    </div>
-                    <div
-                      className="dropdown-item py-1"
-                      onClick={() => handleDropdownClick('/order')}
-                    >
-                      Đơn hàng
-                    </div>
-                    <div
-                      className="dropdown-item py-1"
-                      onClick={() => handleDropdownClick('/review')}
-                    >
-                      Đánh giá
-                    </div>
-                  </div>
-                )} */}
               </div>
             ) : (
               <button
@@ -168,68 +135,6 @@ export default function Header() {
           </div>
         </div>
       </nav>
-
-      {/* mobile menu */}
-      {isMenuOpen && (
-        <div className="mobile-menu d-lg-none bg-white shadow p-3">
-          {/* search mobile */}
-          <div className="mb-3">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm kiếm sản phẩm..."
-              className="form-control"
-            />
-          </div>
-
-          {/* categories */}
-          <div className="d-flex flex-column gap-2">
-            {categories.map((item) => (
-              <button
-                key={item._id}
-                onClick={() => navigateToCategory(item.name)}
-                className="btn btn-link text-start"
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-
-          {/* user mobile */}
-          <div className="mt-3">
-            {user.name ? (
-              <>
-                <button
-                  onClick={() => handleDropdownClick('/profile')}
-                  className="btn btn-link d-block text-start"
-                >
-                  Hồ sơ
-                </button>
-                <button
-                  onClick={() => handleDropdownClick('/order')}
-                  className="btn btn-link d-block text-start"
-                >
-                  Đơn hàng
-                </button>
-                <button
-                  onClick={() => handleDropdownClick('/review')}
-                  className="btn btn-link d-block text-start"
-                >
-                  Đánh giá
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => handleLinkClick('/signin')}
-                className="btn btn-primary w-100"
-              >
-                Đăng nhập
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </>
   )
 }

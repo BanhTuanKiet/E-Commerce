@@ -1,5 +1,28 @@
 const Joi = require('joi')
 
+const updatePassword = Joi.object({
+  currentPassword: Joi.string()
+    .min(8)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "string.empty": "Password is required",
+    }),
+  newPassword: Joi.string()
+    .min(8)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.pattern.base": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "string.empty": "Password is required",
+    }),
+  passwordConfirmed: Joi.string().valid(Joi.ref('newPassword')).required()
+    .messages({ 'any.only': 'Password confirmation does not match password' }),
+})
+
 const updateAccountByAdmin = Joi.object({
   _id: Joi.optional(),
   name: Joi.string().trim().required(),
@@ -402,4 +425,5 @@ module.exports = {
   laptopSchema,
   productSchema,
   updateAccountByAdmin,
+  updatePassword
 }

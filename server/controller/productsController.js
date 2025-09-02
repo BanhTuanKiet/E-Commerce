@@ -345,7 +345,7 @@ const deleteProduct = async (req, res, next) => {
 const searchProduct = async (req, res, next) => {
   try {
     const { searchTerm } = req.query
-
+    console.log(searchTerm)
     if (!searchTerm || !searchTerm.length) throw new ErrorException(400, 'You need write something')
 
     const splitedTerm = searchTerm.split(' ')

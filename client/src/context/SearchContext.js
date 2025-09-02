@@ -1,6 +1,5 @@
 import axios from "../config/AxiosConfig"
-import { useEffect } from "react"
-import { createContext, useRef, useState } from "react"
+import { createContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { warning } from "../util/NotifyUtil"
 
@@ -9,23 +8,18 @@ const SearchContext = createContext()
 const SearchProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [products, setProducts] = useState()
-  const productsRef = useRef(null)
   const navigate = useNavigate()
   const [productsCompare, setProductsCompare] = useState([])
 
   const handleSearch = async (e) => {
     e.preventDefault()
-
+    navigate(`/?searchTerm=${encodeURIComponent(searchTerm)}`)
     try {
       const response = await axios.get(`/products/search?searchTerm=${searchTerm.trim()}`)
       setProducts(response.data)
     } catch (error) {
       console.log(error)
     }
-
-    // if (searchTerm.trim()) {
-    //   navigate(`/search?q=${encodeURIComponent(searchTerm)}`)
-    // }
   }
 
   const handleCompareProducts = (product) => {

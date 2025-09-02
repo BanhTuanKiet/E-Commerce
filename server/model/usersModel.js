@@ -14,7 +14,7 @@ const users = new mongoose.Schema({
     ward: { type: String },
     city: { type: String }
   },
-  providers: { type: [String], default: [] },
+  providers: { type: String, default: ['email/password'] },
   refreshToken: String,
   isActive: { type: Boolean, default: true },
 }, {

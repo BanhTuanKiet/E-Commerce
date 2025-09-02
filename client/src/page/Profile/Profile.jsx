@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Container, Row, Col, Card, Spinner, Form, Button } from 'react-bootstrap'
+import { Container, Row, Col, Card, Spinner, Form, Button, Modal } from 'react-bootstrap'
 import moment from 'moment'
 import axios from '../../config/AxiosConfig'
+import SignoutModal from '../../component/Modal/SignoutModal'
+import ChangePasswordModal from '../../component/Modal/ChangePasswordModal'
 
 export default function Profile({ activeTab }) {
   const [user, setUser] = useState(null)
@@ -17,12 +19,15 @@ export default function Profile({ activeTab }) {
       city: false
     }
   })
+  const [showSignOutModal, setShowSignOutModal] = useState(false)
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false)
 
   useEffect(() => {
     if (activeTab !== "info") return
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/users/profile`)
+        console.log("AAAAAAAAAAA")
         setUser(response.data)
       } catch (error) {
         console.log(error)
@@ -106,11 +111,22 @@ export default function Profile({ activeTab }) {
                   {user.email}
                 </p>
               </Col>
+              <Col xs="auto">
+                <Button
+                  variant="outline-light"
+                  size="sm"
+                  onClick={() => setShowSignOutModal(true)}
+                  className="rounded-3 border-2"
+                >
+                  <i className="bi bi-box-arrow-right me-2"></i>
+                  Signout
+                </Button>
+              </Col>
             </Row>
           </div>
         </Card>
 
-        <Card className="shadow-lg border-0 rounded-4">
+        <Card className="shadow-lg border-0 rounded-4 mb-4">
           <Card.Header className="bg-white border-0 pt-4">
             <h3 className="fw-bold text-dark mb-0">
               <i className="bi bi-person-circle text-primary me-3"></i>
@@ -340,7 +356,17 @@ export default function Profile({ activeTab }) {
               )}
 
               <hr className="my-4" />
-              <div className="text-end">
+              <div className="d-flex justify-content-between align-items-center">
+                <Button
+                  variant="outline-warning"
+                  size="lg"
+                  onClick={() => setShowChangePasswordModal(true)}
+                  className="rounded-3 px-4"
+                >
+                  <i className="bi bi-key me-2"></i>
+                  Change password
+                </Button>
+
                 <Button
                   variant="success"
                   size="lg"
@@ -364,6 +390,9 @@ export default function Profile({ activeTab }) {
             </Form>
           </Card.Body>
         </Card>
+
+        <ChangePasswordModal showChangePasswordModal={showChangePasswordModal} setShowChangePasswordModal={setShowChangePasswordModal} />
+        <SignoutModal showSignOutModal={showSignOutModal} setShowSignOutModal={setShowSignOutModal} />
       </Container>
     </div>
   )

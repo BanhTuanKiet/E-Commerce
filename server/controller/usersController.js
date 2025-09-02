@@ -3,7 +3,7 @@ const ErrorException = require("../util/errorException.js")
 const { sendMail } = require("../util/mailUtl.js")
 const { generateOTP, verifyOTP } = require("../util/otpUtil.js")
 const client = require("../config/redis.js")
-const { hashPassword } = require("../util/passwordUtil.js")
+const { hashPassword, comparePassword } = require("../util/passwordUtil.js")
 const mongoose = require("mongoose")
 const auth = require("../config/firebase.js")
 const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth")
@@ -162,6 +162,16 @@ const signin = async (req, res, next) => {
   }
 }
 
+const signout = async (req, res, next) => {
+  try {
+    res.clearCookie('accessToken', { httpOnly: true, sameSite: 'none', secure: true })
+
+    return res.status(200).json({ message: 'Signed out successfully' })
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getUser = async (req, res, next) => {
   try {
     const { user } = req
@@ -231,6 +241,27 @@ const updateAccount = async (req, res, next) => {
   }
 }
 
+const changePassword = async (req, res, next) => {
+  try {
+    const { user } = req
+    const password = req.body
+
+    await comparePassword(user.password, password.currentPasswor)
+    
+    const hashedPassword = await hashPassword(password.passwordConfirmed)
+    
+    await admin.auth().updateUser(user.firebaseID, { password: password.passwordConfirmed })
+
+    const updatedUser = await updateUser(user._id, { password: hashedPassword })
+
+    if (!updatedUser) throw new ErrorException(400, 'Update failed')
+
+    res.json({ message: "Password updated successfully" })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   signup,
   authOTP,
@@ -240,5 +271,7 @@ module.exports = {
   getUser,
   putUser,
   getFilterUsers,
-  updateAccount
+  updateAccount,
+  signout,
+  changePassword
 }

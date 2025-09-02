@@ -191,32 +191,6 @@ export default function ProductCard({ product, keys, handleCompareProducts }) {
               )
             })}
           </div>
-
-          {/* {product?.stock !== undefined && (
-            <div className="stock-status">
-              <div
-                className="d-flex align-items-center justify-content-between p-2 rounded"
-                style={{ backgroundColor: '#f8f9fa' }}
-              >
-                <span className="small text-muted fw-medium">Status:</span>
-                <div className="d-flex align-items-center">
-                  <div
-                    className={`status-dot me-2 rounded-circle ${product.stock > 10 ? 'bg-success' : product.stock > 1 ? 'bg-warning' : 'bg-danger'}`}
-                    style={{ width: '6px', height: '6px' }}
-                  />
-                  <span
-                    className={`small fw-semibold ${product.stock > 10 ? 'text-success' : product.stock > 1 ? 'text-warning' : 'text-danger'}`}
-                  >
-                    {product.stock > 10
-                      ? 'In Stock'
-                      : product.stock > 1
-                        ? `Only ${product.stock} left`
-                        : 'Out of Stock'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )} */}
         </Card.Body>
       </Card>
     </div>

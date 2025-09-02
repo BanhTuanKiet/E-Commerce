@@ -36,7 +36,7 @@ export default function AdminDashboard() {
           <Col xs={12} md={2} className="mb-3 mb-md-0">
             <Nav variant="pills" className="flex-column">
               <Nav.Item>
-                <Nav.Link eventKey="profile" onClick={() => handleTabChange('profile')}>
+                <Nav.Link eventKey="profile" onClick={() => handleTabChange('info')}>
                   Info
                 </Nav.Link>
               </Nav.Item>
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
 
           <Col xs={12} md={10}>
             <Tab.Content>
-              <Tab.Pane eventKey="profile">
+              <Tab.Pane eventKey="info">
                 <Profile activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="user">

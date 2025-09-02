@@ -1,77 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Button, ButtonGroup, Card, Col, Container, Form, ProgressBar, Row, Tab, Tabs } from 'react-bootstrap'
+import { Button, ButtonGroup, Card, Col, Container, Form, Row, Tab, Tabs } from 'react-bootstrap'
 import axios from '../../config/AxiosConfig'
 import { toReadAble, getObject } from '../../util/DataClassify'
 import { ArrowLeft, Ban, Delete, Edit, Save } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const maxStock = 100
 
-const productDetail = {
-  id: "1",
-  name: "iPhone 15 Pro Max",
-  category: "Điện thoại",
-  brand: "Apple",
-  price: 29990000,
-  originalPrice: 32990000,
-  stock: 25,
-  status: "active",
-  images: [
-    "https://via.placeholder.com/400x400/f8f9fa/6c757d?text=iPhone+15+Pro+Max+Front",
-    "https://via.placeholder.com/400x400/f8f9fa/6c757d?text=iPhone+15+Pro+Max+Back",
-    "https://via.placeholder.com/400x400/f8f9fa/6c757d?text=iPhone+15+Pro+Max+Side",
-    "https://via.placeholder.com/400x400/f8f9fa/6c757d?text=iPhone+15+Pro+Max+Box",
-  ],
-  sku: "IP15PM-256-TI",
-  barcode: "1234567890123",
-  createdAt: "2024-01-15",
-  updatedAt: "2024-01-25",
-  lastRestocked: "2024-01-20",
-  isOnSale: true,
-  salePercentage: 9,
-  soldCount: 45,
-  viewCount: 1250,
-  rating: 4.8,
-  reviewCount: 23,
-  minStock: 10,
-  maxStock: 100,
-  weight: "221g",
-  dimensions: "159.9 x 76.7 x 8.25 mm",
-  description:
-    "iPhone 15 Pro Max với chip A17 Pro mạnh mẽ, camera 48MP chuyên nghiệp và thiết kế titan cao cấp. Màn hình Super Retina XDR 6.7 inch với ProMotion và Always-On display.",
-  specifications: {
-    "Màn hình": "6.7 inch Super Retina XDR OLED",
-    Chip: "A17 Pro",
-    Camera: "48MP + 12MP + 12MP",
-    RAM: "8GB",
-    "Bộ nhớ": "256GB",
-    Pin: "4441mAh",
-    "Hệ điều hành": "iOS 17",
-    "Màu sắc": "Titan Tự Nhiên",
-  },
-  stockHistory: [
-    { date: "2024-01-25", type: "import", quantity: 20, note: "Nhập hàng định kỳ", balance: 25 },
-    { date: "2024-01-23", type: "export", quantity: -3, note: "Bán lẻ", balance: 5 },
-    { date: "2024-01-22", type: "export", quantity: -2, note: "Bán online", balance: 8 },
-    { date: "2024-01-20", type: "import", quantity: 15, note: "Nhập bổ sung", balance: 10 },
-    { date: "2024-01-18", type: "export", quantity: -5, note: "Bán buôn", balance: -5 },
-  ],
-  salesData: [
-    { month: "T1", sales: 12 },
-    { month: "T2", sales: 18 },
-    { month: "T3", sales: 25 },
-    { month: "T4", sales: 15 },
-    { month: "T5", sales: 32 },
-    { month: "T6", sales: 28 },
-  ],
-}
-
-export default function ProductDetail({ productId, setProductId }) {
+export default function ProductDetail({ productId, setProductId, handleTab, indexFilter, setIndexFilter }) {
   const [product, setProduct] = useState()
   const [activeTab, setActiveTab] = useState("overview")
   const [keys, setKeys] = useState()
   const [editFileds, setEditFields] = useState({})
   const [isEdit, setIsEdit] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!productId) return
@@ -161,6 +104,15 @@ export default function ProductDetail({ productId, setProductId }) {
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  const handleNavigate = () => {
+    console.log("AAAAAAA")
+    setIndexFilter({
+      searchTerm: product?.model
+    })
+    handleTab("review")
+    navigate("/manage")
   }
 
   return (
@@ -352,15 +304,15 @@ export default function ProductDetail({ productId, setProductId }) {
               <Col lg={3} md={6} >
                 <Card className="text-center">
                   <Card.Body className="py-3">
-                    <small className="text-muted">Lượt xem</small>
-                    <div className="h5 text-success mb-0">{productDetail.viewCount}</div>
+                    <small className="text-muted">View</small>
+                    <div className="h5 text-success mb-0">100</div>
                   </Card.Body>
                 </Card>
               </Col>
               <Col lg={3} md={6} >
-                <Card className="text-center">
+                <Card className="text-center" onClick={handleNavigate}>
                   <Card.Body className="py-3">
-                    <small className="text-muted">Đánh giá</small>
+                    <small className="text-muted">Score</small>
                     <div className="h5 text-warning mb-0">{product?.avgScore}</div>
                   </Card.Body>
                 </Card>
@@ -370,7 +322,7 @@ export default function ProductDetail({ productId, setProductId }) {
                   <Card.Body className="py-3">
                     <small className="text-muted">Doanh thu</small>
                     <div className="h6 text-info mb-0">
-                      {(productDetail.soldCount * productDetail.price)}
+                      {(product?.soldCount * product?.price) || 0}
                     </div>
                   </Card.Body>
                 </Card>
@@ -419,100 +371,6 @@ export default function ProductDetail({ productId, setProductId }) {
                   </Tab>
                 )
               })}
-
-              {/* <Tab eventKey="inventory" title="Kho hàng">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="mb-0">Lịch sử xuất nhập kho</h5>
-                                    <Button variant="outline-primary" size="sm">Nhập hàng</Button>
-                                </div>
-                                <div className="table-responsive">
-                                    <Table striped>
-                                        <thead>
-                                            <tr>
-                                                <th>Ngày</th>
-                                                <th>Loại</th>
-                                                <th>Số lượng</th>
-                                                <th>Ghi chú</th>
-                                                <th>Tồn kho</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {productDetail.stockHistory.map((record, index) => (
-                                                <tr key={index}>
-                                                    <td>{new Date(record.date).toLocaleDateString("vi-VN")}</td>
-                                                    <td>
-                                                        <Badge bg={record.type === "import" ? "primary" : "secondary"}>
-                                                            {record.type === "import" ? "Nhập" : "Xuất"}
-                                                        </Badge>
-                                                    </td>
-                                                    <td>
-                                                        <span className={`fw-medium ${record.quantity > 0 ? "text-success" : "text-danger"}`}>
-                                                            {record.quantity > 0 ? "+" : ""}
-                                                            {record.quantity}
-                                                        </span>
-                                                    </td>
-                                                    <td>{record.note}</td>
-                                                    <td className="fw-medium">{record.balance}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </Tab> */}
-
-              <Tab eventKey="analytics" title="Phân tích">
-                <h5 className="mb-3">Phân tích bán hàng</h5>
-                <div className="row">
-                  <div className="col-md-6">
-                    <Card>
-                      <Card.Header>
-                        <h6 className="mb-0">Doanh số 6 tháng gần đây</h6>
-                      </Card.Header>
-                      <Card.Body>
-                        {productDetail.salesData.map((data, index) => (
-                          <div key={index} className="d-flex align-items-center mb-2">
-                            <span className="small me-3" style={{ minWidth: '30px' }}>{data.month}</span>
-                            <ProgressBar
-                              now={(data.sales / 35) * 100}
-                              className="flex-grow-1 me-3"
-                              style={{ height: '20px' }}
-                            />
-                            <span className="small fw-medium" style={{ minWidth: '30px' }}>{data.sales}</span>
-                          </div>
-                        ))}
-                      </Card.Body>
-                    </Card>
-                  </div>
-                  <div className="col-md-6">
-                    <Card>
-                      <Card.Header>
-                        <h6 className="mb-0">Thống kê tương tác</h6>
-                      </Card.Header>
-                      <Card.Body>
-                        <div className="d-flex justify-content-between py-2">
-                          <span className="small text-muted">Tỷ lệ chuyển đổi</span>
-                          <span className="fw-semibold">3.6%</span>
-                        </div>
-                        <div className="d-flex justify-content-between py-2">
-                          <span className="small text-muted">Lượt xem trung bình/ngày</span>
-                          <span className="fw-semibold">42</span>
-                        </div>
-                        <div className="d-flex justify-content-between py-2">
-                          <span className="small text-muted">Đánh giá trung bình</span>
-                          <div className="d-flex align-items-center gap-1">
-                            <span className="fw-semibold">{productDetail.rating}</span>
-                            <small className="text-muted">({productDetail.reviewCount})</small>
-                          </div>
-                        </div>
-                        <div className="d-flex justify-content-between py-2">
-                          <span className="small text-muted">Vòng quay kho</span>
-                          <span className="fw-semibold">2.1 lần/tháng</span>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </div>
-                </div>
-              </Tab>
             </Tabs>
           </Card.Body>
         </Card>

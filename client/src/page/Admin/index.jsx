@@ -11,6 +11,7 @@ import UserManagement from './UserManagement'
 export default function AdminDashboard() {
   const hash = window.location.hash?.replace('#', '') || 'info'
   const [activeTab, setActiveTab] = useState(hash)
+  const [indexFilter, setIndexFilter] = useState()
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -82,13 +83,13 @@ export default function AdminDashboard() {
                 <UserManagement activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="product">
-                <ProductManagement activeTab={activeTab} />
+                <ProductManagement activeTab={activeTab} handleTab={setActiveTab} indexFilter={indexFilter} setIndexFilter={setIndexFilter} />
               </Tab.Pane>
               <Tab.Pane eventKey="order">
                 <OrderManagement activeTab={activeTab} />
               </Tab.Pane>
               <Tab.Pane eventKey="review">
-                <ReviewManagement activeTab={activeTab} />
+                <ReviewManagement activeTab={activeTab} indexFilter={indexFilter} setIndexFilter={setIndexFilter} />
               </Tab.Pane>
               <Tab.Pane eventKey="voucher">
                 <VoucherManagement activeTab={activeTab} />

@@ -8,7 +8,7 @@ import { getProductState, getStatusBadge } from '../../util/BadgeUtil'
 import AddModal from '../../component/Modal/AddModal'
 import NotFoundSearch from '../../component/NotFoundSearch'
 
-export default function ProductManagement({ activeTab }) {
+export default function ProductManagement({ activeTab, handleTab, indexFilter, setIndexFilter }) {
   const [categories, setCategories] = useState()
   const [products, setProducts] = useState()
   const [productStates, setProductStates] = useState({
@@ -121,7 +121,7 @@ export default function ProductManagement({ activeTab }) {
   }
 
   if (productId) {
-    return <ProductDetail productId={productId} setProductId={setProductId} />
+    return <ProductDetail productId={productId} setProductId={setProductId} handleTab={handleTab} indexFilter={indexFilter} setIndexFilter={setIndexFilter} />
   }
 
   return (

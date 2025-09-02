@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Container, Row, Col, Card, Table, Button, Form, Badge, ButtonGroup, Alert } from "react-bootstrap"
-import { Search, Eye, Calendar, BarChart3, List } from "lucide-react"
+import { Search, Eye, BarChart3, List } from "lucide-react"
 import { useEffect } from "react"
 import axios from "../../config/AxiosConfig"
 import { renderStars } from "../../util/BadgeUtil"
@@ -8,18 +8,13 @@ import PaginationProducts from "../../component/Pagination"
 import ReviewDetail from "./ReviewDetail"
 import NotFoundSearch from "../../component/NotFoundSearch"
 
-export default function ReviewManagement({ activeTab }) {
+export default function ReviewManagement({ activeTab,  indexFilter, setIndexFilter }) {
   const [reviewId, setReviewId] = useState()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [replyContent, setReplyContent] = useState("")
   const [reviews, setReviews] = useState()
   const [categories, setCategories] = useState()
   const [productAverages, setProductAverages] = useState()
   const [viewMode, setViewMode] = useState("individual")
-  const [filterSelections, setFilterSelections] = useState({
-    isFlagged: "",
-    rating: "",
-  })
+  const [filterSelections, setFilterSelections] = useState({})
   const [totalPages, setTotalPages] = useState(2)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -31,18 +26,7 @@ export default function ReviewManagement({ activeTab }) {
 
   useEffect(() => {
     if (activeTab !== "review") return
-    if (viewMode === "individual") {
-      setFilterSelections({
-        isFlagged: "",
-        rating: "",
-      })
-    }
-    if (viewMode === "average") {
-      setFilterSelections({
-        category: "",
-        sort: "",
-      })
-    }
+    if (indexFilter) setFilterSelections(indexFilter)
   }, [activeTab, viewMode])
 
   useEffect(() => {
@@ -74,7 +58,6 @@ export default function ReviewManagement({ activeTab }) {
     try {
       const options = encodeURIComponent(JSON.stringify(filterSelections))
       const response = await axios.get(`/reviews/filter?options=${options}&page=${currentPage}`)
-      console.log(response.data)
       setReviews(response.data)
       setTotalPages(response.totalPages)
     } catch (error) {
@@ -93,19 +76,12 @@ export default function ReviewManagement({ activeTab }) {
     }
   }
 
-  const handleReply = async (reviewId) => {
-    try {
-      const trimedReply = replyContent.trim()
-      await axios.post(`/reviews/reply`, { reviewId: reviewId, reply: trimedReply })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   const handleFilter = (e) => {
+    const { name, value } = e.target
+
     setFilterSelections((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value
     }))
   }
 
@@ -163,8 +139,9 @@ export default function ReviewManagement({ activeTab }) {
                         ? "Search by customer or model product..."
                         : "Search by model product..."
                     }
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    name="searchTerm"
+                    value={filterSelections?.searchTerm || ""}
+                    onChange={(e) => handleFilter(e)}
                     style={{ paddingLeft: "40px" }}
                   />
                 </div>
@@ -172,20 +149,20 @@ export default function ReviewManagement({ activeTab }) {
               {viewMode === "individual" && (
                 <>
                   <Col md={3}>
-                    <Form.Select value={filterSelections?.flagState} onChange={(e) => handleFilter(e)} name="isFlagged">
+                    <Form.Select name="isFlagged" value={filterSelections?.isFlagged || ""} onChange={(e) => handleFilter(e)}>
                       <option value="">All</option>
-                      <option value={false}>Verified</option>
-                      <option value={true}>Unverified</option>
+                      <option value="false">Verified</option>
+                      <option value="true">Unverified</option>
                     </Form.Select>
                   </Col>
                   <Col md={3}>
-                    <Form.Select value={filterSelections?.starScore} onChange={(e) => handleFilter(e)} name="rating">
+                    <Form.Select name="rating" value={filterSelections?.rating || ""} onChange={(e) => handleFilter(e)}>
                       <option value="">All</option>
-                      <option value={1}>⭐ 1</option>
-                      <option value={2}>⭐ 2</option>
-                      <option value={3}>⭐ 3</option>
-                      <option value={4}>⭐ 4</option>
-                      <option value={5}>⭐ 5</option>
+                      <option value="1">⭐ 1</option>
+                      <option value="2">⭐ 2</option>
+                      <option value="3">⭐ 3</option>
+                      <option value="4">⭐ 4</option>
+                      <option value="5">⭐ 5</option>
                     </Form.Select>
                   </Col>
                 </>
@@ -201,11 +178,10 @@ export default function ReviewManagement({ activeTab }) {
                     </Form.Select>
                   </Col>
                   <Col md={3}>
-                    <Form.Select value={filterSelections?.sort} onChange={(e) => handleFilter(e)} name="sort">
+                    <Form.Select name="sortBy" value={filterSelections?.sortBy} onChange={(e) => handleFilter(e)}>
                       <option value="">Sort by</option>
                       <option value="desc">Highest rated</option>
                       <option value="asc">Lowest rated</option>
-                      <option value="max">Highest rated price</option>
                     </Form.Select>
                   </Col>
                 </>
@@ -221,8 +197,8 @@ export default function ReviewManagement({ activeTab }) {
               {reviews?.length === 0 ? (
                 <Alert variant="info" className="text-center">
                   <div className="fs-1 mb-3">🏷️</div>
-                  <h5>Không tìm thấy review</h5>
-                  <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                  <h5>Review not found</h5>
+                  <p>Try changing filters or searching for keywords</p>
                 </Alert>
               ) : (
                 <>
@@ -291,11 +267,11 @@ export default function ReviewManagement({ activeTab }) {
                         <tr>
                           <th>Index</th>
                           <th>Image</th>
-                          <th>Sản phẩm</th>
-                          <th>Đánh giá trung bình</th>
-                          <th>Tổng số đánh giá</th>
-                          <th>Đánh giá</th>
-                          <th className="text-end">Thao tác</th>
+                          <th>Product</th>
+                          <th>Average Rating</th>
+                          <th>Total Ratings</th>
+                          <th>Ratings</th>
+                          <th className="text-end">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -347,9 +323,10 @@ export default function ReviewManagement({ activeTab }) {
                                   variant="outline-primary"
                                   size="sm"
                                   onClick={() => {
-                                    // Switch to individual view and filter by this product
                                     setViewMode("individual")
-                                    // Add product filter logic here
+                                    setFilterSelections({
+                                      searchTerm: product?.model
+                                    })
                                   }}
                                 >
                                   <Eye size={16} />

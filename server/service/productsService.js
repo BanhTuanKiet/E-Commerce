@@ -33,14 +33,17 @@ const findProductsByCategory = async (category, page) => {
 const getFilterProducts = async (options, page) => {
   const skipIndex = (page - 1) * 10
   const query = {}
+  const sortOption = {}
 
   Object.entries(options).map(([key, value]) => {
-    if (key !== '' && key !== 'total' && value !== '' && value !== 'total') {
+    if (key === 'sortBy' && value !== '') {
+      sortOption.avgScore = value === 'asc' ? 1 : -1
+    } else if (key !== '' && key !== 'total' && value !== '' && value !== 'total') {
       query[key] = { $regex: value, $options: 'i' }
     }
   })
 
-  const products = await Product.find(query).skip(skipIndex).limit(10)
+  let products = await Product.find(query).sort(sortOption).skip(skipIndex).limit(10)
   const totalPages = await Product.countDocuments(query)
 
   return {
